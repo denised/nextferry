@@ -1,0 +1,50 @@
+﻿
+What's next:
+	Read schedule from our Service instead of from WSDOT
+	Get the service up on Azure
+	Figure out how to parameterize so that we can switch between test server and real Azure server.
+	Set app version correctly.
+
+
+Nice to have:
+	Location awareness factors into time-to-ferry
+	Wait time information factors into time-to-ferry --- need the data!
+	Increase size of "OK" button so it is more visible.
+	Improve visibility of EB vs. WB schedules
+	Fetch alerts from our service
+	Add nice "no data yet" pop-up when needed.
+	Figure out how to handle one-off schedules (extra routes on Friday, or over a given weekend).
+	Add "refresh" button to main screen?
+	Initialize route *list* from server?
+
+What's done:
+	Get it into git.
+	Added expiration times.
+	Added details page.
+	Removed main Panorama
+	Fixed caching, again
+	Centralized isWeekend (but haven't implemented holidays)
+	Formatting times correctly on details page (details page is *working*)
+	Create preferences page to select routes.
+	Add a "reset" capability to reload schedules when you think they're messed up.
+	Get it on the phone.
+	Storing display settings in isolated storage.
+	Correct 12/24 time formatting
+	Settings accessible from route page
+	Refactored time functionality; this now solves the end-of-day weirdness correctly.
+	Major formatting of front page in place.  It scrolls and everything.   And the departure times "light up"
+	App icon
+	Added one more goodness state
+	Major performance improvement for route page
+	Added ability to set wait time.
+	Added holidays
+	Fixed threading again
+	Split settings page into two, added About section
+	Figure out how to package it, how to get it onto marketplace?
+
+	Version 2.0
+	Remove schedulefetcher and replace with call to our service.
+	Update parser for format changes and add more robust error checking
+	Add logic to overwrite our cache only when the read from the server is good.
+	Add application and cache version numbers.
+	Add exception handling (this was a *bug* in V1.0 --- had try/finally w/o catch!)

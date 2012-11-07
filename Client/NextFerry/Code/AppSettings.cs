@@ -1,0 +1,191 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.IO.IsolatedStorage;
+using System.Reflection;
+
+namespace NextFerry
+{
+    /// <summary>
+    /// Manage user settings.   Mostly uninteresting boilerplate.
+    /// </summary>
+    public static class AppSettings
+    {
+        // Use the same keys for the app settings and for OnChanged notification
+        public const string KdisplayWB = "displayWB";
+        public const string Kdisplay12hr = "display12hr";
+        public const string KterminalTravelTime = "terminalTravelTime";
+        public const string KdisplaySettings = "displaySettings";
+        public const string KcacheVersion = "cacheVersion";
+
+        private static bool _displayWB = true;
+        public static bool displayWB
+        {
+            get { return _displayWB; }
+            set
+            {
+                _displayWB = value;
+                IsolatedStorageSettings.ApplicationSettings[KdisplayWB] = value;
+                OnChanged(KdisplayWB);
+            }
+        }
+                    
+        private static bool _display12hr = true;
+        public static bool display12hr
+        {
+            get { return _display12hr; }
+            set
+            {
+                _display12hr = value;
+                IsolatedStorageSettings.ApplicationSettings[Kdisplay12hr] = value;
+                OnChanged(Kdisplay12hr);
+            }
+        }
+
+        private static int _terminalTravelTime = 20;
+        public static int terminalTravelTime
+        {
+            get { return _terminalTravelTime; }
+            set
+            {
+                _terminalTravelTime = value;
+                IsolatedStorageSettings.ApplicationSettings[KterminalTravelTime] = value;
+                OnChanged(KterminalTravelTime);
+            }
+        }
+
+        // displaySettings changes are propagated differently --- no notification here.
+        private static List<RouteSetting> _displaySettings = new List<RouteSetting>();
+        public static List<RouteSetting> displaySettings
+        {
+            get { return _displaySettings; }
+            private set { displaySettings = value; }
+        }
+
+        private static string _cacheVersion = "";
+        public static string cacheVersion
+        {
+            get { return _cacheVersion; }
+            set
+            {
+                _cacheVersion = value;
+                IsolatedStorageSettings.ApplicationSettings[KcacheVersion] = value;
+                OnChanged(KcacheVersion);
+            }
+        }
+
+        public static event PropertyChangedEventHandler PropertyChanged;
+        public static void OnChanged(string s)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(null, new PropertyChangedEventArgs(s));
+            }
+        }
+
+
+        /// <summary>
+        /// Read initial values from AppSettings, if present.
+        /// Else initialize from defaults.
+        /// </summary>
+        public static void init()
+        {
+            init<bool>(KdisplayWB);
+            init<bool>(Kdisplay12hr);
+            init<int>(KterminalTravelTime);
+            init<string>(KcacheVersion);
+            init<List<RouteSetting>>(KdisplaySettings);
+            RouteSetting.init(_displaySettings);
+        }
+
+
+        // Use reflection to generalize the process of getting IsolatedStorageSettings.
+        private static void init<T>(string key)
+        {
+            string fieldName = "_" + key;
+            FieldInfo theField = typeof(AppSettings).GetField(fieldName,BindingFlags.NonPublic|BindingFlags.Static);
+            T value;
+
+            if (IsolatedStorageSettings.ApplicationSettings.TryGetValue<T>(key, out value))
+            {
+                // set the field from the stored setting.
+                theField.SetValue(null, value);
+            }
+            else
+            {
+                // initialize stored setting to the default value
+                IsolatedStorageSettings.ApplicationSettings.Add(key, theField.GetValue(null));
+            }
+        }
+
+
+        public static void close()
+        {
+            // Displaysettings is the only one we don't write atomically
+            IsolatedStorageSettings.ApplicationSettings[KdisplaySettings] = displaySettings;
+        }
+    }
+
+
+
+    public class RouteSetting
+    {
+        public string name { get; set; }
+        private bool _display;
+        public bool display
+        {
+            get { return _display; }
+            set // set here, and also update the routes themselves.
+            {
+                _display = value;
+                propagate();
+            }
+        }
+
+        // Instead of a general eventing mechanism, we have this hard-wired:
+        // when the display value is updated, set the corresponding values in the Routes.
+        // Maybe someday rewrite as an event...
+        public void propagate()
+        {
+            // when deserializing, sometimes name is not set yet.
+            if (name != null)
+            {
+                Routes.getRoute(name, "wb").display = _display;
+                Routes.getRoute(name, "eb").display = _display;
+            }
+        }
+
+        /// <summary>
+        /// If dlist is empty, initialize it to the proper set of routes, and 
+        /// set their display values appropriately.
+        /// Also make sure that the display values are propagated to the routes
+        /// themselves.
+        /// </summary>
+        public static void init(List<RouteSetting> dlist)
+        {
+            if (dlist.Count == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("no display settings found");
+                foreach (Route r in Routes.AllRoutes)
+                {
+                    if (String.Equals(r.direction, "wb")) // get only one of the wb/eb pair of routes
+                        dlist.Add(new RouteSetting { name = r.name, display = false });
+                }
+                // First time display just a couple of routes to keep things simple
+                // This happens to be Bainbridge and Edmonds, the most popular.
+                dlist[0].display = true;
+                dlist[1].display = true;
+            }
+            // Propagate (in case deserialization didn't do it properly).
+            foreach (RouteSetting rs in dlist)
+                rs.propagate();
+        }
+    }
+}

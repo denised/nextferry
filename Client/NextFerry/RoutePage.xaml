@@ -1,0 +1,145 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="NextFerry.RoutePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="696" d:DesignWidth="480"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    shell:SystemTray.IsVisible="True">
+
+    <phone:PhoneApplicationPage.Resources>
+        <Style x:Key="mylightstyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe WP Light"/>
+            <Setter Property="FontSize" Value="{StaticResource PhoneFontSizeExtraLarge}"/>
+            <Setter Property="Foreground" Value="{StaticResource PhoneAccentColor}"/>
+        </Style>
+        <Style x:Key="verticalAccent" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="UseLayoutRounding" Value="False"/>
+            <Setter Property="Foreground" Value="{StaticResource PhoneAccentBrush}"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <CompositeTransform Rotation="-90"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="timesStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Tahoma"/>
+            <Setter Property="TextAlignment" Value="Right"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </phone:PhoneApplicationPage.Resources>
+
+
+    <Canvas x:Name="LayoutRoot">
+        <TextBlock Text="NEXT FERRY" Height="27" Canvas.Left="12" Canvas.Top="10"/>
+
+        <!-- Main scrollable section -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Canvas.Left="12" Canvas.Top="49" Height="647" Width="456">
+            <StackPanel Orientation="Vertical" Width="456">
+                
+                <!-- WestBound Section -->
+                <Grid x:Name="wbPanel">
+            		<TextBlock Text="westbound" Style="{StaticResource mylightstyle}" Margin="30,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                    <TextBlock x:Name="eastport" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Margin="8,0,0,0" Height="57" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
+                    <!-- substitute sample for blend editor -->
+            		<!--<TextBlock x:Name="blend_port" Text="Bainbridge" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Height="57" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>-->
+            		<Grid x:Name="wbwdPanel" HorizontalAlignment="Left" Margin="8,98,0,0" VerticalAlignment="Top" Width="215" >
+            			<TextBlock Text="weekday" Style="{StaticResource verticalAccent}" Margin="-20,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            			<Border Margin="32,0,0,30" BorderThickness="2" BorderBrush="{StaticResource PhoneAccentBrush}" Width="173" HorizontalAlignment="Left">
+            				<Grid>
+            					<Rectangle Fill="{StaticResource PhoneAccentBrush}" Stroke="{StaticResource PhoneAccentBrush}" 
+            						Height="37" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+            					<TextBlock Text="AM" TextAlignment="Right" Margin="33,9,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            					<TextBlock Text="PM" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,9,15,0" VerticalAlignment="Top"/>
+            			<!-- Sample for blend editor; comment out when done -->
+            					<!--<TextBlock x:Name="blend_wbwdam" Style="{StaticResource timesStyle}" Margin="0,42,0,12" HorizontalAlignment="Left" Width="68" VerticalAlignment="Top"><Run Text="5:20 7:50 11:10"/></TextBlock>
+            					<TextBlock x:Name="blend_wbwdPM" Style="{StaticResource timesStyle}" Margin="0,42,14,12" HorizontalAlignment="Right" Width="68" d:LayoutOverrides="Height"><Run Text="1:15 2:20 3:40 6:20 8:15 9:30 10:00 10:40 11:12 12:15"/></TextBlock>-->
+            			<!-- The real contents -->
+                                <TextBlock x:Name="wbwdam" Style="{StaticResource timesStyle}" Margin="-2,42,0,12" HorizontalAlignment="Left" Width="68" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="wbwdpm" Style="{StaticResource timesStyle}" Margin="0,42,16,12" HorizontalAlignment="Right" Width="68" d:LayoutOverrides="Height"/>
+            				</Grid>
+            			</Border>
+            		</Grid>
+            		<Grid x:Name="wbwePanel" VerticalAlignment="Top" Margin="227,98,24,0" Width="215" >
+            			<TextBlock Text="weekend" Style="{StaticResource verticalAccent}" Margin="-19.5,0,0,62" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                        <Border Margin="32,0,0,30" BorderThickness="2" BorderBrush="{StaticResource PhoneAccentBrush}" Width="173" HorizontalAlignment="Left">
+                            <Grid>
+                                <Rectangle Fill="{StaticResource PhoneAccentBrush}" Stroke="{StaticResource PhoneAccentBrush}" 
+            						Height="37" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                                <TextBlock Text="AM" TextAlignment="Right" Margin="33,9,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                <TextBlock Text="PM" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,9,15,0" VerticalAlignment="Top"/>
+                                <!-- Sample for blend editor; comment out when done -->
+                                <!--<TextBlock x:Name="blend_wbweam" Style="{StaticResource timesStyle}" Margin="0,42,0,12" HorizontalAlignment="Left" Width="68" VerticalAlignment="Top"><Run Text="5:20 7:50 11:10"/></TextBlock>
+            					<TextBlock x:Name="blend_wbwePM" Style="{StaticResource timesStyle}" Margin="0,42,14,12" HorizontalAlignment="Right" Width="68" d:LayoutOverrides="Height"><Run Text="1:15 2:20 3:40 6:20 8:15 9:30 10:00 10:40 11:12 12:15"/></TextBlock>-->
+                                <!-- The real contents -->
+                                <TextBlock x:Name="wbweam" Style="{StaticResource timesStyle}" Margin="-2,42,0,12" HorizontalAlignment="Left" Width="68" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="wbwepm" Style="{StaticResource timesStyle}" Margin="0,42,16,12" HorizontalAlignment="Right" Width="68" d:LayoutOverrides="Height"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+            	</Grid>
+                
+                <!-- Eastbound Panel -->
+                <Grid x:Name="ebPanel">
+                    <TextBlock Text="eastbound" Style="{StaticResource mylightstyle}" Margin="29,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                    <TextBlock x:Name="westport" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Margin="8,0,0,0" Height="57" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
+                    <!-- substitute sample for blend editor -->
+                    <!--<TextBlock x:Name="blend_port" Text="Bainbridge" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Height="57" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>-->
+                    <Grid x:Name="ebwdPanel" HorizontalAlignment="Left" Margin="8,98,0,0" VerticalAlignment="Top" Width="215" >
+                        <TextBlock Text="weekday" Style="{StaticResource verticalAccent}" Margin="-20,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Border Margin="32,0,0,30" BorderThickness="2" BorderBrush="{StaticResource PhoneAccentBrush}" Width="173" HorizontalAlignment="Left">
+                            <Grid>
+                                <Rectangle Fill="{StaticResource PhoneAccentBrush}" Stroke="{StaticResource PhoneAccentBrush}" 
+            						Height="37" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                                <TextBlock Text="AM" TextAlignment="Right" Margin="33,9,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                <TextBlock Text="PM" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,9,15,0" VerticalAlignment="Top"/>
+                                <!-- Sample for blend editor; comment out when done -->
+                                <!--<TextBlock x:Name="blend_ebwdam" Style="{StaticResource timesStyle}" Margin="0,42,0,12" HorizontalAlignment="Left" Width="68" VerticalAlignment="Top"><Run Text="5:20 7:50 11:10"/></TextBlock>
+            					<TextBlock x:Name="blend_ebwdPM" Style="{StaticResource timesStyle}" Margin="0,42,14,12" HorizontalAlignment="Right" Width="68" d:LayoutOverrides="Height"><Run Text="1:15 2:20 3:40 6:20 8:15 9:30 10:00 10:40 11:12 12:15"/></TextBlock>-->
+                                <!-- The real contents -->
+                                <TextBlock x:Name="ebwdam" Style="{StaticResource timesStyle}" Margin="-2,42,0,12" HorizontalAlignment="Left" Width="68" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="ebwdpm" Style="{StaticResource timesStyle}" Margin="0,42,16,12" HorizontalAlignment="Right" Width="68" d:LayoutOverrides="Height"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <Grid x:Name="ebwePanel" VerticalAlignment="Top" Margin="227,98,24,0" Width="215" >
+                        <TextBlock Text="weekend" Style="{StaticResource verticalAccent}" Margin="-19.5,0,0,62" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                        <Border Margin="32,0,0,30" BorderThickness="2" BorderBrush="{StaticResource PhoneAccentBrush}" Width="173" HorizontalAlignment="Left">
+                            <Grid>
+                                <Rectangle Fill="{StaticResource PhoneAccentBrush}" Stroke="{StaticResource PhoneAccentBrush}" 
+            						Height="37" Width="78" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                                <TextBlock Text="AM" TextAlignment="Right" Margin="33,9,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                <TextBlock Text="PM" TextAlignment="Right" HorizontalAlignment="Right" Margin="0,9,15,0" VerticalAlignment="Top"/>
+                                <!-- Sample for blend editor; comment out when done -->
+                                <!--<TextBlock x:Name="blend_ebweam" Style="{StaticResource timesStyle}" Margin="0,42,0,12" HorizontalAlignment="Left" Width="68" VerticalAlignment="Top"><Run Text="5:20 7:50 11:10"/></TextBlock>
+            					<TextBlock x:Name="blend_ebwePM" Style="{StaticResource timesStyle}" Margin="0,42,14,12" HorizontalAlignment="Right" Width="68" d:LayoutOverrides="Height"><Run Text="1:15 2:20 3:40 6:20 8:15 9:30 10:00 10:40 11:12 12:15"/></TextBlock>-->
+                                <!-- The real contents -->
+                                <TextBlock x:Name="ebweam" Style="{StaticResource timesStyle}" Margin="-2,42,0,12" HorizontalAlignment="Left" Width="68" VerticalAlignment="Top"/>
+                                <TextBlock x:Name="ebwepm" Style="{StaticResource timesStyle}" Margin="0,42,16,12" HorizontalAlignment="Right" Width="68" d:LayoutOverrides="Height"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Canvas>
+
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" Mode="Minimized" IsMenuEnabled="True">
+            <shell:ApplicationBar.MenuItems>
+                <shell:ApplicationBarMenuItem Text="settings" Click="gotoSettings"/>
+            </shell:ApplicationBar.MenuItems>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+</phone:PhoneApplicationPage>
+
+    
+
+

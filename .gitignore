@@ -1,0 +1,15 @@
+# files to ignore
+*.sap
+*.suo
+*.sln
+*.user
+*.pyc
+*.komodoproject
+*.kpf
+*.dll
+bin/
+Bin/
+obj/
+Debug/
+PerformanceLogs/
+SubmissionInfo/
