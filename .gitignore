@@ -10,6 +10,7 @@
 bin/
 Bin/
 obj/
+csx/
 Debug/
 PerformanceLogs/
 SubmissionInfo/
