@@ -16,11 +16,11 @@ import logging
 # The terminals are constants used by WSDOT in their web pages (see table below)
 # The order of the terminals in a route is significant --- we call end1->end2 a
 # "westbound" route and end2->end1 an "eastbound" route.   This is accurate for all
-# routes except pt. defiance which is actually north/south.
+# routes except pt. defiance which is north/south.
 # We simplify the San Juan routes by only considering two pairs:  Anacortes/Friday Harbor
 # and Anacortes/Orcas.  Shaw and Lopez are left out, as are all inter-island routes.
 
-# If this variable is defined, it must be a path name to a directory in which to put
+# If storepages is set, it must be a path name to a directory in which to put
 # copies of the downloaded pages, for logging/debugging purposes
 storepages = None
 logger = logging.getLogger(__name__)

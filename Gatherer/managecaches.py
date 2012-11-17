@@ -43,11 +43,11 @@ def getwsdotexpiration():
     # we extract the 2nd one.
     datepat = re.search(r"\d\d?/\d\d?/\d\d\d\d +- +(\d\d?)/(\d\d?)/(\d\d\d\d)",text)
     if datepat != None:
-        logging.info("WSDOT schedules expire at %s", datepat.group(0))
+        logger.info("WSDOT schedules expire at %s", datepat.group(0))
         return datetime.date(int(datepat.group(3)),int(datepat.group(1)),int(datepat.group(2)))
     else:
-        logging.error("Unable to obtain expiration from WSDOT")
-        logging.error(text)
+        logger.error("Unable to obtain expiration from WSDOT")
+        logger.error(text)
         raise RuntimeError("Unable to obtain expiration from WSDOT")
 
 
