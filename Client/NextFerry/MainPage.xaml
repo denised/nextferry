@@ -90,7 +90,7 @@
                             <StackPanel Height="74">
                                 <TextBlock Text="{Binding name}" FontSize="32" Foreground="{StaticResource DarkerPugetGrey}"
                                        VerticalAlignment="Bottom"/>
-                                <TextBlock Text="[Go]" FontSize="12" Foreground="{StaticResource DarkerPugetGrey}"/>
+                                <TextBlock Text="[Full]" FontSize="16" Foreground="{StaticResource DarkerPugetGrey}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -127,6 +127,10 @@
             <Button Content="westbound" x:Name="buttonWB" Click="switchToWB" Style="{StaticResource toggleSelected}"/>
             <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}"/>
         </StackPanel>
+        <TextBlock x:Name="westsign" Text="west" Margin="0,29,16,-16"
+        	Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4"/>
+        <TextBlock x:Name="eastsign" Text="east" Margin="0,29,16,-16"
+        	Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4"/>
     </Grid>
 
     <phone:PhoneApplicationPage.ApplicationBar>

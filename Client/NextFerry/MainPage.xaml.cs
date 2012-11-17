@@ -56,6 +56,8 @@ namespace NextFerry
 
             buttonWB.Style = (Style)this.Resources["toggleSelected"];
             buttonEB.Style = (Style)this.Resources["toggleUnselected"];
+            westsign.Visibility = Visibility.Visible;
+            eastsign.Visibility = Visibility.Collapsed;
         }
 
         private void switchToEB(object sender, RoutedEventArgs e)
@@ -70,6 +72,8 @@ namespace NextFerry
 
             buttonWB.Style = (Style)this.Resources["toggleUnselected"];
             buttonEB.Style = (Style)this.Resources["toggleSelected"];
+            westsign.Visibility = Visibility.Collapsed;
+            eastsign.Visibility = Visibility.Visible;
         }
 
 

@@ -2,8 +2,6 @@
 What's next:
 	Location awareness factors into time-to-ferry
 	Wait time information factors into time-to-ferry --- need the data!
-	Increase size of "OK" button so it is more visible.
-	Improve visibility of EB vs. WB schedules
 	Fetch alerts from our service
 	Add nice "no data yet" pop-up when needed.
 	Figure out how to handle one-off schedules (extra routes on Friday, or over a given weekend).
@@ -45,4 +43,5 @@ What's done:
 	Version 2.0 rev 2
 	Switched to Google App Engine after being unable to do logging usefully.
 	System is now working with deployed servide http://nextferry.appspot.com/
+	Improvements to visibility on main page
 
