@@ -151,7 +151,7 @@ namespace NextFerry
             }
 
             pt.addAction(1, findNetwork);
-            pt.addAction(2, RouteIO.getUpdate);
+            pt.addAction(2, ServerIO.getScheduleUpdate);
 
             //pt.addAction(3, bar); // Display "no can do" if we have no data at all.
             //pt.addAction(3, foo); // TODO: update distances if user asks.

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Windows;
 using System.IO;
 using System.IO.IsolatedStorage;
@@ -7,12 +6,11 @@ using System.IO.IsolatedStorage;
 namespace NextFerry
 {
     /// <summary>
-    /// Auxiliary functionality to fetching schedules from the server and 
-    /// storing them in IsolatedStorage
+    /// Parse and store schedules in IsolatedStorage.
     /// </summary>
     public static class RouteIO
     {
-        // We get the ferrry schedule from an Azure service, and store it locally.
+        // We get the ferrry schedule from a web service, and store it locally.
         // The schedule format is simple text: a sequence of lines of the form:
         //
         //      bainbridge,wd,330,370,...
@@ -21,69 +19,6 @@ namespace NextFerry
         // and then a list of departure times (in minutes past midnight).
         //
         // When we read the schedule file, we update AllRoutes accordingly.
-
-        public static void getUpdate()
-        {
-            // if there's no network we don't do anything
-            if (((App)Application.Current).usingNetwork)
-            {
-                string appVersion = ((App)Application.Current).appVersion;
-                string cacheVersion = AppSettings.cacheVersion;
-                NextFerryServer.Service1Client client = null;
-
-                try
-                {
-                    client = new NextFerryServer.Service1Client();
-                    client.GetSchedulesCompleted += processServerSchedule;
-                    client.GetSchedulesAsync(appVersion, cacheVersion);
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine("Error accessing Server: " + e.Message);
-                }
-                finally
-                {
-                    if (null != client)
-                    {
-                        client.CloseAsync();
-                    }
-                }
-            }
-        }
-
-
-        public static void processServerSchedule(Object sender, EventArgs args)
-        {
-            string answer = ((NextFerryServer.GetSchedulesCompletedEventArgs)args).Result;
-            int count = 0;
-
-            System.Diagnostics.Debug.WriteLine("Received " + answer.Length + " bytes from Ferry Server");
-            if (answer.Length > 0)
-            {
-                // Try to parse it.
-                try
-                {
-                    count = deserialize(new StringReader(answer));
-                }
-                catch (Exception e)
-                {
-                    // Something went wrong. Restore the old cached value and exit.
-                    // TODO: ...and if there was no cached value?  could end up with partial junk?
-                    System.Diagnostics.Debug.WriteLine("Parse error in Ferry Server response: " + e.Message);
-
-                    readCache();
-                    return;
-                }
-                System.Diagnostics.Debug.WriteLine("Read " + count + " records from Ferry Server");
-                if (count == Routes.AllRoutes.Count * 2)
-                {
-                    // complete read: save a local copy and update our state.
-                    writeCache(answer);
-                    AppSettings.cacheVersion = DateTime.Today.ToShortDateString();
-                }
-                // else do nothing: we show what we read but don't store it.
-            }
-        }
 
         private readonly static IsolatedStorageFile myStore = IsolatedStorageFile.GetUserStoreForApplication();
         private const string scheduleFile = "CachedFerrySchedules.txt";  // where on disk to store it.
@@ -136,8 +71,10 @@ namespace NextFerry
             {
                 string line = s.ReadLine();
                 if (line == null) break;
-                //System.Diagnostics.Debug.WriteLine("deserialize: " + line);
-                if (line.StartsWith("//")) continue;  // Allows us to add comments in the file when testing, etc.
+                System.Diagnostics.Debug.WriteLine("deserialize: |" + line + "|");
+                // Skip comments and empty lines.
+                if (line.Length < 2) continue;
+                if (line.StartsWith("//")) continue;
 
                 parseLine(line);
                 count++;
@@ -180,7 +117,7 @@ namespace NextFerry
         }
 
         /// <summary>
-        /// Deleted the cache.  Does <strong>not</strong> clear data from AllRoutes.
+        /// Delete the cache.  Does <strong>not</strong> clear data from AllRoutes.
         /// </summary>
         public static void deleteCache()
         {

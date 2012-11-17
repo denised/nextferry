@@ -74,11 +74,7 @@
     <Compile Include="Code\RouteIO.cs" />
     <Compile Include="Code\Holiday.cs" />
     <Compile Include="Code\PhaseTasker.cs" />
-    <Compile Include="Service References\NextFerryServer\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
+    <Compile Include="Code\ServerIO.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
@@ -116,36 +112,20 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\NextFerryServer\Service1.disco" />
-    <None Include="Service References\NextFerryServer\configuration91.svcinfo" />
-    <None Include="Service References\NextFerryServer\configuration.svcinfo" />
-    <None Include="Service References\NextFerryServer\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
     <Content Include="ServiceReferences.ClientConfig" />
-    <None Include="Service References\NextFerryServer\Service1.wsdl" />
-    <None Include="Service References\NextFerryServer\Service1.xsd" />
-    <None Include="Service References\NextFerryServer\Service11.xsd" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitignore" />
     <Content Include="Resources\IconLarge.png" />
     <Content Include="Resources\IconSmall.png" />
     <Content Include="SplashScreenImage.jpg" />
-    <Content Include="Todo.txt" />
     <Resource Include="Resources\FerryCrop4.jpg" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\NextFerryServer\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

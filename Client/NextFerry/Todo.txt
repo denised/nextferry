@@ -1,12 +1,5 @@
 ﻿
 What's next:
-	Read schedule from our Service instead of from WSDOT
-	Get the service up on Azure
-	Figure out how to parameterize so that we can switch between test server and real Azure server.
-	Set app version correctly.
-
-
-Nice to have:
 	Location awareness factors into time-to-ferry
 	Wait time information factors into time-to-ferry --- need the data!
 	Increase size of "OK" button so it is more visible.
@@ -48,3 +41,8 @@ What's done:
 	Add logic to overwrite our cache only when the read from the server is good.
 	Add application and cache version numbers.
 	Add exception handling (this was a *bug* in V1.0 --- had try/finally w/o catch!)
+
+	Version 2.0 rev 2
+	Switched to Google App Engine after being unable to do logging usefully.
+	System is now working with deployed servide http://nextferry.appspot.com/
+
