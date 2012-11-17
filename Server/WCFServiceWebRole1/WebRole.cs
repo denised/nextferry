@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using System.Diagnostics;
 
 namespace WCFServiceWebRole1
 {
@@ -15,9 +16,12 @@ namespace WCFServiceWebRole1
             DiagnosticMonitorConfiguration diagnosticConfig = DiagnosticMonitor.GetDefaultInitialConfiguration();
             diagnosticConfig.Directories.ScheduledTransferPeriod = TimeSpan.FromMinutes(1);
             diagnosticConfig.Directories.DataSources.Add(AzureLocalStorageTraceListener.GetLogDirectory());
+            DiagnosticMonitor.Start("Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString", diagnosticConfig);
 
             // For information on handling configuration changes
             // see the MSDN topic at http://go.microsoft.com/fwlink/?LinkId=166357.
+
+            Trace.WriteLine("On Start!");
 
             return base.OnStart();
         }

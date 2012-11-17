@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ServiceModel;
 using System.ServiceModel.Web;
+using System.Diagnostics;
 
 namespace WCFServiceWebRole1
 {
@@ -9,6 +10,7 @@ namespace WCFServiceWebRole1
 
         public string GetSchedules(string clientversion, string lastdataversion)
         {
+            Trace.WriteLine("someone cares!  " + clientversion + "/" + lastdataversion);
             DateTime dv;
             if (DateTime.TryParse(lastdataversion, out dv) &&
                 dv <= currentexpiration)
