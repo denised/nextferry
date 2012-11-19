@@ -244,44 +244,5 @@ namespace NextFerry
         }
     }
 
-    /// <summary>
-    /// Represents the end-point of a ferry route.
-    /// </summary>
-    public class Terminal
-    {
-        public int code { get; set; }   // codes as used in the WSDOT's web services.
-        public string name { get; set; }
-        // TODO: add location?
 
-        public static Terminal lookup(int code)
-        {
-            if (AllTerminals == null) initAllTerminals();
-            return AllTerminals[code];
-        }
-
-        private static Dictionary<int, Terminal> AllTerminals = null;
-        private static void initAllTerminals()
-        {
-            AllTerminals = new Dictionary<int, Terminal>();
-            AllTerminals.Add(1, new Terminal { code = 1, name = "Anacortes" });
-            AllTerminals.Add(3, new Terminal { code = 3, name = "Bainbridge" });
-            AllTerminals.Add(4, new Terminal { code = 4, name = "Bremerton" });
-            AllTerminals.Add(5, new Terminal { code = 5, name = "Clinton" });
-            AllTerminals.Add(11, new Terminal { code = 11, name = "Coupville" });
-            AllTerminals.Add(8, new Terminal { code = 8, name = "Edmonds" });
-            AllTerminals.Add(9, new Terminal { code = 9, name = "Fauntleroy" });
-            AllTerminals.Add(10, new Terminal { code = 10, name = "Friday Harbor" });
-            AllTerminals.Add(12, new Terminal { code = 12, name = "Kingston" });
-            AllTerminals.Add(13, new Terminal { code = 13, name = "Lopez Island" });
-            AllTerminals.Add(14, new Terminal { code = 14, name = "Mukilteo" });
-            AllTerminals.Add(15, new Terminal { code = 15, name = "Orcas Island" });
-            AllTerminals.Add(16, new Terminal { code = 16, name = "Point Defiance" });
-            AllTerminals.Add(17, new Terminal { code = 17, name = "Port Townsend" });
-            AllTerminals.Add(7, new Terminal { code = 7, name = "Seattle" });
-            AllTerminals.Add(18, new Terminal { code = 18, name = "Shaw Island" });
-            AllTerminals.Add(20, new Terminal { code = 20, name = "Southworth" });
-            AllTerminals.Add(21, new Terminal { code = 21, name = "Tahlequah" });
-            AllTerminals.Add(22, new Terminal { code = 22, name = "Vashon Island" });
-        }
-    }
 }
