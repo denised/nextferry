@@ -64,22 +64,34 @@ namespace NextFerry
         }
 
 
-        public static int deserialize(TextReader s)
+        /// <summary>
+        /// Parse a schedule.   We trap exceptions here.
+        /// </summary>
+        /// <returns>True if we successfully parsed all routes.</returns>
+        public static bool deserialize(TextReader s)
         {
-            int count = 0;
-            while (true)
+            try
             {
-                string line = s.ReadLine();
-                if (line == null) break;
-                System.Diagnostics.Debug.WriteLine("deserialize: |" + line + "|");
-                // Skip comments and empty lines.
-                if (line.Length < 2) continue;
-                if (line.StartsWith("//")) continue;
+                int count = 0;
+                while (true)
+                {
+                    string line = s.ReadLine();
+                    if (line == null) break;
+                    System.Diagnostics.Debug.WriteLine("deserialize: |" + line + "|");
+                    // Skip comments and empty lines.
+                    if (line.Length < 2) continue;
+                    if (line.StartsWith("//")) continue;
 
-                parseLine(line);
-                count++;
+                    parseLine(line);
+                    count++;
+                }
+                return (count == Routes.AllRoutes.Count * 2);
             }
-            return count;
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("Unexpected exception " + e);
+                return false;
+            }
         }
 
 

@@ -144,6 +144,8 @@ namespace NextFerry
         {
             pt = new PhaseTasker();
 
+            // do tasks in three phases.  Each phase must complete before the next begins.
+            // note this means that the the tasks themselves have to behave synchronously.
             if (freshStart)
             {
                 // do only once
@@ -151,7 +153,7 @@ namespace NextFerry
             }
 
             pt.addAction(1, findNetwork);
-            pt.addAction(2, ServerIO.getScheduleUpdate);
+            pt.addAction(2, ServerIO.requestInitUpdate);
 
             //pt.addAction(3, bar); // Display "no can do" if we have no data at all.
             //pt.addAction(3, foo); // TODO: update distances if user asks.

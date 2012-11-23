@@ -2,14 +2,14 @@ application: nextferry
 version: 1
 runtime: python27
 api_version: 1
-threadsafe: false
+threadsafe: true
 
 handlers:
 - url: /.*
-  script: gaeVersionServer.py
+  script: Server.app
 
-libraries:
-- name: webapp2
-  version: latest
+#libraries:
+#- name: webapp2
+#  version: latest
 
 

@@ -44,4 +44,5 @@ What's done:
 	Switched to Google App Engine after being unable to do logging usefully.
 	System is now working with deployed servide http://nextferry.appspot.com/
 	Improvements to visibility on main page
+	Added first implementation of travel distance on server (client not yet using).
 
