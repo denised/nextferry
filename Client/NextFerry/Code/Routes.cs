@@ -72,5 +72,17 @@ namespace NextFerry
             foreach (Route r in AllRoutes)
                 r.clearSchedules();
         }
+
+        /// <summary>
+        /// Perform update action on all routes that are displayed.
+        /// </summary>
+        public static void updateDisplay()
+        {
+            foreach (Route r in AllRoutes)
+            {
+                if (r.display)
+                    r.stateRefresh();
+            }
+        }
     }
 }

@@ -22,11 +22,13 @@ namespace NextFerry
         public MainPage()
         {
             InitializeComponent();
+
+            ((App)Application.Current).theMainPage = this;
  
             DepartureTime.tooLateStyle = (Style)this.Resources["tooLateStyle"];
-            DepartureTime.tooSoonStyle = (Style)this.Resources["tooSoonStyle"];
+            DepartureTime.riskyStyle = (Style)this.Resources["riskyStyle"];
             DepartureTime.goodStyle = (Style)this.Resources["goodStyle"];
-            DepartureTime.tooFarStyle = (Style)this.Resources["tooFarStyle"];
+            DepartureTime.defaultStyle = (Style)this.Resources["defaultStyle"];
 
             list1.ItemsSource = displayRoutes;
             list3.ItemsSource = displayRoutes;
@@ -97,6 +99,23 @@ namespace NextFerry
         {
             NavigationService.Navigate(new Uri("/Choose.xaml", UriKind.Relative));
         }
+
+        private void gotoHelp(object sender, EventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/help.xaml", UriKind.Relative));
+        }
         #endregion
+
+
+        public void addWarning(string contents)
+        {
+            warningText.Text = contents;
+            warning.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        public void removeWarning()
+        {
+            warning.Visibility = System.Windows.Visibility.Collapsed;
+        }
     }
 }

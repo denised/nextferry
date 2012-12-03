@@ -89,7 +89,7 @@ namespace NextFerry
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Unexpected exception " + e);
+                System.Diagnostics.Debug.WriteLine("Unexpected exception in Route deserialize " + e);
                 return false;
             }
         }
@@ -112,8 +112,7 @@ namespace NextFerry
             bool iswest = (code[0] == 'w');
             bool isweekend = (code[1] == 'e');
 
-            Schedule news = new Schedule();
-            news.isWeekend = isweekend;
+            Schedule news = new Schedule(isweekend);
 
             // unpack the times
             for (int i = 4; i < len; i++)

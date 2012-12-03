@@ -1,0 +1,85 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="NextFerry.help"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480"
+    shell:SystemTray.IsVisible="True">
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Block -->
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="NEXT FERRY" Margin="12,10,0,0"/>
+            <TextBlock Text="help" Margin="12,-7,0,20" Style="{StaticResource PhoneTextTitle1Style}"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Height="610" VerticalAlignment="Top"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <!-- Page Content -->
+            <StackPanel Grid.Row="1" Margin="12,0,20,12">
+                <TextBlock Text="routes" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
+                <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                Select which routes to display with the "choose routes..." operation.
+                The main page shows the next available travel times.  The "[Full]" button
+                will show a complete schedule.
+                </TextBlock>
+
+                <TextBlock Text="times" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
+                <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                The color coding on the travel times indicates how likely you can make
+                that departure if you are driving.
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                Turning on location services in the settings will use your current location to
+                estimate drive time.  Otherwise drive time is not estimated.
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                Use the buffer time setting to increase or decrease the time allowed.
+                If you do not use location services, increase this time to account for drive time.
+                </TextBlock>
+
+                <!-- Notices -->
+
+                <TextBlock Text="notices" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
+                <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                    This application uses network access to retrieve ferry schedules and
+                    travel times.  The amount of data required is minimal.  However there may
+                    be occasions when the application cannot show results if network access is
+                    not available.
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                    This application uses schedule and recommended wait times from WSDOT, but is not affiliated with WSDOT.
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                    This application may use travel estimates from MapQuest, but is not affiliated with MapQuest.
+                </TextBlock>
+
+                <!-- About -->
+
+                <TextBlock Text="about" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
+                <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                     Developed by Denise Draper, 2012, because I'm always trying to 
+                     figure out whether to take the Edmonds or Bainbridge ferry.
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
+                     Email denisesandbox@mailup.net for information, feedback or requests.
+                </TextBlock>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+ 
+</phone:PhoneApplicationPage>

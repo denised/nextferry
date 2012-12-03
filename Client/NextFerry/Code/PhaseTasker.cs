@@ -82,7 +82,7 @@ namespace NextFerry
                         }
                         catch (Exception err)
                         {
-                            System.Diagnostics.Debug.WriteLine("task error " + err.Message);
+                            System.Diagnostics.Debug.WriteLine("task error " + err.ToString());
                         }
                         finally
                         {
@@ -123,7 +123,7 @@ namespace NextFerry
                         }
                         catch (Exception err)
                         {
-                            System.Diagnostics.Debug.WriteLine("task error " + err.Message);
+                            System.Diagnostics.Debug.WriteLine("task error " + err.ToString());
                         }
                         finally
                         {
@@ -161,7 +161,7 @@ namespace NextFerry
                     }
                     catch (Exception err)
                     {
-                        System.Diagnostics.Debug.WriteLine("task error " + err.Message);
+                        System.Diagnostics.Debug.WriteLine("task error " + err.ToString());
                     }
                 });
             }

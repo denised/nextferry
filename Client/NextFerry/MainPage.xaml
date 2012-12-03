@@ -22,9 +22,13 @@
         <SolidColorBrush x:Key="PugetGrey" Color="#FF5D7681"/>
         <SolidColorBrush x:Key="PugetGreySoft" Color="#FF5D7681" Opacity="0.6"/>
         <SolidColorBrush x:Key="MilkySky" Color="#FFF8F0E8"/>
+        <SolidColorBrush x:Key="NoGoodRed" Color="#FF994E59"/>
         <SolidColorBrush x:Key="GoodGreen" Color="#FF198519"/>
         <SolidColorBrush x:Key="CautiousYellow" Color="#FFE0C226"/>
+        <!--<SolidColorBrush x:Key="GoodGreen" Color="#FF49BE0A"/>
+        <SolidColorBrush x:Key="CautiousYellow" Color="#FFD4CC0C"/>-->
         <SolidColorBrush x:Key="DarkerPugetGrey" Color="#FF43545C"/>
+        <SolidColorBrush x:Key="PaleYellow" Color="#FFDEE5B3"/>
 
         <!-- How we format times -->
         <Style x:Name="rowBase" TargetType="TextBlock">
@@ -34,16 +38,16 @@
             <Setter Property="Height" Value="74"/>
         </Style>
         <Style x:Name="tooLateStyle" TargetType="TextBlock" BasedOn="{StaticResource rowBase}">
-            <Setter Property="Foreground" Value="{StaticResource PugetGreySoft}"/>
+            <Setter Property="Foreground" Value="{StaticResource NoGoodRed}"/>
         </Style>
-        <Style x:Name="tooSoonStyle" TargetType="TextBlock" BasedOn="{StaticResource rowBase}">
+        <Style x:Name="riskyStyle" TargetType="TextBlock" BasedOn="{StaticResource rowBase}">
             <Setter Property="Foreground" Value="{StaticResource CautiousYellow}"/>
         </Style>
         <Style x:Name="goodStyle" TargetType="TextBlock" BasedOn="{StaticResource rowBase}">
             <Setter Property="Foreground" Value="{StaticResource GoodGreen}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
-        <Style x:Name="tooFarStyle" TargetType="TextBlock" BasedOn="{StaticResource rowBase}">
+        <Style x:Name="defaultStyle" TargetType="TextBlock" BasedOn="{StaticResource rowBase}">
             <Setter Property="Foreground" Value="{StaticResource DarkerPugetGrey}"/>
         </Style>
 
@@ -72,6 +76,10 @@
                    Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}"/>
 
         <Image Grid.Row="1" Grid.RowSpan="2" Source="Resources\FerryCrop4.jpg" Stretch="Fill"/>
+        <TextBlock x:Name="westsign" Text="west" Margin="0,29,26,-16"
+                   Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4" TextAlignment="Right"/>
+        <TextBlock x:Name="eastsign" Text="east" Margin="0,29,26,-16"
+                   Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4" TextAlignment="Right"/>
 
         <!-- Main Panel -->
         <!-- The only real trick here is that the listbox and itemscontrol show slices of the same data, and are kept -->
@@ -104,7 +112,7 @@
                                   Style="{StaticResource VerticalList}" HorizontalAlignment="Left">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <ItemsControl ItemsSource="{Binding futureDepartures}" 
+                                <ItemsControl ItemsSource="{Binding futureDepartures}"
                                               Style="{StaticResource HorizontalList}"
                                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="74">
                                     <ItemsControl.ItemTemplate>
@@ -127,11 +135,16 @@
             <Button Content="westbound" x:Name="buttonWB" Click="switchToWB" Style="{StaticResource toggleSelected}"/>
             <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}"/>
         </StackPanel>
-        <TextBlock x:Name="westsign" Text="west" Margin="0,29,16,-16"
-        	Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4"/>
-        <TextBlock x:Name="eastsign" Text="east" Margin="0,29,16,-16"
-        	Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4"/>
-    </Grid>
+
+        <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" Visibility="Collapsed">
+            <Rectangle Height="33" Width="395" Fill="{StaticResource PaleYellow}" RadiusX="5" RadiusY="5"/>
+            <TextBlock x:Name="warningText" Margin="40,0,0,0" Foreground="{StaticResource DarkerPugetGrey}" 
+                       TextWrapping="NoWrap" TextAlignment="Center">
+                Travel time information is stale
+            </TextBlock>
+            <Image Height="35" Width="35" HorizontalAlignment="Left" Source="Resources\warning.png" Stretch="Uniform"/>
+        </Canvas>
+     </Grid>
 
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" Mode="Minimized" IsMenuEnabled="True" 
@@ -140,6 +153,7 @@
             <shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="choose routes" Click="gotoChoose"/>
                 <shell:ApplicationBarMenuItem Text="settings" Click="gotoSettings"/>
+                <shell:ApplicationBarMenuItem Text="help" Click="gotoHelp"/>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>

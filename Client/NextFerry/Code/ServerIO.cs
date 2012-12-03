@@ -21,7 +21,7 @@ namespace NextFerry
     public static class ServerIO
     {
         private const string initURL = "http://nextferry.appspot.com/init";
-        private const string distanceURL = "http://nextferry.appspot.com/traveltimes";
+        private const string travelURL = "http://nextferry.appspot.com/traveltimes";
 
         public static void requestInitUpdate()
         {
@@ -30,26 +30,51 @@ namespace NextFerry
             {
                 WebClient request = new WebClient();
                 string appVersion = ((App)Application.Current).appVersion;
-                string cacheVersion = AppSettings.cacheVersion;
-                Uri uri = new Uri(initURL + "/" + appVersion + "/" + cacheVersion);
+                Uri uri = new Uri(String.Format("{0}/{1}/{2}", initURL, appVersion, AppSettings.cacheVersion));
                 System.Diagnostics.Debug.WriteLine("Sending " + uri);
 
                 try
                 {
                     ManualResetEvent mre = new ManualResetEvent(false);
-                    request.DownloadStringCompleted += processInitResponse;
+                    request.DownloadStringCompleted += processResponse;
                     request.DownloadStringAsync(uri, mre);
                     mre.WaitOne();  // wait until it completes --- this makes network activity sequential, which we want
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error accessing Server: " + e.Message);
+                    System.Diagnostics.Debug.WriteLine("Error accessing Server (init): " + e.Message);
                 }
             }
         }
 
 
-        public static void processInitResponse(Object sender, DownloadStringCompletedEventArgs args)
+        public static void requestTravelTimes(string loc)
+        {
+            if (((App)Application.Current).usingNetwork)
+            {
+                WebClient request = new WebClient();
+                string appVersion = ((App)Application.Current).appVersion;
+
+                Uri uri = new Uri(String.Format("{0}/{1}/{2}", travelURL, appVersion, loc));
+                System.Diagnostics.Debug.WriteLine("Sending " + uri);
+
+                try
+                {
+                    request.DownloadStringCompleted += processResponse;
+                    request.DownloadStringAsync(uri,null);
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error accessing Server (travel): " + e.Message);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Common routine to handle the response from the server, for all requests.
+        /// </summary>
+        public static void processResponse(Object sender, DownloadStringCompletedEventArgs args)
         {
             try
             {
@@ -70,9 +95,9 @@ namespace NextFerry
                 string controlLine = sr.ReadLine();
                 while (controlLine != null)
                 {
-                    if (! controlLine.StartsWith("#"))
+                    if (!controlLine.StartsWith("#"))
                     {
-                        System.Diagnostics.Debug.WriteLine("Error reading result: expected control line, got " + controlLine);
+                        System.Diagnostics.Debug.WriteLine("Error: expected control line, got " + controlLine);
                         // abandon ship.
                         return;
                     }
@@ -83,7 +108,7 @@ namespace NextFerry
 
                     // else gather up the corresponding data block
                     buffer.Clear();
-                    while(sr.Peek() != '#'  &&  sr.Peek() != -1)
+                    while (sr.Peek() != '#' && sr.Peek() != -1)
                     {
                         buffer.Append(sr.ReadLine());
                         buffer.Append('\n');
@@ -104,18 +129,25 @@ namespace NextFerry
                         // if we weren't successful, we leave whatever we managed to read, but don't update
                         // the cache file.
                     }
+                    else if (controlLine.StartsWith("#traveltimes"))
+                    {
+                        Terminal.storeTravelTimes(buffer.ToString());
+                    }
                     // else: do nothing: ignore unknown blocks
 
                     controlLine = sr.ReadLine();
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Unexpected exception " + e);
+                System.Diagnostics.Debug.WriteLine("Unexpected exception in ServerIO " + e);
             }
             finally
             {
-                ((ManualResetEvent)args.UserState).Set(); // tell original thread to continue.
+                if (args.UserState != null)
+                {
+                    ((ManualResetEvent)args.UserState).Set(); // tell original thread to continue.
+                }
             }
         }
     }

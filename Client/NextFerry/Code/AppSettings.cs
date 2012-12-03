@@ -1,13 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.ComponentModel;
-using System.Runtime.Serialization;
 using System.IO.IsolatedStorage;
 using System.Reflection;
 
@@ -21,9 +14,10 @@ namespace NextFerry
         // Use the same keys for the app settings and for OnChanged notification
         public const string KdisplayWB = "displayWB";
         public const string Kdisplay12hr = "display12hr";
-        public const string KterminalTravelTime = "terminalTravelTime";
+        public const string KbufferTime = "bufferTime";
         public const string KdisplaySettings = "displaySettings";
         public const string KcacheVersion = "cacheVersion";
+        public const string KuseLocation = "useLocation";
 
         private static bool _displayWB = true;
         public static bool displayWB
@@ -49,15 +43,15 @@ namespace NextFerry
             }
         }
 
-        private static int _terminalTravelTime = 20;
-        public static int terminalTravelTime
+        private static int _bufferTime = 20;
+        public static int bufferTime
         {
-            get { return _terminalTravelTime; }
+            get { return _bufferTime; }
             set
             {
-                _terminalTravelTime = value;
-                IsolatedStorageSettings.ApplicationSettings[KterminalTravelTime] = value;
-                OnChanged(KterminalTravelTime);
+                _bufferTime = value;
+                IsolatedStorageSettings.ApplicationSettings[KbufferTime] = value;
+                OnChanged(KbufferTime);
             }
         }
 
@@ -81,6 +75,18 @@ namespace NextFerry
             }
         }
 
+        private static bool _useLocation = false;
+        public static bool useLocation
+        {
+            get { return _useLocation; }
+            set
+            {
+                _useLocation = value;
+                IsolatedStorageSettings.ApplicationSettings[KuseLocation] = value;
+                OnChanged(KuseLocation);
+            }
+        }
+
         public static event PropertyChangedEventHandler PropertyChanged;
         public static void OnChanged(string s)
         {
@@ -99,8 +105,9 @@ namespace NextFerry
         {
             init<bool>(KdisplayWB);
             init<bool>(Kdisplay12hr);
-            init<int>(KterminalTravelTime);
+            init<int>(KbufferTime);
             init<string>(KcacheVersion);
+            init<bool>(KuseLocation);
             init<List<RouteSetting>>(KdisplaySettings);
             RouteSetting.init(_displaySettings);
         }

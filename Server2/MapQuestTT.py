@@ -133,7 +133,7 @@ def getTravelTimes(lat,lon):
             continue            
         
         #if we get here, we want to return this value.
-        ourresponse += "{}:{}\n".format(codeof(term), times[i+1])
+        ourresponse += "{}:{}\n".format(codeof(term), int(times[i+1]/60))
     
     ## Return our response
     return ourresponse

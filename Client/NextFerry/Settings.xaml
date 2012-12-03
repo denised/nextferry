@@ -41,39 +41,29 @@
         <!-- Page Content -->
         <StackPanel Grid.Row="1" Margin="12,0,20,12">
             <!-- Options -->
-            <Grid Margin="12,0,0,0" Width="436" Height="166">
+            <Grid Margin="12,0,0,0" Width="436" Height="253">
             	<TextBlock Text="Time format:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,23,0,0"/>
-            	<Button Content="12 hr" x:Name="time12" Click="switchTo12hr" Margin="124,4,208,0" d:LayoutOverrides="Width" VerticalAlignment="Top"/>
-            	<Button Content="24 hr" x:Name="time24" Click="switchTo24hr" Margin="208,4,120,0" d:LayoutOverrides="Width" VerticalAlignment="Top"/>
-            	<TextBlock Text="Drive+wait time (min):" VerticalAlignment="Top" Margin="12,92,0,0" HorizontalAlignment="Left" ToolTipService.ToolTip="Time to allow before departure: travel and wait time."/>
-            	<Slider x:Name="waitslider" Minimum="20" Maximum="150" SmallChange="5" LargeChange="10" FontSize="20" Margin="214,80,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="169"/>
+            	<Button Content="12 hr" x:Name="time12" Click="switchTo12hr" Margin="149,4,179,0" VerticalAlignment="Top" Width="108"/>
+            	<Button Content="24 hr" x:Name="time24" Click="switchTo24hr" Margin="0,4,93,0" VerticalAlignment="Top" Width="108" HorizontalAlignment="Right" d:LayoutOverrides="Width"/>
+            	<TextBlock Text="Use Location:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,81,0,0" Width="130"/>
+            	<Button Content="Yes" x:Name="uselocYes" Click="uselocOn" Margin="149,62,179,0" Width="108" VerticalAlignment="Top"/>
+            	<Button Content="No" x:Name="uselocNo" Click="uselocOff" Margin="0,62,93,0" HorizontalAlignment="Right" Width="108" VerticalAlignment="Top"/>
+            	<TextBlock Text="Buffer time (min):" Margin="12,154,0,0" HorizontalAlignment="Left" ToolTipService.ToolTip="Time to allow before departure: travel and wait time." VerticalAlignment="Top"/>
+            	<Slider x:Name="waitslider" Minimum="0" Maximum="150" Value="35" SmallChange="5" LargeChange="10" FontSize="20" Margin="177,142,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="205"/>
             	<TextBlock x:Name="slideValue" Text="{Binding Value, Converter={StaticResource wtConverter}, ElementName=waitslider}" 
-            		Style="{StaticResource PhoneTextSmallStyle}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,94,30,0"/>
+            		Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Right" Margin="0,156,30,0" VerticalAlignment="Top"/>
+            	<TextBlock x:Name="explanation" TextWrapping="Wrap" Margin="12,0,0,0" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Left" Width="165" Text="Travel + wait time." VerticalAlignment="Bottom" Height="68"/>
             </Grid>
 
             <!-- Clear Cache -->
             <Button Content="Refresh Schedules" Click="deleteCache" Margin="8,0,8,-4"/>
             <TextBlock TextWrapping="Wrap" Margin="20,-4,6,0" Style="{StaticResource PhoneTextSmallStyle}"><Run Text="Delete cached schedules on phone. Restart application to begin reloading."/></TextBlock>
-            <TextBlock x:Name="debugScreen" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}"/>
-            
-            <!-- About -->
-            <!--
-            <TextBlock Text="about" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
-            <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                 Developed by Denise Draper, 2012, because I'm always trying to 
-                 figure out whether to take the Edmonds or Bainbridge ferry.
-            </TextBlock>
-            <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                 Not a product of or assiciated with WSDOT (though we use the data from their website).
-            </TextBlock>
-            <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                 Email denisesandbox@mailup.net for information, feedback or requests.
-            </TextBlock>
-             -->
-            
+            <TextBlock x:Name="cacheStatus" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">Sample text.</TextBlock>
+
+
             <!-- Testing -->
-            <Button Content="Click here" Margin="20,30,0,0" Click="Button_Click"/>
-            <TextBlock x:Name="testResultScreen" Margin="20,0,0,0"/>
+            <Button Content="Click here" Margin="8,30,12,0" Click="Button_Click"/>
+            <TextBox x:Name="testResultScreen" Margin="20,0,0,0"/>
         </StackPanel>
     </Grid>
 

@@ -17,10 +17,14 @@ namespace NextFerry
         public PhoneApplicationFrame RootFrame { get; private set; }
         public bool usingNetwork = false;
         public string appVersion = "2.0";  // TODO: set via reflection?  (didn't work?)
+        public MainPage theMainPage = null;
+        public DispatcherTimer theTimer = null;
 
         public App()
         {
             UnhandledException += Application_UnhandledException;
+            theTimer = new DispatcherTimer();
+            theTimer.Interval = new TimeSpan(0, 0, 20);
 
             InitializeComponent();
             InitializePhoneApplication();
@@ -57,6 +61,7 @@ namespace NextFerry
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
             AppSettings.close();
+            theTimer.Stop();
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
@@ -150,15 +155,17 @@ namespace NextFerry
             {
                 // do only once
                 pt.addAction(1, RouteIO.readCache);
+                pt.addAction(3, LocationMonitor.go);
+                theTimer.Tick += checkNetwork;
             }
 
             pt.addAction(1, findNetwork);
             pt.addAction(2, ServerIO.requestInitUpdate);
 
             //pt.addAction(3, bar); // Display "no can do" if we have no data at all.
-            //pt.addAction(3, foo); // TODO: update distances if user asks.
-
+            
             pt.go();
+            theTimer.Start();
         }
 
         /// <summary>
@@ -166,10 +173,24 @@ namespace NextFerry
         /// the system will wait on the network availability for a certain amount of time before
         /// timing out.
         /// </summary>
-        private void findNetwork()
+        public void findNetwork()
         {
             usingNetwork = NetworkInterface.GetIsNetworkAvailable();
             // NB: BeginInvoke not needed, since this isn't UI state and there's no race conditions.
+        }
+
+        private static int counter = 0;
+        public void checkNetwork(Object o, EventArgs a)
+        {
+            counter++;
+            if (counter % 5 == 0)
+            {
+                if (!usingNetwork)
+                {
+                    System.Diagnostics.Debug.WriteLine("rechecking network");
+                    findNetwork();
+                }
+            }
         }
 
         #endregion

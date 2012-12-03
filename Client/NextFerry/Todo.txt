@@ -1,12 +1,10 @@
 ﻿
 What's next:
-	Location awareness factors into time-to-ferry
-	Wait time information factors into time-to-ferry --- need the data!
+	Test location awareness effects
 	Fetch alerts from our service
 	Add nice "no data yet" pop-up when needed.
 	Figure out how to handle one-off schedules (extra routes on Friday, or over a given weekend).
-	Add "refresh" button to main screen?
-	Initialize route *list* from server?
+
 
 What's done:
 	Get it into git.
@@ -45,4 +43,6 @@ What's done:
 	System is now working with deployed servide http://nextferry.appspot.com/
 	Improvements to visibility on main page
 	Added first implementation of travel distance on server (client not yet using).
+	Location awareness on the client is in!   
+	Unfortunately the emulator doesn't seem to help us debug it, so we'll actually have to drive around and see...
 

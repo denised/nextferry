@@ -75,6 +75,9 @@
     <Compile Include="Code\Holiday.cs" />
     <Compile Include="Code\PhaseTasker.cs" />
     <Compile Include="Code\ServerIO.cs" />
+    <Compile Include="help.xaml.cs">
+      <DependentUpon>help.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
@@ -88,7 +91,8 @@
     <Compile Include="RoutePage.xaml.cs">
       <DependentUpon>RoutePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Code\TravelTime.cs" />
+    <Compile Include="Code\Location.cs" />
+    <Compile Include="Code\Terminal.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -96,6 +100,10 @@
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
     <Page Include="Choose.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="help.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -117,11 +125,11 @@
     <None Include="Properties\WMAppManifest.xml">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="ServiceReferences.ClientConfig" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\IconLarge.png" />
     <Content Include="Resources\IconSmall.png" />
+    <Resource Include="Resources\warning.png" />
     <Content Include="SplashScreenImage.jpg" />
     <Resource Include="Resources\FerryCrop4.jpg" />
   </ItemGroup>
