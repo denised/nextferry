@@ -58,8 +58,9 @@ namespace NextFerry
 
             buttonWB.Style = (Style)this.Resources["toggleSelected"];
             buttonEB.Style = (Style)this.Resources["toggleUnselected"];
-            westsign.Visibility = Visibility.Visible;
-            eastsign.Visibility = Visibility.Collapsed;
+            ewsign.Opacity = 0;
+            ewsign.Text = "west";
+            fadeIn.Begin();
         }
 
         private void switchToEB(object sender, RoutedEventArgs e)
@@ -74,8 +75,9 @@ namespace NextFerry
 
             buttonWB.Style = (Style)this.Resources["toggleUnselected"];
             buttonEB.Style = (Style)this.Resources["toggleSelected"];
-            westsign.Visibility = Visibility.Collapsed;
-            eastsign.Visibility = Visibility.Visible;
+            ewsign.Opacity = 0;
+            ewsign.Text = "east";
+            fadeIn.Begin();
         }
 
 
@@ -116,6 +118,11 @@ namespace NextFerry
         public void removeWarning()
         {
             warning.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        private void notifications_Tap(object sender, GestureEventArgs e)
+        {
+
         }
     }
 }

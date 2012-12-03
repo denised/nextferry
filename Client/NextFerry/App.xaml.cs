@@ -161,8 +161,7 @@ namespace NextFerry
 
             pt.addAction(1, findNetwork);
             pt.addAction(2, ServerIO.requestInitUpdate);
-
-            //pt.addAction(3, bar); // Display "no can do" if we have no data at all.
+            pt.addAction(3, verifySchedule);
             
             pt.go();
             theTimer.Start();
@@ -190,6 +189,21 @@ namespace NextFerry
                     System.Diagnostics.Debug.WriteLine("rechecking network");
                     findNetwork();
                 }
+            }
+        }
+
+
+        /// <summary>
+        /// Show a pop-up message if we failed to get a schedule.
+        /// </summary>
+        public void verifySchedule()
+        {
+            if (!Routes.haveSchedules())
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    theMainPage.nonetwork.Visibility = System.Windows.Visibility.Visible;
+                });
             }
         }
 

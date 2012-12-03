@@ -74,6 +74,20 @@ namespace NextFerry
         }
 
         /// <summary>
+        /// Return true if we have schedules.   We cheat and say yes if we have *any* schedules
+        /// </summary>
+        /// <returns></returns>
+        public static bool haveSchedules()
+        {
+            foreach (Route r in AllRoutes)
+            {
+                if (r.display && r.weekday.times.Count > 0)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Perform update action on all routes that are displayed.
         /// </summary>
         public static void updateDisplay()

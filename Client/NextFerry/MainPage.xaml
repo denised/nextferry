@@ -25,10 +25,8 @@
         <SolidColorBrush x:Key="NoGoodRed" Color="#FF994E59"/>
         <SolidColorBrush x:Key="GoodGreen" Color="#FF198519"/>
         <SolidColorBrush x:Key="CautiousYellow" Color="#FFE0C226"/>
-        <!--<SolidColorBrush x:Key="GoodGreen" Color="#FF49BE0A"/>
-        <SolidColorBrush x:Key="CautiousYellow" Color="#FFD4CC0C"/>-->
         <SolidColorBrush x:Key="DarkerPugetGrey" Color="#FF43545C"/>
-        <SolidColorBrush x:Key="PaleYellow" Color="#FFDEE5B3"/>
+        <SolidColorBrush x:Key="PaleYellow" Color="#FFF1EE9A"/>
 
         <!-- How we format times -->
         <Style x:Name="rowBase" TargetType="TextBlock">
@@ -62,6 +60,11 @@
             <Setter Property="BorderBrush" Value="{StaticResource PhoneSubtleBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource MilkySky}"/>
         </Style>
+
+        <Storyboard x:Name="fadeIn">
+            <DoubleAnimation x:Name="doubleAnim" Storyboard.TargetName="ewsign" FillBehavior="HoldEnd"
+                             Storyboard.TargetProperty="Opacity" From="0.0" To="0.25" Duration="0:0:1.2"/>
+        </Storyboard>
     </phone:PhoneApplicationPage.Resources>
 
     <Grid x:Name="Main" Background="{StaticResource MilkySky}">
@@ -74,12 +77,20 @@
         <!-- Title -->
         <TextBlock Text="next ferry" Grid.Row="0" Margin="10,17,0,28"
                    Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}"/>
+        <TextBlock x:Name="ewsign" Text="west" Margin="0,29,26,-16"
+                   Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4" TextAlignment="Right"/>
 
+
+        <!-- Notification Button -->             
+        <Canvas x:Name="notifications" Height="38" Width="55" Margin="0,8,26,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+                Tap="notifications_Tap" Visibility="Collapsed">
+            <Rectangle Height="38" Width="55" RadiusX="10" RadiusY="10" Fill="{StaticResource PhoneAccentBrush}"/>
+            <TextBlock x:Name="notificationCount" Foreground="{StaticResource PhoneChromeBrush}" Margin="18,2,0,0"
+                       FontSize="22" FontWeight="Bold" Text="11"/>
+        </Canvas>
+            
+        <!-- Background image -->
         <Image Grid.Row="1" Grid.RowSpan="2" Source="Resources\FerryCrop4.jpg" Stretch="Fill"/>
-        <TextBlock x:Name="westsign" Text="west" Margin="0,29,26,-16"
-                   Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4" TextAlignment="Right"/>
-        <TextBlock x:Name="eastsign" Text="east" Margin="0,29,26,-16"
-                   Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4" TextAlignment="Right"/>
 
         <!-- Main Panel -->
         <!-- The only real trick here is that the listbox and itemscontrol show slices of the same data, and are kept -->
@@ -128,15 +139,21 @@
                 </ScrollViewer>
             </Grid>
         </ScrollViewer>
+        
+        <!-- No-network notification -->
+        <Canvas x:Name="nonetwork" Margin="80,20,79,118" Grid.Row="1" Width="320" Height="410" Visibility="Collapsed">
+            <Rectangle Fill="{StaticResource PaleYellow}" RadiusX="20" RadiusY="20" Width="320" Height="410"/>
+            <TextBlock TextWrapping="Wrap" Foreground="{StaticResource PugetGrey}" Width="240" Height="216" Canvas.Left="55" Canvas.Top="95"><Run Text="We're sorry: network access is required to obtain ferry schedules."/><LineBreak/><Run Text="Please re-open the app when you have a network connection."/></TextBlock>
+        </Canvas>
 
-        <!-- Choice Box -->
+
         <StackPanel Grid.Row="1" Orientation="Horizontal" Height="72" Margin="0,0,0,20" 
                     VerticalAlignment="Bottom" HorizontalAlignment="Center">
             <Button Content="westbound" x:Name="buttonWB" Click="switchToWB" Style="{StaticResource toggleSelected}"/>
             <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}"/>
         </StackPanel>
 
-        <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" Visibility="Collapsed">
+        <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" Visibility="Collapsed" HorizontalAlignment="Center">
             <Rectangle Height="33" Width="395" Fill="{StaticResource PaleYellow}" RadiusX="5" RadiusY="5"/>
             <TextBlock x:Name="warningText" Margin="40,0,0,0" Foreground="{StaticResource DarkerPugetGrey}" 
                        TextWrapping="NoWrap" TextAlignment="Center">
@@ -144,7 +161,7 @@
             </TextBlock>
             <Image Height="35" Width="35" HorizontalAlignment="Left" Source="Resources\warning.png" Stretch="Uniform"/>
         </Canvas>
-     </Grid>
+    </Grid>
 
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" Mode="Minimized" IsMenuEnabled="True" 

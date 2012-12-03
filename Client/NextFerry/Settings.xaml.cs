@@ -86,6 +86,8 @@ namespace NextFerry
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).usingNetwork = !((App)Application.Current).usingNetwork;
+            Routes.clearSchedules();
+            ((App)Application.Current).verifySchedule();
             //((App)Application.Current).theMainPage.addWarning("hi there!");
         }
     }

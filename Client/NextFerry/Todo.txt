@@ -2,9 +2,9 @@
 What's next:
 	Test location awareness effects
 	Fetch alerts from our service
-	Add nice "no data yet" pop-up when needed.
 	Figure out how to handle one-off schedules (extra routes on Friday, or over a given weekend).
 
+	It died in the background??
 
 What's done:
 	Get it into git.
@@ -40,9 +40,10 @@ What's done:
 
 	Version 2.0 rev 2
 	Switched to Google App Engine after being unable to do logging usefully.
-	System is now working with deployed servide http://nextferry.appspot.com/
+	System is now working with deployed service http://nextferry.appspot.com/
 	Improvements to visibility on main page
 	Added first implementation of travel distance on server (client not yet using).
 	Location awareness on the client is in!   
 	Unfortunately the emulator doesn't seem to help us debug it, so we'll actually have to drive around and see...
+	Added "no network" popup.
 
