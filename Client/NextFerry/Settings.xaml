@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:NextFerry"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -40,30 +41,38 @@
         
         <!-- Page Content -->
         <StackPanel Grid.Row="1" Margin="12,0,20,12">
-            <!-- Options -->
-            <Grid Margin="12,0,0,0" Width="436" Height="253">
-            	<TextBlock Text="Time format:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,23,0,0"/>
-            	<Button Content="12 hr" x:Name="time12" Click="switchTo12hr" Margin="149,4,179,0" VerticalAlignment="Top" Width="108"/>
-            	<Button Content="24 hr" x:Name="time24" Click="switchTo24hr" Margin="0,4,93,0" VerticalAlignment="Top" Width="108" HorizontalAlignment="Right" d:LayoutOverrides="Width"/>
-            	<TextBlock Text="Use Location:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,81,0,0" Width="130"/>
-            	<Button Content="Yes" x:Name="uselocYes" Click="uselocOn" Margin="149,62,179,0" Width="108" VerticalAlignment="Top"/>
-            	<Button Content="No" x:Name="uselocNo" Click="uselocOff" Margin="0,62,93,0" HorizontalAlignment="Right" Width="108" VerticalAlignment="Top"/>
-            	<TextBlock Text="Buffer time (min):" Margin="12,154,0,0" HorizontalAlignment="Left" ToolTipService.ToolTip="Time to allow before departure: travel and wait time." VerticalAlignment="Top"/>
-            	<Slider x:Name="waitslider" Minimum="0" Maximum="150" Value="35" SmallChange="5" LargeChange="10" FontSize="20" Margin="177,142,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="205"/>
-            	<TextBlock x:Name="slideValue" Text="{Binding Value, Converter={StaticResource wtConverter}, ElementName=waitslider}" 
-            		Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Right" Margin="0,156,30,0" VerticalAlignment="Top"/>
-            	<TextBlock x:Name="explanation" TextWrapping="Wrap" Margin="12,0,0,0" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Left" Width="165" Text="Travel + wait time." VerticalAlignment="Bottom" Height="68"/>
-            </Grid>
-
-            <!-- Clear Cache -->
-            <Button Content="Refresh Schedules" Click="deleteCache" Margin="8,0,8,-4"/>
-            <TextBlock TextWrapping="Wrap" Margin="20,-4,6,0" Style="{StaticResource PhoneTextSmallStyle}"><Run Text="Delete cached schedules on phone. Restart application to begin reloading."/></TextBlock>
-            <TextBlock x:Name="cacheStatus" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">Sample text.</TextBlock>
-
-
-            <!-- Testing -->
-            <Button Content="Click here" Margin="8,30,12,0" Click="Button_Click"/>
-            <TextBox x:Name="testResultScreen" Margin="20,0,0,0"/>
+        	<Canvas x:Name="timeformatblock" Height="89" Margin="25,0,0,0">
+        		<TextBlock Text="Time format"/>
+        		<Button Content="12 hr" x:Name="time12" Click="switchTo12hr" Width="108" d:LayoutOverrides="HorizontalAlignment, Width" Canvas.Top="25"/>
+        		<Button Content="24 hr" x:Name="time24" Click="switchTo24hr" Width="108" HorizontalAlignment="Right" d:LayoutOverrides="Width" Canvas.Left="90" Canvas.Top="25"/>
+        	</Canvas>
+        	<Canvas x:Name="uselocationblock" Margin="25,10,0,0" Height="116">
+        		<TextBlock Text="Use Location" Width="130"/>
+        		<toolkit:ToggleSwitch x:Name="useLoc"  IsChecked="False" Height="113" Canvas.Top="3" Width="256" Canvas.Left="1"
+                                      Checked="uselocOn" Unchecked="uselocOff"/>
+        	</Canvas>
+        	<Canvas x:Name="buffertimeblock" Height="104" Margin="15,-20,0,0">
+        		<TextBlock Text="Buffer time (min)" ToolTipService.ToolTip="Time to allow before departure: travel and wait time." VerticalAlignment="Top" Canvas.Left="10"/>
+        		<Slider x:Name="waitslider" Minimum="0" Maximum="150" Value="35" SmallChange="5" LargeChange="10" FontSize="20" VerticalAlignment="Top" Width="205" Canvas.Top="15" Canvas.Left="14"/>
+        		<TextBlock x:Name="slideValue" Text="{Binding Value, Converter={StaticResource wtConverter}, ElementName=waitslider}" 
+        			Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Top" Canvas.Left="218" Canvas.Top="30"/>
+        		<TextBlock x:Name="explanation" TextWrapping="Wrap" Margin="0" Style="{StaticResource PhoneTextSmallStyle}" Width="201" Text="Travel + wait time." Height="42" Canvas.Left="23" Canvas.Top="57"/>
+        	</Canvas>
+        	<StackPanel x:Name="refreshschedulesblock" Margin="8,0,0,0" Orientation="Vertical">
+        		<Button Content="Refresh Schedules" Click="deleteCache" Margin="0,0,8,0"/>
+        		<TextBlock TextWrapping="Wrap" Margin="12,0,6,0" Style="{StaticResource PhoneTextSmallStyle}"><Run Text="Delete cached schedules on phone. Restart application to begin reloading."/></TextBlock>
+        		<TextBlock x:Name="cacheStatus" Margin="12,0,0,0" Style="{StaticResource PhoneTextSmallStyle}"><Run Text="Sample text."/></TextBlock>
+        	</StackPanel>
+        	<Canvas x:Name="debugblock" Margin="25,10,0,0" Height="116">
+                <TextBlock Text="Debugging" Width="130"/> 
+                <HyperlinkButton Canvas.Left="296" Canvas.Top="8" Content="Go To Log" Height="102" Width="121" FontSize="18.667"
+                        Click="gotoLog" />
+        		<toolkit:ToggleSwitch x:Name="debug" IsChecked="False" Height="108" Canvas.Top="8" Width="256" Canvas.Left="1"
+                                      Checked="debug_Checked" Unchecked="debug_Unchecked"/>
+                <Rectangle Canvas.Left="0" Canvas.Top="0" Height="116" Name="blind" Width="423" 
+                           Fill="{StaticResource PhoneBackgroundBrush}"
+                           DoubleTap="magic_DoubleTap"/>
+            </Canvas>
         </StackPanel>
     </Grid>
 

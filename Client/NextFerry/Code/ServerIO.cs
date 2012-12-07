@@ -31,7 +31,7 @@ namespace NextFerry
                 WebClient request = new WebClient();
                 string appVersion = ((App)Application.Current).appVersion;
                 Uri uri = new Uri(String.Format("{0}/{1}/{2}", initURL, appVersion, AppSettings.cacheVersion));
-                System.Diagnostics.Debug.WriteLine("Sending " + uri);
+                Log.write("Sending " + uri);
 
                 try
                 {
@@ -42,7 +42,7 @@ namespace NextFerry
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error accessing Server (init): " + e.Message);
+                    Log.write("Error accessing Server (init): " + e.Message);
                 }
             }
         }
@@ -56,7 +56,7 @@ namespace NextFerry
                 string appVersion = ((App)Application.Current).appVersion;
 
                 Uri uri = new Uri(String.Format("{0}/{1}/{2}", travelURL, appVersion, loc));
-                System.Diagnostics.Debug.WriteLine("Sending " + uri);
+                Log.write("Sending " + uri);
 
                 try
                 {
@@ -65,7 +65,7 @@ namespace NextFerry
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error accessing Server (travel): " + e.Message);
+                    Log.write("Error accessing Server (travel): " + e.Message);
                 }
             }
         }
@@ -80,12 +80,12 @@ namespace NextFerry
             {
                 if (args.Error != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("fetch failed: " + args.Error.ToString());
+                    Log.write("fetch failed: " + args.Error.ToString());
                     return;
                 }
                 else if (args.Cancelled)
                 {
-                    System.Diagnostics.Debug.WriteLine("fetch cancelled");
+                    Log.write("fetch cancelled");
                     // skip; it will be reread another time
                     return;
                 }
@@ -97,7 +97,7 @@ namespace NextFerry
                 {
                     if (!controlLine.StartsWith("#"))
                     {
-                        System.Diagnostics.Debug.WriteLine("Error: expected control line, got " + controlLine);
+                        Log.write("Error: expected control line, got " + controlLine);
                         // abandon ship.
                         return;
                     }
@@ -140,7 +140,7 @@ namespace NextFerry
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Unexpected exception in ServerIO " + e);
+                Log.write("Unexpected exception in ServerIO " + e);
             }
             finally
             {

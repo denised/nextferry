@@ -15,7 +15,7 @@ namespace NextFerry
             lastupdate = DateTime.Now;
             Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    System.Diagnostics.Debug.WriteLine("Adding location check");
+                    Log.write("Adding location check");
                     ((App)Application.Current).theTimer.Tick += checkNow;
                 });
             // do one call immediately
@@ -34,10 +34,10 @@ namespace NextFerry
 
         public static void checkNow(Object sender, EventArgs args)
         {
-            System.Diagnostics.Debug.WriteLine("checkNow @ {0:t}", DateTime.Now);
+            Log.write(String.Format("checkNow @ {0:t}", DateTime.Now));
             if (AppSettings.useLocation && ((App)Application.Current).usingNetwork)
             {
-                //System.Diagnostics.Debug.WriteLine("getting location");
+                //Log.write("getting location");
                 ImmediateLocation loc = new ImmediateLocation(consumeLocation);
                 loc.GetLocation();
             }
@@ -46,7 +46,7 @@ namespace NextFerry
             if (AppSettings.useLocation)
             {
                 int age = (int)(DateTime.Now - lastupdate).TotalMinutes;
-                System.Diagnostics.Debug.WriteLine("tt age is " + age);
+                Log.write("tt age is " + age);
                 if (age > 10)
                 {
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -55,7 +55,7 @@ namespace NextFerry
                             ((App)Application.Current).theMainPage.addWarning("Unable to get travel times");
                         });
                 }
-                else if (age > 6)
+                else if (age > 5)
                 {
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
@@ -67,7 +67,7 @@ namespace NextFerry
 
         public static void consumeLocation(GeoCoordinate gc)
         {
-            //System.Diagnostics.Debug.WriteLine("tock: got {0} at {1:t}", gc.ToString(), DateTime.Now);
+            //Log.write("tock: got {0} at {1:t}", gc.ToString(), DateTime.Now);
             if (!gc.IsUnknown)
             {
                 ServerIO.requestTravelTimes(String.Format("{0:F6},{1:F6}", gc.Latitude, gc.Longitude));

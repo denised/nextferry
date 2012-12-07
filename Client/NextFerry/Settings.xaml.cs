@@ -8,6 +8,8 @@ namespace NextFerry
 {
     public partial class Settings : PhoneApplicationPage
     {
+        private const string explainWT = "Wait time.";
+        private const string explainWTT = "Travel + wait time.";
 
         public Settings()
         {
@@ -19,10 +21,14 @@ namespace NextFerry
             time12.Style = (Style)this.Resources[ AppSettings.display12hr ? "toggleSelected" : "toggleUnselected" ];
             time24.Style = (Style)this.Resources[ AppSettings.display12hr ? "toggleUnselected" : "toggleSelected" ];
 
-            uselocYes.Style = (Style)this.Resources[AppSettings.useLocation ? "toggleSelected" : "toggleUnselected"];
-            uselocNo.Style = (Style)this.Resources[AppSettings.useLocation ? "toggleUnselected" : "toggleSelected"];
-
             waitslider.Value = AppSettings.bufferTime;
+            useLoc.IsChecked = AppSettings.useLocation;
+            explanation.Text = (AppSettings.useLocation ? explainWT : explainWTT);
+
+            debug.IsChecked = AppSettings.debug;
+            setDebugAppearance(AppSettings.debug);
+
+
             cacheStatus.Text = RouteIO.cacheStatus();
         }
 
@@ -60,27 +66,30 @@ namespace NextFerry
 
         private void uselocOn(object sender, RoutedEventArgs e)
         {
-            AppSettings.useLocation = true;
-            uselocYes.Style = (Style)this.Resources["toggleSelected"];
-            uselocNo.Style = (Style)this.Resources["toggleUnselected"];
-            explanation.Text = "Wait time.";
-            int val = Int16.Parse(slideValue.Text);
-            if (val > 10)
-            {
-                waitslider.Value = Math.Max(5,val-30);
+            if (!AppSettings.useLocation)   // the check is because the toggle switch will trigger an event
+            {                               // even when being initialized, which we don't want to respond to.
+                AppSettings.useLocation = true;
+                explanation.Text = explainWT;
+                int val = Int16.Parse(slideValue.Text);
+                if (val > 10)
+                {
+                    waitslider.Value = Math.Max(5, val - 30);
+                }
+                LocationMonitor.checkNow(null, null);
             }
-            LocationMonitor.checkNow(null, null);
         }
 
         private void uselocOff(object sender, RoutedEventArgs e)
         {
-            AppSettings.useLocation = false;
-            uselocYes.Style = (Style)this.Resources["toggleUnselected"];
-            uselocNo.Style = (Style)this.Resources["toggleSelected"];
-            explanation.Text = "Travel + wait time.";
-            int newval = Int16.Parse(slideValue.Text) + 30;
-            waitslider.Value = (newval > waitslider.Maximum ? waitslider.Maximum : newval);
+            if (AppSettings.useLocation)
+            {
+                AppSettings.useLocation = false;
+                explanation.Text = explainWTT;
+                int newval = Int16.Parse(slideValue.Text) + 30;
+                waitslider.Value = (newval > waitslider.Maximum ? waitslider.Maximum : newval);
+            }
         }
+
 
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -90,9 +99,43 @@ namespace NextFerry
             ((App)Application.Current).verifySchedule();
             //((App)Application.Current).theMainPage.addWarning("hi there!");
         }
+
+
+        // We do a little sleight of hand with some controls that appear and disappear,
+        // depending on state.
+        private void setDebugAppearance(bool appear)
+        {
+            // The blind blocks the view of the rest of the controls, so we want the blind to be
+            // *visible* when the controls are *invisible* and vice versa.
+            blind.Visibility = (appear ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible);
+        }
+
+        private void gotoLog(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/debug.xaml", UriKind.Relative));
+        }
+
+        private void magic_DoubleTap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            setDebugAppearance(true);
+        }
+
+        private void debug_Checked(object sender, RoutedEventArgs e)
+        {
+            AppSettings.debug = true;
+        }
+
+        private void debug_Unchecked(object sender, RoutedEventArgs e)
+        {
+            AppSettings.debug = false;
+            setDebugAppearance(false);
+        }
     }
 
 
+    /// <summary>
+    /// Convert the slider value (a double) into an integer divisible by five.
+    /// </summary>
     public class wtConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

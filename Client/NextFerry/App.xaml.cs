@@ -93,7 +93,7 @@ namespace NextFerry
             // other threads that we can't put a try/catch around.
             if (e.ExceptionObject is System.ServiceModel.CommunicationException)
             {
-                System.Diagnostics.Debug.WriteLine("Server communication failure: " + e.ExceptionObject.Message);
+                Log.write("Server communication failure: " + e.ExceptionObject.Message);
                 e.Handled = true;
             }
             else if (System.Diagnostics.Debugger.IsAttached)
@@ -186,7 +186,7 @@ namespace NextFerry
             {
                 if (!usingNetwork)
                 {
-                    System.Diagnostics.Debug.WriteLine("rechecking network");
+                    Log.write("rechecking network");
                     findNetwork();
                 }
             }

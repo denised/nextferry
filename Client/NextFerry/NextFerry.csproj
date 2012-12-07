@@ -53,6 +53,7 @@
     <Reference Include="Microsoft.Expression.Interactions" />
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Controls" />
+    <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Phone.Interop" />
     <Reference Include="System.Device" />
     <Reference Include="System.Runtime.Serialization" />
@@ -73,10 +74,16 @@
       <DependentUpon>Choose.xaml</DependentUpon>
     </Compile>
     <Compile Include="Code\AppSettings.cs" />
+    <Compile Include="Code\MemoryStats.cs" />
     <Compile Include="Code\RouteIO.cs" />
     <Compile Include="Code\Holiday.cs" />
     <Compile Include="Code\PhaseTasker.cs" />
+    <Compile Include="Code\RunTimeDebug.cs" />
+    <Compile Include="Code\RunTimeDebugDisplay.cs" />
     <Compile Include="Code\ServerIO.cs" />
+    <Compile Include="debug.xaml.cs">
+      <DependentUpon>debug.xaml</DependentUpon>
+    </Compile>
     <Compile Include="help.xaml.cs">
       <DependentUpon>help.xaml</DependentUpon>
     </Compile>
@@ -102,6 +109,10 @@
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
     <Page Include="Choose.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="debug.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -28,7 +28,7 @@ namespace NextFerry
         /// </summary>
         public static void writeCache(string newtext)
         {
-            System.Diagnostics.Debug.WriteLine("writing cache");
+            Log.write("writing cache");
             using (IsolatedStorageFileStream stream = new IsolatedStorageFileStream(scheduleFile, FileMode.Create, myStore))
             {
                 using (StreamWriter writer = new StreamWriter(stream))
@@ -54,11 +54,11 @@ namespace NextFerry
                             deserialize(isoFileReader);
                         }
                     }
-                    System.Diagnostics.Debug.WriteLine("readCache succeeded");
+                    Log.write("readCache succeeded");
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine("readCache failed: " + e.Message);
+                    Log.write("readCache failed: " + e.Message);
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace NextFerry
                 {
                     string line = s.ReadLine();
                     if (line == null) break;
-                    System.Diagnostics.Debug.WriteLine("deserialize: |" + line + "|");
+                    Log.write("deserialize: |" + line + "|");
                     // Skip comments and empty lines.
                     if (line.Length < 2) continue;
                     if (line.StartsWith("//")) continue;
@@ -89,7 +89,7 @@ namespace NextFerry
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Unexpected exception in Route deserialize " + e);
+                Log.write("Unexpected exception in Route deserialize " + e);
                 return false;
             }
         }
@@ -123,7 +123,7 @@ namespace NextFerry
                 throw new ArgumentException("unexpected route name");
 
             // Update AllRoutes.
-            System.Diagnostics.Debug.WriteLine("updating " + r.name + "/" + r.direction + "/" + news.isWeekend);
+            Log.write("updating " + r.name + "/" + r.direction + "/" + news.isWeekend);
             r.setScheduleMT(news, true);
         }
 
@@ -139,7 +139,7 @@ namespace NextFerry
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Unable to clear cache: " + e.Message);
+                Log.write("Unable to clear cache: " + e.Message);
             }
         }
 

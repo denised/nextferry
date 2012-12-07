@@ -116,7 +116,7 @@ namespace NextFerry
                 string[] ss = line.Split(':');
                 if (ss.Length != 2)
                 {
-                    System.Diagnostics.Debug.WriteLine("Badly formatted travel time response?  " + line);
+                    Log.write("Badly formatted travel time response?  " + line);
                     return;
                 }
                 int code, val;
@@ -129,7 +129,7 @@ namespace NextFerry
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Unable to parse travel time response " + line);
+                    Log.write("Unable to parse travel time response " + line);
                     return;
                 }
             }

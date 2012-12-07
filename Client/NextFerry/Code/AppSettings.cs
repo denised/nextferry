@@ -18,6 +18,7 @@ namespace NextFerry
         public const string KdisplaySettings = "displaySettings";
         public const string KcacheVersion = "cacheVersion";
         public const string KuseLocation = "useLocation";
+        public const string Kdebug = "debug";
 
         private static bool _displayWB = true;
         public static bool displayWB
@@ -87,6 +88,18 @@ namespace NextFerry
             }
         }
 
+        private static bool _debug = false;
+        public static bool debug
+        {
+            get { return _debug; }
+            set
+            {
+                _debug = value;
+                IsolatedStorageSettings.ApplicationSettings[Kdebug] = value;
+                OnChanged(Kdebug);
+            }
+        }
+
         public static event PropertyChangedEventHandler PropertyChanged;
         public static void OnChanged(string s)
         {
@@ -108,6 +121,7 @@ namespace NextFerry
             init<int>(KbufferTime);
             init<string>(KcacheVersion);
             init<bool>(KuseLocation);
+            init<bool>(Kdebug);
             init<List<RouteSetting>>(KdisplaySettings);
             RouteSetting.init(_displaySettings);
         }
@@ -179,7 +193,7 @@ namespace NextFerry
         {
             if (dlist.Count == 0)
             {
-                System.Diagnostics.Debug.WriteLine("no display settings found");
+                Log.write("no display settings found");
                 foreach (Route r in Routes.AllRoutes)
                 {
                     if (String.Equals(r.direction, "wb")) // get only one of the wb/eb pair of routes

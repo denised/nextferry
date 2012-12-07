@@ -52,7 +52,7 @@ namespace NextFerry
 
             if (routeName == null)
             {
-                System.Diagnostics.Debug.WriteLine("Can't recover RoutePage state!");
+                Log.write("Can't recover RoutePage state!");
                 throw new InvalidOperationException();
             }
 

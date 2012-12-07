@@ -32,6 +32,8 @@ namespace NextFerry
 
             list1.ItemsSource = displayRoutes;
             list3.ItemsSource = displayRoutes;
+
+            WP7Contrib.Diagnostics.RuntimeDebug.Initialize(true, false, "denisesandbox@mailup.net", "");
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -80,8 +82,13 @@ namespace NextFerry
             fadeIn.Begin();
         }
 
+        private void notifications_Tap(object sender, EventArgs e)
+        {
 
-        private void gotoRoutePage(object sender, GestureEventArgs e)
+        }
+
+
+        private void gotoRoutePage(object sender, System.Windows.Input.GestureEventArgs e)
         {          
             // Figure out which item we were on (thank you msdn code samples!)
             FrameworkElement item = (FrameworkElement)e.OriginalSource;
@@ -120,9 +127,6 @@ namespace NextFerry
             warning.Visibility = System.Windows.Visibility.Collapsed;
         }
 
-        private void notifications_Tap(object sender, GestureEventArgs e)
-        {
 
-        }
     }
 }
