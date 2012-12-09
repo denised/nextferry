@@ -1,5 +1,7 @@
 ﻿namespace NextFerry
 {
+    using System.Collections.Generic;
+
     public static class Log
     {
         public static void write(object o)
@@ -11,6 +13,14 @@
                 {
                     WP7Contrib.Diagnostics.RuntimeDebug.Write(o);
                 });
+            }
+        }
+
+        public static void write<X,Y>(IDictionary<X,Y> d)
+        {
+            foreach (KeyValuePair<X,Y> item in d)
+            {
+                Log.write("> " + item.Key.ToString() + ": " + item.Value.ToString());
             }
         }
     }

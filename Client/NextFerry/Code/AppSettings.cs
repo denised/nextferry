@@ -158,7 +158,7 @@ namespace NextFerry
 
     public class RouteSetting
     {
-        public string name { get; set; }
+        public string wbname { get; set; }
         private bool _display;
         public bool display
         {
@@ -176,10 +176,11 @@ namespace NextFerry
         public void propagate()
         {
             // when deserializing, sometimes name is not set yet.
-            if (name != null)
+            if (wbname != null)
             {
-                Routes.getRoute(name, "wb").display = _display;
-                Routes.getRoute(name, "eb").display = _display;
+                Route r = Routes.getRoute(wbname, "wb");
+                r.display = _display;
+                r.sibling().display = _display;
             }
         }
 
@@ -196,8 +197,8 @@ namespace NextFerry
                 Log.write("no display settings found");
                 foreach (Route r in Routes.AllRoutes)
                 {
-                    if (String.Equals(r.direction, "wb")) // get only one of the wb/eb pair of routes
-                        dlist.Add(new RouteSetting { name = r.name, display = false });
+                    if (String.Equals(r.direction, "wb")) // get only the westbound routes.
+                        dlist.Add(new RouteSetting { wbname = r.name, display = false });
                 }
                 // First time display just a couple of routes to keep things simple
                 // This happens to be Bainbridge and Edmonds, the most popular.

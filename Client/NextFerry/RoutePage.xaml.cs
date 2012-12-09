@@ -59,21 +59,21 @@ namespace NextFerry
             routeWB = Routes.getRoute(routeName, "wb");
             routeEB = Routes.getRoute(routeName, "eb");
 
+            // some names are different in each direction,
+            // in which case we need to recover the missing one from its sibling.
+            if (routeWB == null) routeWB = routeEB.sibling();
+            if (routeEB == null) routeEB = routeWB.sibling();
+
             eastport.Text = routeWB.eastTerminal().name;
             westport.Text = routeWB.westTerminal().name;
 
             assignLists();
-
-            routeEB.PropertyChanged += maybeRedraw;
-            routeEB.PropertyChanged += maybeRedraw;
         }
 
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
         {
             // We just store the name of the route and regenerate everything else (it's cheap enough)
             State["route"] = routeWB.name;
-            routeWB.PropertyChanged -= maybeRedraw;
-            routeEB.PropertyChanged -= maybeRedraw;
         }
 
         private void gotoSettings(object sender, EventArgs e)

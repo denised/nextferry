@@ -25,6 +25,7 @@ namespace NextFerry
         // Call when update has been confirmed.
         public static void confirm()
         {
+            Log.write(String.Format("Confirming @ {0:T}",DateTime.Now));
             lastupdate = DateTime.Now;
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
@@ -34,7 +35,7 @@ namespace NextFerry
 
         public static void checkNow(Object sender, EventArgs args)
         {
-            Log.write(String.Format("checkNow @ {0:t}", DateTime.Now));
+            Log.write(String.Format("checkNow @ {0:T}", DateTime.Now));
             if (AppSettings.useLocation && ((App)Application.Current).usingNetwork)
             {
                 //Log.write("getting location");
@@ -55,7 +56,7 @@ namespace NextFerry
                             ((App)Application.Current).theMainPage.addWarning("Unable to get travel times");
                         });
                 }
-                else if (age > 5)
+                else if (age > 2)
                 {
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                         {
@@ -68,7 +69,7 @@ namespace NextFerry
         public static void consumeLocation(GeoCoordinate gc)
         {
             //Log.write("tock: got {0} at {1:t}", gc.ToString(), DateTime.Now);
-            if (!gc.IsUnknown)
+            if (!gc.IsUnknown && gc.HorizontalAccuracy < 1000) // only use if accuracy within 1000 meters
             {
                 ServerIO.requestTravelTimes(String.Format("{0:F6},{1:F6}", gc.Latitude, gc.Longitude));
             }

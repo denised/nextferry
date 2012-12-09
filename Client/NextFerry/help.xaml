@@ -55,13 +55,12 @@
 
                 <TextBlock Text="notices" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
                 <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                    This application uses network access to retrieve ferry schedules and
-                    travel times.  The amount of data required is minimal.  However there may
-                    be occasions when the application cannot show results if network access is
-                    not available.
+                    This application uses network access to retrieve data, including
+                    ferry schedules and travel times.  The amount of data required is minimal.  
+                    Network access and location accuracy can be poor in some parts of the Puget Sound region.
                 </TextBlock>
                 <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                    This application uses schedule and recommended wait times from WSDOT, but is not affiliated with WSDOT.
+                    This application uses schedule and other information from WSDOT, but is not affiliated with WSDOT.
                 </TextBlock>
                 <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
                     This application may use travel estimates from MapQuest, but is not affiliated with MapQuest.

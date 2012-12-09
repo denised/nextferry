@@ -4,7 +4,15 @@ What's next:
 	Fetch alerts from our service
 	Figure out how to handle one-off schedules (extra routes on Friday, or over a given weekend).
 
-	It died in the background??
+	Airplane mode doesn't cause staleness
+
+	Suspected crashes --- deploy w/ logging to check.
+
+	Fix location for Pierce-west of narrows bridge.  (Server change)
+	Make travel time per route, so it can include wait time, eventually.
+
+
+			
 
 What's done:
 	Get it into git.
@@ -46,4 +54,5 @@ What's done:
 	Location awareness on the client is in!   
 	Unfortunately the emulator doesn't seem to help us debug it, so we'll actually have to drive around and see...
 	Added "no network" popup.
+	Made vashon-* names direction specific
 

@@ -27,15 +27,15 @@ namespace NextFerry
             new Route("wb", "pt townsend", 11, 17 ),
             new Route("eb", "pt townsend", 17, 11 ),
             new Route("wb", "fauntleroy-southworth", 9, 20 ),
-            new Route("eb", "fauntleroy-southworth", 20, 9 ),
+            new Route("eb", "southworth-fauntleroy", 20, 9 ),
             new Route("wb", "fauntleroy-vashon", 9, 22 ),
-            new Route("eb", "fauntleroy-vashon", 22, 9 ),
+            new Route("eb", "vashon-fauntleroy", 22, 9 ),
             new Route("wb", "vashon-southworth", 22, 20 ),
-            new Route("eb", "vashon-southworth", 20, 22 ),
+            new Route("eb", "southworth-vashon", 20, 22 ),
             new Route("wb", "bremerton", 7, 4 ),
             new Route("eb", "bremerton", 4, 7 ),
-            new Route("wb", "pt defiance", 21, 16 ),  // OK, so WB/EB doesn't make sense in this case...
-            new Route("eb", "pt defiance", 16, 21 ),
+            new Route("wb", "vashon-pt defiance", 21, 16 ),  // OK, so WB/EB doesn't make sense in this case...
+            new Route("eb", "pt defiance-vashon", 16, 21 ),
             new Route("wb", "friday harbor", 1, 10 ),   // these aren't perfect either, but hopefully useful enough
             new Route("eb", "friday harbor", 10, 1 ),   
             new Route("wb", "orcas", 1, 15 ),
@@ -62,6 +62,14 @@ namespace NextFerry
                 if (r.sourceCode == sCode && r.destCode == dCode)
                     return r;
             return null;
+        }
+
+        /// <summary>
+        /// Get the matching route in the other dirction
+        /// </summary>
+        public static Route getSibling(Route r)
+        {
+            return getRoute(r.destCode, r.sourceCode);
         }
 
         /// <summary>

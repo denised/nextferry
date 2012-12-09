@@ -54,7 +54,6 @@ namespace NextFerry
                             deserialize(isoFileReader);
                         }
                     }
-                    Log.write("readCache succeeded");
                 }
                 catch (Exception e)
                 {
@@ -77,7 +76,7 @@ namespace NextFerry
                 {
                     string line = s.ReadLine();
                     if (line == null) break;
-                    Log.write("deserialize: |" + line + "|");
+                    //Log.write("deserialize: |" + line + "|");
                     // Skip comments and empty lines.
                     if (line.Length < 2) continue;
                     if (line.StartsWith("//")) continue;
@@ -85,6 +84,7 @@ namespace NextFerry
                     parseLine(line);
                     count++;
                 }
+                Log.write("Deserialize successful (" + count + ")");
                 return (count == Routes.AllRoutes.Count * 2);
             }
             catch (Exception e)
@@ -120,10 +120,10 @@ namespace NextFerry
 
             Route r = Routes.getRoute(name, iswest ? "wb" : "eb");
             if (r == null)
-                throw new ArgumentException("unexpected route name");
+                throw new ArgumentException("unexpected route name " + name);
 
             // Update AllRoutes.
-            Log.write("updating " + r.name + "/" + r.direction + "/" + news.isWeekend);
+            //Log.write("updating " + r.name + "/" + r.direction + "/" + news.isWeekend);
             r.setScheduleMT(news, true);
         }
 
@@ -139,7 +139,7 @@ namespace NextFerry
             }
             catch (Exception e)
             {
-                Log.write("Unable to clear cache: " + e.Message);
+                Log.write("Unable to clear cache: " + e);
             }
         }
 

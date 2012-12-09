@@ -201,6 +201,10 @@ namespace NextFerry
             return Terminal.lookup(direction[0] == 'w' ? destCode : sourceCode);
         }
 
+        public Route sibling()
+        {
+            return Routes.getSibling(this);
+        }
 
         /// <summary>
         /// Return true if the weekend schedule should be used today, i.e. today is a weekend or holiday.

@@ -156,8 +156,8 @@ namespace NextFerry
         /// Rule 2: There are five possible states:
         ///         Too late:  Now + 0.95(tt + wait) is after  departure time
         ///            (Translation: even if you drive too fast, you will be too late.)
-        ///         Risky:  not too late   AND   Now + (tt + wait)  is after  (departure time - 5min)
-        ///             (Translation: reasonable travel and wait estimates don't get you there with at least 5 min to spare)
+        ///         Risky:  not too late   AND   Now + (tt + wait)  is after  departure time
+        ///             (Translation: reasonable travel and wait estimates don't get you there on time)
         ///         Good:  neither of the above  AND this is within a couple of hours from now
         ///         Indifferent: none of the above  **OR** terminal is out of range.
         ///         Unknown: we cannot get server data, so we don't have up-to-date info on travel time or range.
@@ -187,7 +187,7 @@ namespace NextFerry
                 goodness = Unknown;
             else if (now + 0.95 * (tt + buffer) > this.value)
                 goodness = TooLate;
-            else if (now + tt + buffer + 5 > this.value)
+            else if (now + tt + buffer > this.value)
                 goodness = Risky;
             else if (now + tt + buffer + 120 > this.value)
                 goodness = Good;
