@@ -11,6 +11,8 @@ What's next:
 	Fix location for Pierce-west of narrows bridge.  (Server change)
 	Make travel time per route, so it can include wait time, eventually.
 
+	Remove diag button from debug display.
+
 
 			
 

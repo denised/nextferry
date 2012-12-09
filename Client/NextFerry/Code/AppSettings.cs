@@ -19,6 +19,7 @@ namespace NextFerry
         public const string KcacheVersion = "cacheVersion";
         public const string KuseLocation = "useLocation";
         public const string Kdebug = "debug";
+        public const string KlastAppVersion = "lastAppVersion";
 
         private static bool _displayWB = true;
         public static bool displayWB
@@ -100,6 +101,22 @@ namespace NextFerry
             }
         }
 
+        private static string _lastAppVersion = "0.0";
+        /// <summary>
+        /// The last version of the application to run before this invocation.
+        /// This allows us to check for upgrades and perform one-time behaviors.
+        /// </summary>
+        public static string lastAppVersion
+        {
+            get { return _lastAppVersion; }
+            set
+            {
+                _lastAppVersion = value;
+                IsolatedStorageSettings.ApplicationSettings[KlastAppVersion] = value;
+                OnChanged(KlastAppVersion);
+            }
+        }
+
         public static event PropertyChangedEventHandler PropertyChanged;
         public static void OnChanged(string s)
         {
@@ -122,6 +139,7 @@ namespace NextFerry
             init<string>(KcacheVersion);
             init<bool>(KuseLocation);
             init<bool>(Kdebug);
+            init<string>(KlastAppVersion);
             init<List<RouteSetting>>(KdisplaySettings);
             RouteSetting.init(_displaySettings);
         }

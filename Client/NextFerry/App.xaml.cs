@@ -36,6 +36,13 @@ namespace NextFerry
         {
             // call order matters.
             AppSettings.init();
+            if (! appVersion.Equals(AppSettings.lastAppVersion))
+            {
+                // Clear the cache --- it will have bad route data.
+                Log.write("upgrading from V1");
+                RouteIO.deleteCache();
+                AppSettings.lastAppVersion = appVersion;
+            }
             startThreads(true);
         }
 

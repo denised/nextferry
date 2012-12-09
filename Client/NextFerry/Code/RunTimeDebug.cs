@@ -16,9 +16,17 @@
             }
         }
 
-        public static void write<X,Y>(IDictionary<X,Y> d)
+        public static void writeSeq<X>(IEnumerable<X> seq)
         {
-            foreach (KeyValuePair<X,Y> item in d)
+            foreach (X item in seq)
+            {
+                Log.write("> " + item.ToString());
+            }
+        }
+
+        public static void writeDict<X, Y>(IDictionary<X, Y> d)
+        {
+            foreach (KeyValuePair<X, Y> item in d)
             {
                 Log.write("> " + item.Key.ToString() + ": " + item.Value.ToString());
             }
