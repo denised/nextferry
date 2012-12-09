@@ -71,20 +71,20 @@
 
             Button clearButton = new Button();
             Button emailButton = new Button();
-            Border memoryborder = new Border();
-            memoryborder.Opacity = 0.5;
-            memoryborder.Background = new SolidColorBrush(Colors.White);
+            //Border memoryborder = new Border();
+            //memoryborder.Opacity = 0.5;
+            //memoryborder.Background = new SolidColorBrush(Colors.White);
 
-            TextBlock memoryoutput = new TextBlock();
-            memoryoutput.Foreground = new SolidColorBrush(Colors.Red);
-            memoryoutput.FontWeight = FontWeights.ExtraBold;
-            memoryborder.Child = memoryoutput;
-            memoryborder.Visibility = Visibility.Collapsed;
+            //TextBlock memoryoutput = new TextBlock();
+            //memoryoutput.Foreground = new SolidColorBrush(Colors.Red);
+            //memoryoutput.FontWeight = FontWeights.ExtraBold;
+            //memoryborder.Child = memoryoutput;
+            //memoryborder.Visibility = Visibility.Collapsed;
 
             Rectangle line = new Rectangle() { Height = 2, Fill = new SolidColorBrush(Colors.Red) };
             line.Visibility = System.Windows.Visibility.Collapsed;
 
-            memoryoutput.Text = MemoryStats.DebugString; 
+            //memoryoutput.Text = MemoryStats.DebugString; 
             
             ItemsControl ic = new ItemsControl();
             ic.IsHitTestVisible = false;
@@ -92,35 +92,35 @@
             ic.ItemsSource = ItemSource;
             ic.Foreground = new SolidColorBrush(Colors.Red);
             ic.FontWeight = FontWeights.Bold;
-            CheckBox cb = new CheckBox();
-            cb.Checked += delegate(object sender2, RoutedEventArgs e2)
-            {
-                ic.Visibility = Visibility.Visible;
-                clearButton.Visibility = Visibility.Visible;
-                emailButton.Visibility = Visibility.Visible;
-                memoryborder.Visibility = Visibility.Visible;
-                line.Visibility = System.Windows.Visibility.Visible;
-            };
-            cb.Unchecked += delegate(object sender3, RoutedEventArgs e3)
-            {
-                ic.Visibility = Visibility.Collapsed;
-                clearButton.Visibility = Visibility.Collapsed;
-                emailButton.Visibility = Visibility.Collapsed;
-                memoryborder.Visibility = Visibility.Collapsed;
-                line.Visibility = System.Windows.Visibility.Collapsed;
+            //CheckBox cb = new CheckBox();
+            //cb.Checked += delegate(object sender2, RoutedEventArgs e2)
+            //{
+            //    ic.Visibility = Visibility.Visible;
+            //    clearButton.Visibility = Visibility.Visible;
+            //    emailButton.Visibility = Visibility.Visible;
+            //    memoryborder.Visibility = Visibility.Visible;
+            //    line.Visibility = System.Windows.Visibility.Visible;
+            //};
+            //cb.Unchecked += delegate(object sender3, RoutedEventArgs e3)
+            //{
+            //    ic.Visibility = Visibility.Collapsed;
+            //    clearButton.Visibility = Visibility.Collapsed;
+            //    emailButton.Visibility = Visibility.Collapsed;
+            //    memoryborder.Visibility = Visibility.Collapsed;
+            //    line.Visibility = System.Windows.Visibility.Collapsed;
 
-            };
+            //};
 
-            cb.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
-            cb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            //cb.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+            //cb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             
-            cb.Content = "diag.";
+            //cb.Content = "diag.";
             ic.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             ic.Background = new SolidColorBrush(Colors.White);
             ic.Opacity = 0.7;
             ic.Height = 800;
             ic.SetValue(Grid.RowProperty, 1);
-            cb.SetValue(Grid.RowProperty, 0);
+            //cb.SetValue(Grid.RowProperty, 0);
 
             clearButton.Content = "clear";
             clearButton.Visibility = System.Windows.Visibility.Collapsed;
@@ -138,15 +138,20 @@
             };
             sp.Children.Add(clearButton);
             sp.Children.Add(emailButton);
-            sp.Children.Add(cb);
+            //sp.Children.Add(cb);
             spRoot.Children.Add(sp);
-            spRoot.Children.Add(memoryborder);
+            //spRoot.Children.Add(memoryborder);
             spRoot.Children.Add(line);
 
             spRoot.SetValue(Grid.RowProperty, 0);
             sp.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;            
             this.Children.Add(ic);
             this.Children.Add(spRoot);
+
+            ic.Visibility = Visibility.Visible;
+            clearButton.Visibility = Visibility.Visible;
+            emailButton.Visibility = Visibility.Visible;
+            line.Visibility = Visibility.Visible;
         }
 
 

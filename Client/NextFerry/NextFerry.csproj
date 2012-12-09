@@ -74,7 +74,6 @@
       <DependentUpon>Choose.xaml</DependentUpon>
     </Compile>
     <Compile Include="Code\AppSettings.cs" />
-    <Compile Include="Code\MemoryStats.cs" />
     <Compile Include="Code\RouteIO.cs" />
     <Compile Include="Code\Holiday.cs" />
     <Compile Include="Code\PhaseTasker.cs" />

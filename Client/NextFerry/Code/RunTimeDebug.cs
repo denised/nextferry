@@ -265,7 +265,7 @@ namespace WP7Contrib.Diagnostics
                 if (EmailIntro != string.Empty)
                     sb.Append(EmailIntro);
 
-                sb.AppendLine(string.Format("memory use: {0}", MemoryStats.DebugString));
+                //sb.AppendLine(string.Format("memory use: {0}", MemoryStats.DebugString));
                 
                 foreach (string s in _output)
                 {
@@ -408,7 +408,7 @@ namespace WP7Contrib.Diagnostics
         /// <param name="e"></param>
         static void Current_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
-            Write(string.Format("error: {0}", MemoryStats.DebugString));
+            //Write(string.Format("error: {0}", MemoryStats.DebugString));
             Write(e.ExceptionObject.Message);
         }
 
