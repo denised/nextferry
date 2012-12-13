@@ -42,7 +42,7 @@ namespace NextFerry
                 }
                 catch (Exception e)
                 {
-                    Log.write("Error accessing Server (init): " + e.Message);
+                    Log.write("Error accessing Server (init): " + e);
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace NextFerry
                 }
                 catch (Exception e)
                 {
-                    Log.write("Error accessing Server (travel): " + e.Message);
+                    Log.write("Error accessing Server (travel): " + e);
                 }
             }
         }
@@ -103,6 +103,7 @@ namespace NextFerry
                     }
                     if (controlLine.StartsWith("#done"))
                     {
+                        Log.write("end of received");
                         return;
                     }
 
@@ -117,6 +118,7 @@ namespace NextFerry
                     // and decide what to do with it
                     if (controlLine.StartsWith("#schedule"))
                     {
+                        Log.write("received schedule");
                         string dataversion = controlLine.Substring("#schedule".Length + 1);
                         string newschedule = buffer.ToString();
                         bool success = RouteIO.deserialize(new StringReader(newschedule));
@@ -131,9 +133,13 @@ namespace NextFerry
                     }
                     else if (controlLine.StartsWith("#traveltimes"))
                     {
+                        Log.write("received traveltimes");
                         Terminal.storeTravelTimes(buffer.ToString());
                     }
-                    // else: do nothing: ignore unknown blocks
+                    else
+                    {
+                        Log.write("received/ignoring: " + controlLine);
+                    }
 
                     controlLine = sr.ReadLine();
                 }

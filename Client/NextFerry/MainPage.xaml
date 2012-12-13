@@ -153,13 +153,13 @@
             <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}"/>
         </StackPanel>
 
-        <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" Visibility="Collapsed" HorizontalAlignment="Center">
-            <Rectangle Height="33" Width="395" Fill="{StaticResource PaleYellow}" RadiusX="5" RadiusY="5"/>
-            <TextBlock x:Name="warningText" Margin="40,0,0,0" Foreground="{StaticResource DarkerPugetGrey}" 
-                       TextWrapping="NoWrap" TextAlignment="Center">
+        <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
+            <Rectangle Height="33" Width="395" Fill="{StaticResource PaleYellow}" RadiusX="5" RadiusY="5" Canvas.Left="-190"/>
+            <TextBlock x:Name="warningText" Foreground="{StaticResource DarkerPugetGrey}" 
+                       TextWrapping="NoWrap" TextAlignment="Center" Canvas.Left="-134" Canvas.Top="3">
                 Travel time information is stale
             </TextBlock>
-            <Image Height="35" Width="35" HorizontalAlignment="Left" Source="Resources\warning.png" Stretch="Uniform"/>
+            <Image Height="35" Width="35" HorizontalAlignment="Left" Source="Resources\warning.png" Stretch="Uniform" Canvas.Left="-190" Canvas.Top="-2"/>
         </Canvas>
     </Grid>
 

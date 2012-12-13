@@ -4,16 +4,11 @@ What's next:
 	Fetch alerts from our service
 	Figure out how to handle one-off schedules (extra routes on Friday, or over a given weekend).
 
-	Airplane mode doesn't cause staleness
-
 	Suspected crashes --- deploy w/ logging to check.
 
 	Fix location for Pierce-west of narrows bridge.  (Server change)
 	Make travel time per route, so it can include wait time, eventually.
-
-	Remove diag button from debug display.
-
-
+	Review all debugging :  durations that are artificially short, log messages.
 			
 
 What's done:
