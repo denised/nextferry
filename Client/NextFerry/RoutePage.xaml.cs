@@ -19,36 +19,39 @@ namespace NextFerry
     {
         private Route routeWB = null;
         private Route routeEB = null;
-        private List<string> redrawEvents = null;
+
+        // Note that the data on this page is "dead".  If the schedule is updated while the 
+        // user is on this page (or while the page is tombstoned), the page will not update.
+        // However, the page is recomputed from scratch every time it is visited fresh from
+        // mainpage.   I consider this a reasonable tradeoff.
 
         public RoutePage()
         {
             InitializeComponent();
-
-            // This setting exists for the lifetime of the page.
-            // Since we reuse this page for all routes, this is okay --- the page will only be
-            // destroyed on app exist or tombstoning --- and in those cases AppSettings is destroyed too.
-            AppSettings.PropertyChanged += maybeRedraw;
-            redrawEvents = new List<string>();
-            redrawEvents.Add("display12hr"); // from AppSettings
-            redrawEvents.Add("weekday"); // from Route
-            redrawEvents.Add("weekend"); // from Route
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
+            bool recovered = false;
+
             // if our state is already set, we don't need to do anything
             if (routeWB != null)
                 return;
 
-            // Otherwise, this is either a new page, or we're being restored from tombstoning.
+            // This is either a new page, or we're being restored from tombstoning.
             // If we tombstoned, the route should be in State
             // If this is a new page, the route name is in the URL.
             String routeName = null;
             if (State.ContainsKey("route"))
+            {
                 routeName = (string)State["route"];
+                recoverLists();
+                recovered = true;
+            }
             else
+            {
                 NavigationContext.QueryString.TryGetValue("route", out routeName);
+            }
 
             if (routeName == null)
             {
@@ -57,51 +60,59 @@ namespace NextFerry
             }
 
             routeWB = Routes.getRoute(routeName, "wb");
-            routeEB = Routes.getRoute(routeName, "eb");
-
-            // some names are different in each direction,
-            // in which case we need to recover the missing one from its sibling.
-            if (routeWB == null) routeWB = routeEB.sibling();
-            if (routeEB == null) routeEB = routeWB.sibling();
+            routeEB = routeWB.sibling();
 
             eastport.Text = routeWB.eastTerminal().name;
             westport.Text = routeWB.westTerminal().name;
 
-            assignLists();
-        }
-
-        protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
-        {
-            // We just store the name of the route and regenerate everything else (it's cheap enough)
-            State["route"] = routeWB.name;
-        }
-
-        private void gotoSettings(object sender, EventArgs e)
-        {
-            NavigationService.Navigate(new Uri("/Settings.xaml", UriKind.Relative));
-        }
-
-       
-        private void maybeRedraw(Object sender, PropertyChangedEventArgs args)
-        {
-            if (redrawEvents != null && redrawEvents.Contains(args.PropertyName))
+            if (!recovered)
             {
                 assignLists();
             }
         }
 
+
+        #region content management
         private void assignLists()
         {
             wbwdam.Text = computeString(Departures.beforeNoon(routeWB.weekday.times));
             wbwdpm.Text = computeString(Departures.afterNoon(routeWB.weekday.times));
             wbweam.Text = computeString(Departures.beforeNoon(routeWB.weekend.times));
             wbwepm.Text = computeString(Departures.afterNoon(routeWB.weekend.times));
-            
+
             ebwdam.Text = computeString(Departures.beforeNoon(routeEB.weekday.times));
             ebwdpm.Text = computeString(Departures.afterNoon(routeEB.weekday.times));
             ebweam.Text = computeString(Departures.beforeNoon(routeEB.weekend.times));
             ebwepm.Text = computeString(Departures.afterNoon(routeEB.weekend.times));
         }
+
+        protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
+        {
+            State["route"] = routeWB.name;
+            State["wbwdam"] = wbwdam.Text;
+            State["wbwdpm"] = wbwdpm.Text;
+            State["wbweam"] = wbweam.Text;
+            State["wbwepm"] = wbwepm.Text;
+
+            State["ebwdam"] = ebwdam.Text;
+            State["ebwdpm"] = ebwdpm.Text;
+            State["ebweam"] = ebweam.Text;
+            State["ebwepm"] = ebwepm.Text;
+        }
+
+        private void recoverLists()
+        {
+            wbwdam.Text = (string)State["wbwdam"];
+            wbwdpm.Text = (string)State["wbwdpm"];
+            wbweam.Text = (string)State["wbweam"];
+            wbwepm.Text = (string)State["wbwepm"];
+
+            ebwdam.Text = (string)State["ebwdam"];
+            ebwdpm.Text = (string)State["ebwdpm"];
+            ebweam.Text = (string)State["ebweam"];
+            ebwepm.Text = (string)State["ebwepm"];
+        }
+        #endregion
 
         private static System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
@@ -117,6 +128,13 @@ namespace NextFerry
                 sb.Remove(sb.Length - 1, 1); // remove the last newline.
 
             return sb.ToString();
+        }
+
+
+
+        private void gotoSettings(object sender, EventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/Settings.xaml", UriKind.Relative));
         }
     }
 }

@@ -212,7 +212,7 @@ namespace NextFerry
         {
             if (dlist.Count == 0)
             {
-                Log.write("no display settings found");
+                Log.write("no display settings found; initializing");
                 foreach (Route r in Routes.AllRoutes)
                 {
                     if (String.Equals(r.direction, "wb")) // get only the westbound routes.

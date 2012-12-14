@@ -45,6 +45,7 @@ namespace NextFerry
         {
             if (myStore.FileExists(scheduleFile))
             {
+                Log.write("reading cache");
                 try
                 {
                     using (var isoFileStream = new IsolatedStorageFileStream(scheduleFile, FileMode.Open, myStore))
@@ -57,7 +58,7 @@ namespace NextFerry
                 }
                 catch (Exception e)
                 {
-                    Log.write("readCache failed: " + e.Message);
+                    Log.write("readCache failed: " + e);
                 }
             }
         }

@@ -24,7 +24,7 @@ namespace NextFerry
         {
             UnhandledException += Application_UnhandledException;
             theTimer = new DispatcherTimer();
-            theTimer.Interval = new TimeSpan(0, 0, 20);
+            theTimer.Interval = new TimeSpan(0,2,0);
 
             InitializeComponent();
             InitializePhoneApplication();
@@ -83,6 +83,7 @@ namespace NextFerry
         // Code to execute if a navigation fails
         private void RootFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
+            Log.write("Root navigation failed! " + e.Exception);
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 // A navigation has failed; break into the debugger
@@ -100,7 +101,7 @@ namespace NextFerry
             // other threads that we can't put a try/catch around.
             if (e.ExceptionObject is System.ServiceModel.CommunicationException)
             {
-                Log.write("Server communication failure: " + e.ExceptionObject.Message);
+                Log.write("Server communication failure: " + e.ExceptionObject);
                 e.Handled = true;
             }
             else if (System.Diagnostics.Debugger.IsAttached)

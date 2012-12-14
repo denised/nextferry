@@ -25,7 +25,6 @@ namespace NextFerry
         // Call when update has been confirmed.
         public static void confirm()
         {
-            Log.write(String.Format("Confirming @ {0:T}",DateTime.Now));
             lastupdate = DateTime.Now;
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
@@ -35,7 +34,6 @@ namespace NextFerry
 
         public static void checkNow(Object sender, EventArgs args)
         {
-            Log.write(String.Format("checkNow @ {0:T}", DateTime.Now));
             if (AppSettings.useLocation && ((App)Application.Current).usingNetwork)
             {
                 //Log.write("getting location");
@@ -47,7 +45,10 @@ namespace NextFerry
             if (AppSettings.useLocation)
             {
                 int age = (int)(DateTime.Now - lastupdate).TotalMinutes;
-                Log.write("tt age is " + age);
+                if (age > 0)
+                {
+                    Log.write("Travel data age is " + age);
+                }
                 if (age > 10)
                 {
                     Deployment.Current.Dispatcher.BeginInvoke(() =>

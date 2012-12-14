@@ -1,15 +1,11 @@
 ﻿
 What's next:
-	Test location awareness effects
-	Fetch alerts from our service
-	Figure out how to handle one-off schedules (extra routes on Friday, or over a given weekend).
-
-	Suspected crashes --- deploy w/ logging to check.
-
-	Fix location for Pierce-west of narrows bridge.  (Server change)
-	Make travel time per route, so it can include wait time, eventually.
-	Review all debugging :  durations that are artificially short, log messages.
-			
+	Postponing to V3:
+		Alerts
+		Travel times accomodate wait times.
+		One-off schedules for holidays and other events
+		
+	Fix location for Pierce-west of narrows bridge.  (Server change)			
 
 What's done:
 	Get it into git.
@@ -52,4 +48,7 @@ What's done:
 	Unfortunately the emulator doesn't seem to help us debug it, so we'll actually have to drive around and see...
 	Added "no network" popup.
 	Made vashon-* names direction specific
+	Added upgrade capability (check what the last version of the app to run is).
+	Added "easter egg" debug capability.
+	Added help page.
 
