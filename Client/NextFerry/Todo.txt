@@ -1,5 +1,10 @@
 ﻿
 What's next:
+	We've got a performance problem.
+	It comes in drawing "list3" --- you get a 0.5 sec delay.
+	However commenting out the dynamic binding on goodness doesn't fix it.
+	What is going on?
+
 	Postponing to V3:
 		Alerts
 		Travel times accomodate wait times.

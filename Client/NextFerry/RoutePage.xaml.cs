@@ -59,8 +59,12 @@ namespace NextFerry
                 throw new InvalidOperationException();
             }
 
+            // We might get passed a wb name or an eb name;
+            // cover all bases.
             routeWB = Routes.getRoute(routeName, "wb");
-            routeEB = routeWB.sibling();
+            routeEB = Routes.getRoute(routeName, "eb");
+            if (routeWB == null) routeWB = routeEB.sibling();
+            if (routeEB == null) routeEB = routeWB.sibling();
 
             eastport.Text = routeWB.eastTerminal().name;
             westport.Text = routeWB.westTerminal().name;

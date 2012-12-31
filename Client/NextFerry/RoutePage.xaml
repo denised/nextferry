@@ -46,7 +46,7 @@
                 
                 <!-- WestBound Section -->
                 <Grid x:Name="wbPanel">
-            		<TextBlock Text="westbound" Style="{StaticResource mylightstyle}" Margin="30,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            		<TextBlock Text="westbound" Style="{StaticResource mylightstyle}" Margin="21,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                     <TextBlock x:Name="eastport" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Margin="8,0,0,0" Height="57" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
                     <!-- substitute sample for blend editor -->
             		<!--<TextBlock x:Name="blend_port" Text="Bainbridge" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Height="57" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>-->
@@ -88,7 +88,7 @@
                 
                 <!-- Eastbound Panel -->
                 <Grid x:Name="ebPanel">
-                    <TextBlock Text="eastbound" Style="{StaticResource mylightstyle}" Margin="29,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                    <TextBlock Text="eastbound" Style="{StaticResource mylightstyle}" Margin="21,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                     <TextBlock x:Name="westport" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Margin="8,0,0,0" Height="57" HorizontalAlignment="Left" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>
                     <!-- substitute sample for blend editor -->
                     <!--<TextBlock x:Name="blend_port" Text="Bainbridge" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Height="57" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment"/>-->

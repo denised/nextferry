@@ -62,8 +62,8 @@
         </Style>
 
         <Storyboard x:Name="fadeIn">
-            <DoubleAnimation x:Name="doubleAnim" Storyboard.TargetName="ewsign" FillBehavior="HoldEnd"
-                             Storyboard.TargetProperty="Opacity" From="0.0" To="0.25" Duration="0:0:1.2"/>
+            <DoubleAnimation x:Name="fadeInAnimation" Storyboard.TargetName="ewsign" FillBehavior="HoldEnd"
+                             Storyboard.TargetProperty="Opacity" From="0.0" To="0.25" Duration="0:0:1.5"/>
         </Storyboard>
     </phone:PhoneApplicationPage.Resources>
 
@@ -125,11 +125,12 @@
                             <DataTemplate>
                                 <ItemsControl ItemsSource="{Binding futureDepartures}"
                                               Style="{StaticResource HorizontalList}"
-                                              HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="74">
+                                              HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="74"
+                                              x:Name="times">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <!-- useStyle updates automatically to reflect "goodness" of the time -->
-                                            <TextBlock Text="{Binding}" Style="{Binding useStyle}"/>
+                                            <TextBlock x:Name="atime" Text="{Binding}" Style="{Binding useStyle}"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
