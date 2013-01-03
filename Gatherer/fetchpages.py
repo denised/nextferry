@@ -26,17 +26,28 @@ storepages = None
 logger = logging.getLogger(__name__)
 
 routes = [
-    ("bainbridge", 7, 3 ), 
-    ("edmonds", 8, 12 ),
-    ("mukilteo", 14, 5 ),
-    ("pt townsend", 11, 17 ),
-    ("fauntleroy-southworth", 9, 20 ),
-    ("fauntleroy-vashon", 9, 22 ),
-    ("vashon-southworth", 22, 20 ),
-    ("bremerton", 7, 4 ),
-    ("pt defiance", 21, 16 ),
-    ("friday harbor", 1, 10 ),
-    ("orcas", 1, 15 )
+    ("bainbridge", 7, 3, "w" ),
+    ("bainbridge", 3, 7, "e" ),
+    ("edmonds", 8, 12, "w" ),
+    ("edmonds", 12, 8, "e" ),
+    ("mukilteo", 14, 5, "w" ),
+    ("mukilteo", 5, 14, "e" ),
+    ("pt townsend", 11, 17, "w" ),
+    ("pt townsend", 17, 11, "e" ),
+    ("fauntleroy-southworth", 9, 20, "w" ),
+    ("southworth-fauntleroy", 20, 9, "e" ),
+    ("fauntleroy-vashon", 9, 22, "w" ),
+    ("vashon-fauntleroy", 22, 9, "e" ),
+    ("vashon-southworth", 22, 20, "w" ),
+    ("southworth-vashon", 20, 22, "e" ),
+    ("bremerton", 7, 4, "w" ),
+    ("bremerton", 4, 7, "e" ),
+    ("vashon-pt defiance", 21, 16, "w" ),
+    ("pt defiance-vashon", 16, 21, "e" ),
+    ("friday harbor", 1, 10, "w" ),
+    ("friday harbor", 10, 1, "e" ),
+    ("orcas", 1, 15, "w" ),
+    ("orcas", 15, 1, "e" )
 ]
 
 # translation of the constants:
@@ -116,12 +127,10 @@ def parse(text):
 def allschedules():
     """Return all schedules for our tracked WSDOT ferry routes, as a sequence of strings"""
     result = [];
-    for (name, terma, termb) in routes:
-        # each route generates four schedules:  (eb/wb) X (weekday/weekend)       
-        result.append( "{0},wd,{1}".format(name,parse(fetch(terma, termb, "Monday"))))
-        result.append( "{0},we,{1}".format(name,parse(fetch(terma, termb, "Sunday"))))
-        result.append( "{0},ed,{1}".format(name,parse(fetch(termb, terma, "Monday"))))
-        result.append( "{0},ee,{1}".format(name,parse(fetch(termb, terma, "Sunday"))))
+    for (name, terma, termb, direction) in routes:
+        # each route generates two schedules: one for week day, one for weekend      
+        result.append( "{0},{1}d,{2}".format(name, direction, parse(fetch(terma, termb, "Monday"))))
+        result.append( "{0},{1}e,{2}".format(name, direction, parse(fetch(terma, termb, "Sunday"))))
     return result
    
 
