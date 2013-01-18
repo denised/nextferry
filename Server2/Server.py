@@ -44,6 +44,12 @@ class GetTravelTimes(webapp2.RequestHandler):
             self.response.out.write('#traveltimes\n')
             self.response.out.write(MapQuestTT.getTravelTimes(flat,flon))
         self.response.out.write('#done\n')
+
+
+class IamAwake(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write('#I am awake\n')
         
 
 app = webapp2.WSGIApplication(debug=True)
@@ -52,6 +58,7 @@ app = webapp2.WSGIApplication(debug=True)
 app.router.add((r'/init/(.{3,20}?)/(\d\d\d\d).(\d\d).(\d\d)', GetInitUpdate))
 app.router.add((r'/init/(.{3,20}?)/', GetInitUpdate))
 app.router.add((r'/traveltimes/(.{3,20}?)/([+-]?[\d.]{3,11}),([+-]?[\d.]{3,11})', GetTravelTimes))
+app.router.add((r'/stayawake/', IamAwake))
 
 if __name__ == '__main__':
     app.run()
