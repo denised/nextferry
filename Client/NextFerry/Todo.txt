@@ -1,16 +1,25 @@
 ﻿
 What's next:
-	We've got a performance problem.
-	It comes in drawing "list3" --- you get a 0.5 sec delay.
-	However commenting out the dynamic binding on goodness doesn't fix it.
-	What is going on?
+	
+	We've got a performance problem: drawing the main display can take as much as 0.5 second.
+		Investigation reveals this is an organic problem, simply linear in the number of times displayed.
+		Obvious solutions won't work for various reasons, so postponing indefinitely.
 
-	Postponing to V3:
+	Observations of V2 client show that we seem to be sending multiple messages to server.
+		Particular observation:  my own phone sending an init/2.0 message (implies the message was sent before the
+		cached version was retrieved), and sending four successive init/2.0/version messages.
+		So far this is not resulting in crashes or inaccurate behavior, but probably is leading to delays, 
+		and eventually to server load.
+
+
+	Postponing features to V3:
 		Alerts
 		Travel times accomodate wait times.
 		One-off schedules for holidays and other events
 		
-	Fix location for Pierce-west of narrows bridge.  (Server change)			
+	Fix location for Pierce-west of narrows bridge.  (Server change)
+	Automate tooling for retrieving schedule (low priority)	
+	Add a "donate" button?		
 
 What's done:
 	Get it into git.
@@ -56,4 +65,6 @@ What's done:
 	Added upgrade capability (check what the last version of the app to run is).
 	Added "easter egg" debug capability.
 	Added help page.
+
+	Create a public repository, just for grins (maybe someone else will add features?)
 
