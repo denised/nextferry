@@ -109,7 +109,7 @@ namespace WP7Contrib.Diagnostics
         /// </summary>
         public static void Initialize()
         {
-            Initialize(false, true);
+            Initialize(false, IsVisual);
         }
 
         /// <summary>
@@ -133,11 +133,10 @@ namespace WP7Contrib.Diagnostics
         {
             EmailTo = to;
             EmailIntro = body;
+            IsVisual = visual;
 
             if (_output == null)
             {
-                IsVisual = visual;
-
                 _output = new ObservableCollection<string>();
                 _output = GetLog();
                 if (writeexceptions)
@@ -147,7 +146,7 @@ namespace WP7Contrib.Diagnostics
 
 
 
-                // if the host is ready wire up the navigate and add the visual
+                // if the host is ready, wire up the navigate and add the visual
                 // add control on each navigate
                 Microsoft.Phone.Controls.PhoneApplicationFrame frame = (Microsoft.Phone.Controls.PhoneApplicationFrame)Application.Current.RootVisual;
                 if (frame != null)
@@ -285,7 +284,7 @@ namespace WP7Contrib.Diagnostics
         /// <param name="o"></param>
         public static void Write(object o)
         {
-            Initialize();
+            Initialize();   // <-- Bad Design (I think).  But it's working, so don't mess with it.
 
             string output = Format(o.ToString());
             _output.Insert(0, output);
