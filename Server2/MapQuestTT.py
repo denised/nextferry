@@ -85,8 +85,8 @@ def getTravelTimes(lat,lon):
     try:
         stream = urllib2.urlopen(uri)
         mqresponse = json.load(stream)
-    except (IOError, HTTPError) as e:
-        logging.warn("Access to mapquest failed: " + repr(e))
+    except urllib2.URLError as e:
+        logging.warn("Access to mapquest failed: " + e.reason)
         return ""
     except ValueError as e:
         logging.error("error parsing mapquest response: " + repr(e))
@@ -139,12 +139,12 @@ def getTravelTimes(lat,lon):
     return ourresponse
 
 def closeEnough(lat1,lon1,loc2):
-    """Return true if the two points are within approx 50 miles of each other
+    """Return true if the two points are within approx 40 miles of each other
     This only measures x & y delta (not true distance)
     A degree latitude ~ 69 miles
     A degree longitude (at this latitude) ~ 47 miles
     """
     deltax = lat1 - loc2[0]
     deltay = lon1 - loc2[1]
-    return -0.7 < deltax < 0.7 and -1.0 < deltay < 1.0
+    return -0.6 < deltax < 0.6 and -0.9 < deltay < 0.9
 

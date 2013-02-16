@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
+using System.Windows.Threading;
 
 namespace NextFerry
 {
@@ -18,6 +19,7 @@ namespace NextFerry
     public partial class MainPage : PhoneApplicationPage
     {
         private ObservableCollection<Route> displayRoutes = new ObservableCollection<Route>();
+        private DispatcherTimer travelTimeWatcher = new DispatcherTimer();
 
         public MainPage()
         {
@@ -34,6 +36,8 @@ namespace NextFerry
             list3.ItemsSource = displayRoutes;
 
             WP7Contrib.Diagnostics.RuntimeDebug.Initialize(true, false, "denisesandbox@mailup.net", "");
+
+            initWatcher();
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -45,14 +49,22 @@ namespace NextFerry
                 switchToWB(this, null);
             else
                 switchToEB(this, null);
+
+            if (AppSettings.useLocation)
+                travelTimeWatcher.Start();
         }
 
-        #region events / actions
+        protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
+        {
+            travelTimeWatcher.Stop();
+        }
+
+        #region user actions
         private void switchToWB(object sender, RoutedEventArgs e)
         {
             AppSettings.displayWB = true;
             displayRoutes.Clear();
-            foreach (Route r in Routes.AllRoutes)
+            foreach (Route r in RouteManager.AllRoutes)
             {
                 if (r.display && String.Equals(r.direction, "wb"))
                     displayRoutes.Add(r);
@@ -69,7 +81,7 @@ namespace NextFerry
         {
             AppSettings.displayWB = false;
             displayRoutes.Clear();
-            foreach (Route r in Routes.AllRoutes)
+            foreach (Route r in RouteManager.AllRoutes)
             {
                 if (r.display && String.Equals(r.direction, "eb"))
                     displayRoutes.Add(r);
@@ -80,11 +92,6 @@ namespace NextFerry
             ewsign.Opacity = 0;
             ewsign.Text = "east";
             fadeIn.Begin();
-        }
-
-        private void notifications_Tap(object sender, EventArgs e)
-        {
-
         }
 
 
@@ -115,18 +122,81 @@ namespace NextFerry
         }
         #endregion
 
+        #region travel time management
 
-        public void addWarning(string contents)
+        private TimeSpan shortInterval = new TimeSpan(0, 0, 10);
+        private TimeSpan longInterval = new TimeSpan(0, 3, 0);
+
+        private void initWatcher()
+        {
+            travelTimeWatcher.Interval = shortInterval;
+            travelTimeWatcher.Tick += (o, a) =>
+                {
+                    if (AppSettings.useLocation)
+                    {
+                        addWarning("Waiting for travel times");
+                    }
+                    // The timer will be turned back on when travel times arrive.
+                    travelTimeWatcher.Stop();
+                };
+
+            LocationMonitor.NewTravelTimes += timesReceived;
+        }
+
+        /// <summary>
+        /// What to do when some new travel times arrive.
+        /// </summary>
+        private void timesReceived(TravelTimeEventArgs args)
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                if (args.traveltimes.Count > 0)
+                    removeWarning();
+                else
+                    addWarning("Travel times not available");
+
+                foreach (Terminal t in Terminal.AllTerminals)
+                {
+                    if (args.traveltimes.ContainsKey(t.code))
+                    {
+                        t.setTT(args.traveltimes[t.code]);
+                    }
+                    else
+                    {
+                        t.clearTT();
+                    }
+                }
+                RouteManager.updateDisplay();
+
+
+                // After the first times are received, set the watch interval to longer
+                travelTimeWatcher.Interval = longInterval;
+                travelTimeWatcher.Start();
+            });
+        }
+
+
+        private void addWarning(string contents)
         {
             warningText.Text = contents;
             warning.Visibility = System.Windows.Visibility.Visible;
         }
 
-        public void removeWarning()
+        private void removeWarning()
         {
             warning.Visibility = System.Windows.Visibility.Collapsed;
         }
 
 
+        #endregion
+        
+        #region notifications
+
+        private void notifications_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+
+        }
+
+        #endregion
     }
 }

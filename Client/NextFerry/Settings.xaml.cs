@@ -46,7 +46,7 @@ namespace NextFerry
         private void deleteCache(object sender, EventArgs e)
         {
             RouteIO.deleteCache();
-            Routes.clearSchedules();
+            RouteManager.clearSchedules();
             cacheStatus.Text = RouteIO.cacheStatus();
         }
 
@@ -75,7 +75,7 @@ namespace NextFerry
                 {
                     waitslider.Value = Math.Max(5, val - 30);
                 }
-                LocationMonitor.checkNow(null, null);
+                Util.Asynch(() => { LocationMonitor.checkTravelTimes(); });
             }
         }
 
@@ -95,8 +95,8 @@ namespace NextFerry
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).usingNetwork = !((App)Application.Current).usingNetwork;
-            Routes.clearSchedules();
-            ((App)Application.Current).verifySchedule();
+            RouteManager.clearSchedules();
+            //((App)Application.Current).verifySchedule();
             //((App)Application.Current).theMainPage.addWarning("hi there!");
         }
 

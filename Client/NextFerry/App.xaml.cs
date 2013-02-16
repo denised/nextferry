@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Navigation;
@@ -8,6 +9,7 @@ using System.IO.IsolatedStorage;
 using System.Net.NetworkInformation;
 using System.Windows.Threading;
 using System.Reflection;
+using System.ComponentModel;
 
 
 namespace NextFerry
@@ -18,14 +20,10 @@ namespace NextFerry
         public bool usingNetwork = false;
         public string appVersion = "2.0";  // TODO: set via reflection?  (didn't work?)
         public MainPage theMainPage = null;
-        public DispatcherTimer theTimer = null;
 
         public App()
         {
             UnhandledException += Application_UnhandledException;
-            theTimer = new DispatcherTimer();
-            theTimer.Interval = new TimeSpan(0,2,0);
-
             InitializeComponent();
             InitializePhoneApplication();
         }
@@ -36,6 +34,7 @@ namespace NextFerry
         {
             // call order matters.
             AppSettings.init();
+            Log.write("Launching");
             if (! appVersion.Equals(AppSettings.lastAppVersion))
             {
                 // Clear the cache --- it will have bad route data.
@@ -43,7 +42,7 @@ namespace NextFerry
                 RouteIO.deleteCache();
                 AppSettings.lastAppVersion = appVersion;
             }
-            startThreads(true);
+            startBackground();
         }
 
 
@@ -53,28 +52,29 @@ namespace NextFerry
         {
             if (e.IsApplicationInstancePreserved)
             {
-                // restart network requests only
-                startThreads(false);
+                Log.write("Activating, instance preserved");
             }
             else // start over again
             {
                 AppSettings.init();
-                startThreads(true);
+                Log.write("Activating, rehydrating, cache version " + AppSettings.cacheVersion );
             }
+            startBackground();
         }
 
         // Code to execute when the application is deactivated (sent to background)
         // This code will not execute when the application is closing
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
+            LocationMonitor.stop();
             AppSettings.close();
-            theTimer.Stop();
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
         // This code will not execute when the application is deactivated
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
+            LocationMonitor.stop();
             AppSettings.close();
         }
 
@@ -149,71 +149,39 @@ namespace NextFerry
 
         #endregion
 
-        #region background threads
+        #region background work
 
-        private PhaseTasker pt;
-
-        private void startThreads(bool freshStart)
+        private void startBackground()
         {
-            pt = new PhaseTasker();
-
-            // do tasks in three phases.  Each phase must complete before the next begins.
-            // note this means that the the tasks themselves have to behave synchronously.
-            if (freshStart)
-            {
-                // do only once
-                pt.addAction(1, RouteIO.readCache);
-                pt.addAction(3, LocationMonitor.go);
-                theTimer.Tick += checkNetwork;
-            }
-
-            pt.addAction(1, findNetwork);
-            pt.addAction(2, ServerIO.requestInitUpdate);
-            pt.addAction(3, verifySchedule);
-            
-            pt.go();
-            theTimer.Start();
-        }
-
-        /// <summary>
-        /// Determine if the network is available.   This is done on a background thread because
-        /// the system will wait on the network availability for a certain amount of time before
-        /// timing out.
-        /// </summary>
-        public void findNetwork()
-        {
-            usingNetwork = NetworkInterface.GetIsNetworkAvailable();
-            // NB: BeginInvoke not needed, since this isn't UI state and there's no race conditions.
-        }
-
-        private static int counter = 0;
-        public void checkNetwork(Object o, EventArgs a)
-        {
-            counter++;
-            if (counter % 5 == 0)
-            {
-                if (!usingNetwork)
+            // we have to start a thread because readCache is synchronous, and we 
+            // want to complete it before beginning ServerIO or LocationMonitor.
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += (o, e) =>
                 {
-                    Log.write("rechecking network");
-                    findNetwork();
-                }
-            }
+                    if (!RouteManager.haveSchedules())
+                    {
+                        RouteIO.readCache();
+                        ServerIO.requestInitUpdate();
+                    }
+                    LocationMonitor.start();
+                };
+            bw.RunWorkerAsync();
         }
 
 
-        /// <summary>
-        /// Show a pop-up message if we failed to get a schedule.
-        /// </summary>
-        public void verifySchedule()
-        {
-            if (!Routes.haveSchedules())
-            {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    theMainPage.nonetwork.Visibility = System.Windows.Visibility.Visible;
-                });
-            }
-        }
+        ///// <summary>
+        ///// Show a pop-up message if we failed to get a schedule.
+        ///// </summary>
+        //public void verifySchedule()
+        //{
+        //    if (!RouteManager.haveSchedules())
+        //    {
+        //        Deployment.Current.Dispatcher.BeginInvoke(() =>
+        //        {
+        //            theMainPage.nonetwork.Visibility = System.Windows.Visibility.Visible;
+        //        });
+        //    }
+        //}
 
         #endregion
     }

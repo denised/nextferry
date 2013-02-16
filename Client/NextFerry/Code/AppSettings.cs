@@ -142,6 +142,7 @@ namespace NextFerry
             init<string>(KlastAppVersion);
             init<List<RouteSetting>>(KdisplaySettings);
             RouteSetting.init(_displaySettings);
+            Log.write("Application Settings restored");
         }
 
 
@@ -189,14 +190,14 @@ namespace NextFerry
         }
 
         // Instead of a general eventing mechanism, we have this hard-wired:
-        // when the display value is updated, set the corresponding values in the Routes.
+        // when the display value is updated, set the corresponding values in the RouteManager.
         // Maybe someday rewrite as an event...
         public void propagate()
         {
             // when deserializing, sometimes name is not set yet.
             if (wbname != null)
             {
-                Route r = Routes.getRoute(wbname, "wb");
+                Route r = RouteManager.getRoute(wbname, "wb");
                 r.display = _display;
                 r.sibling().display = _display;
             }
@@ -213,7 +214,7 @@ namespace NextFerry
             if (dlist.Count == 0)
             {
                 Log.write("no display settings found; initializing");
-                foreach (Route r in Routes.AllRoutes)
+                foreach (Route r in RouteManager.AllRoutes)
                 {
                     if (String.Equals(r.direction, "wb")) // get only the westbound routes.
                         dlist.Add(new RouteSetting { wbname = r.name, display = false });

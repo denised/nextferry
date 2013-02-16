@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows;
+﻿using System.Collections.Generic;
 
 namespace NextFerry
 {
@@ -37,7 +34,7 @@ namespace NextFerry
         }
 
         /// <summary>
-        /// Remove all estimates of travel time to this terminal.
+        /// Remove estimate of travel time to this terminal.
         /// </summary>
         public void clearTT()
         {
@@ -70,6 +67,9 @@ namespace NextFerry
         };
 
 
+        /// <summary>
+        /// Return terminal from code.
+        /// </summary>
         public static Terminal lookup(int code)
         {
             foreach (Terminal t in AllTerminals)
@@ -80,6 +80,9 @@ namespace NextFerry
             return null;
         }
 
+        /// <summary>
+        /// Return terminal from name
+        /// </summary>
         public static Terminal lookup(string name)
         {
             foreach (Terminal t in AllTerminals)
@@ -90,6 +93,9 @@ namespace NextFerry
             return null;
         }
 
+        /// <summary>
+        /// Clear all travel times.
+        /// </summary>
         public static void clearTravelTimes()
         {
             foreach (Terminal t in AllTerminals)
@@ -98,59 +104,14 @@ namespace NextFerry
             }
         }
 
+        /// <summary>
+        /// Convenience method:  return travel time from code.
+        /// </summary>
+        /// <returns>Travel time in minutes, or -1 if none.</returns>
         public static int gettt(int code)
         {
             Terminal term = lookup(code);
             return (term.hasTT ? term.tt : -1);
-        }
-
-
-        public static void storeTravelTimes(string textblock)
-        {
-            StringReader sr = new StringReader(textblock);
-            Dictionary<int, int> parsed = new Dictionary<int, int>();
-            while (true)
-            {
-                string line = sr.ReadLine();
-                if (line == null) break;
-                string[] ss = line.Split(':');
-                if (ss.Length != 2)
-                {
-                    Log.write("Badly formatted travel time response?  " + line);
-                    return;
-                }
-                int code, val;
-                bool success = true;
-                success &= Int32.TryParse(ss[0], out code);
-                success &= Int32.TryParse(ss[1], out val);
-                if (success)
-                {
-                    parsed[code] = val;
-                }
-                else
-                {
-                    Log.write("Unable to parse travel time response " + line);
-                    return;
-                }
-            }
-
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    foreach (Terminal t in Terminal.AllTerminals)
-                    {
-                        if (parsed.ContainsKey(t.code))
-                        {
-                            t.setTT(parsed[t.code]);
-                        }
-                        else
-                        {
-                            t.clearTT();
-                        }
-                    }
-                    Routes.updateDisplay();
-                });
-
-            LocationMonitor.confirm();
         }
         #endregion
     }

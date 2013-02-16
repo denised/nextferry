@@ -6,7 +6,7 @@ using System.IO.IsolatedStorage;
 namespace NextFerry
 {
     /// <summary>
-    /// Parse and store schedules in IsolatedStorage.
+    /// Parse schedules from text, and read/write IsolatedStorage copy.
     /// </summary>
     public static class RouteIO
     {
@@ -86,7 +86,7 @@ namespace NextFerry
                     count++;
                 }
                 Log.write("Deserialize successful (" + count + ")");
-                return (count == Routes.AllRoutes.Count * 2);
+                return (count == RouteManager.AllRoutes.Count * 2);
             }
             catch (Exception e)
             {
@@ -119,7 +119,7 @@ namespace NextFerry
             for (int i = 4; i < len; i++)
                 news.times.Add(new DepartureTime(int.Parse(data[i])));
 
-            Route r = Routes.getRoute(name, iswest ? "wb" : "eb");
+            Route r = RouteManager.getRoute(name, iswest ? "wb" : "eb");
             if (r == null)
                 throw new ArgumentException("unexpected route name " + name);
 

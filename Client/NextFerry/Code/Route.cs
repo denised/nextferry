@@ -203,7 +203,7 @@ namespace NextFerry
 
         public Route sibling()
         {
-            return Routes.getSibling(this);
+            return RouteManager.getSibling(this);
         }
 
         /// <summary>

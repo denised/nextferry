@@ -1,148 +1,215 @@
 ﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Threading;
 using System.Device.Location;
 using System.Windows;
+using System.ComponentModel;
 using System.Windows.Threading;
 
 
 namespace NextFerry
 {
-    public static class LocationMonitor
+    /// <summary>
+    /// Notifies that new travel times have been received.
+    /// </summary>
+    public class TravelTimeEventArgs : EventArgs
     {
-        private static DateTime lastupdate;
+        /// <summary>
+        /// A dictionary mapping terminal-id to travel time (in minutes).
+        /// </summary>
+        public Dictionary<int, int> traveltimes { get; set; }
 
-        public static void go()
+        public TravelTimeEventArgs(Dictionary<int, int> d)
         {
-            lastupdate = DateTime.Now;
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    Log.write("Adding location check");
-                    ((App)Application.Current).theTimer.Tick += checkNow;
-                });
-            // do one call immediately
-            checkNow(null, null);
-        }
-
-        // Call when update has been confirmed.
-        public static void confirm()
-        {
-            lastupdate = DateTime.Now;
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-            {
-                ((App)Application.Current).theMainPage.removeWarning();
-            });
-        }
-
-        public static void checkNow(Object sender, EventArgs args)
-        {
-            if (AppSettings.useLocation && ((App)Application.Current).usingNetwork)
-            {
-                //Log.write("getting location");
-                ImmediateLocation loc = new ImmediateLocation(consumeLocation);
-                loc.GetLocation();
-            }
-
-            // Also check that the times are not getting stale
-            if (AppSettings.useLocation)
-            {
-                int age = (int)(DateTime.Now - lastupdate).TotalMinutes;
-                if (age > 0)
-                {
-                    Log.write("Travel data age is " + age);
-                }
-                if (age > 10)
-                {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Terminal.clearTravelTimes();
-                            ((App)Application.Current).theMainPage.addWarning("Unable to get travel times");
-                        });
-                }
-                else if (age > 2)
-                {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            ((App)Application.Current).theMainPage.addWarning("Travel times are stale");
-                        });
-                }
-            }
-        }
-
-        public static void consumeLocation(GeoCoordinate gc)
-        {
-            //Log.write("tock: got {0} at {1:t}", gc.ToString(), DateTime.Now);
-            if (!gc.IsUnknown && gc.HorizontalAccuracy < 1000) // only use if accuracy within 1000 meters
-            {
-                ServerIO.requestTravelTimes(String.Format("{0:F6},{1:F6}", gc.Latitude, gc.Longitude));
-            }
+            traveltimes = d;
         }
     }
 
-
-    // Thank you Don Kackman
-    // http://www.codeproject.com/Articles/134982/A-helper-class-to-get-the-current-location-on-a-Wi
-
-    public class ImmediateLocation : IDisposable
+    /// <summary>
+    /// Handles logic for retrieving locations as well as turning locations into travel time information.
+    /// </summary>
+    public static class LocationMonitor
     {
-        private GeoCoordinateWatcher _watcher;
-        private Action<GeoCoordinate> _action;
+        private static GeoCoordinateWatcher watcher = null;
+        private static TimeSpan delayThreshold = new TimeSpan(0, 0, 3);
+        private static BackgroundWorker loop = null;
 
-        public ImmediateLocation(Action<GeoCoordinate> a)
-        {
-            _action = a;
-        }
+        public delegate void TravelTimeEventHandler(TravelTimeEventArgs fe);
+        public static event TravelTimeEventHandler NewTravelTimes;
 
-        public void GetLocation()
+        #region loop thread
+        /// <summary>
+        /// Start the travel time monitor background process.
+        /// Has no impact if the monitor is already running.
+        /// </summary>
+        public static void start()
         {
-            if (_watcher == null)
+            if (loop == null)
             {
-                _watcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
-                _watcher.MovementThreshold = 1000;
-
-                _watcher.PositionChanged += new
-                    EventHandler<GeoPositionChangedEventArgs<GeoCoordinate>>
-                    (_watcher_PositionChanged);
-                _watcher.StatusChanged += new
-                    EventHandler<GeoPositionStatusChangedEventArgs>
-                    (_watcher_StatusChanged);
-
-                _watcher.Start(false);
-
-                if (_watcher.Status == GeoPositionStatus.Disabled
-                    || _watcher.Permission == GeoPositionPermission.Denied)
-                    Dispose();
+                initloop();
+                loop.RunWorkerAsync();
             }
         }
 
-        void _watcher_StatusChanged(object sender,
-            GeoPositionStatusChangedEventArgs e)
+        /// <summary>
+        /// Stop the background monitor process, and the GPS unit, if it is running.
+        /// </summary>
+        public static void stop()
         {
-            if (e.Status == GeoPositionStatus.Disabled
-                || _watcher.Permission == GeoPositionPermission.Denied)
-                Dispose();
-        }
-
-        void _watcher_PositionChanged(object sender,
-            GeoPositionChangedEventArgs<GeoCoordinate> e)
-        {
-            _action(e.Position.Location);
-            Dispose();
-        }
-
-        public void Dispose()
-        {
-            if (_watcher != null)
+            if (watcher != null)
             {
-                _watcher.Stop();
-                _watcher.PositionChanged -= new
-                    EventHandler<GeoPositionChangedEventArgs<GeoCoordinate>>
-                    (_watcher_PositionChanged);
-                _watcher.StatusChanged -= new
-                    EventHandler<GeoPositionStatusChangedEventArgs>
-                    (_watcher_StatusChanged);
-                _watcher.Dispose();
+                watcher.Stop();
             }
-            _watcher = null;
-            _action = null;
+            if (loop != null)
+            {
+                loop.CancelAsync();
+                loop = null;
+            }
         }
+
+
+        private static void initloop()
+        {
+            loop = new BackgroundWorker();
+            loop.WorkerSupportsCancellation = true;
+            Log.write("created new loop " + loop.GetHashCode());
+
+            loop.DoWork += (o, a) =>
+            {
+                BackgroundWorker me = (BackgroundWorker)o;
+                int counter = 0;
+                while (!me.CancellationPending)
+                {
+                    counter++;
+                    if (counter % 4 == 1)  // 80 seconds
+                    {
+                        Log.write("tick: " + me.GetHashCode());
+                        if (AppSettings.useLocation)
+                        {
+                            checkTravelTimes();
+                        }
+                    }
+                    Thread.Sleep(1000 * 20);   // 20 seconds
+                }
+                Log.write("loop " + me.GetHashCode() + " received cancellation");
+            };
+        }
+
+        #endregion
+
+        #region GPS interaction
+        /// <summary>
+        /// Return the current location, or null if unable to get it.
+        /// This must not be called directly on the UI thread, as it blocks.
+        /// </summary>
+        public static GeoCoordinate getLocation()
+        {
+            if (!AppSettings.useLocation)
+                return null;
+
+            if (watcher == null)
+            {
+                watcher = new GeoCoordinateWatcher(GeoPositionAccuracy.High);
+                watcher.MovementThreshold = 25; // in meters.  this is finer-grained than we actually care about
+                                                // because we want to be sure the GPS is trying, if accuracy is poor.
+            }
+
+            // Note: we don't check status or permission, because TryStart checks for us
+            if (!watcher.TryStart(false, delayThreshold))
+                return null;
+
+            // The watcher may return a stale location, which we
+            // detect with the timestamp check.   In addition, it may return a bad reading (low accuracy)
+            // So we want to repeat the check for a little while until we get it right, but not repeat it forever.
+            // The GeoCoordinateWatcher interface is designed to use a change event to tell you when it has a new
+            // value ready, but it is very awkward to do the counting and checking over arbitrarily many threads,
+            // and we want a synchronous result anyway, so we use an old-fashioned sleep loop instead.
+
+            GeoPosition<GeoCoordinate> place;
+            DateTime limit = DateTime.Now.AddMinutes(1.0);
+            DateTime minbar = DateTime.Now.AddMinutes(-2.0);
+            int counter = 0;
+            while (DateTime.Now < limit) // keep trying for up to one minute.
+            {
+                counter++;
+                place = watcher.Position;
+
+                if (place.Location.IsUnknown)  // someone turned off the GPS
+                {
+                    break;
+                }
+
+                //Log.write("GPS accuracy = " + place.Location.HorizontalAccuracy);
+                if (place.Location.HorizontalAccuracy < 1000 ||  // accuracy in meters
+                    place.Timestamp > minbar)  // recent enough
+                {
+                    watcher.Stop();
+                    Log.write("Took " + counter + " tries to get GPS result");
+                    return place.Location;
+                }
+
+                Thread.Sleep(500); // sleep for half a second
+            }
+
+            Log.write("Giving up on GPS result after " + counter + " tries.");
+            watcher.Stop();
+            return null;
+        }
+        #endregion
+
+        #region travel times
+        /// <summary>
+        /// Put it together into a single call:  go get location, and then get the travel times from that.
+        /// </summary>
+        public static void checkTravelTimes()
+        {
+            GeoCoordinate loc = getLocation();
+            if (loc != null)
+            {
+                ServerIO.requestTravelTimes(String.Format("{0:F6},{1:F6}", loc.Latitude, loc.Longitude));
+                // The continuation calls processTravelTimes (see below)
+            }
+        }
+
+        /// <summary>
+        /// Parse the travel times as returned from the NextFerry service.
+        /// When the parse is complete, the NewTravelTimes event is raised.
+        /// </summary>
+        public static void processTravelTimes(string textblock)
+        {
+            StringReader sr = new StringReader(textblock);
+            Dictionary<int, int> parsed = new Dictionary<int, int>();
+            while (true)
+            {
+                string line = sr.ReadLine();
+                if (line == null) break;
+                string[] ss = line.Split(':');
+                if (ss.Length != 2)
+                {
+                    Log.write("Badly formatted travel time response?  " + line);
+                    continue;
+                }
+                int code, val;
+                bool success = true;
+                success &= Int32.TryParse(ss[0], out code);
+                success &= Int32.TryParse(ss[1], out val);
+                if (success)
+                {
+                    parsed[code] = val;
+                }
+                else
+                {
+                    Log.write("Unable to parse travel time response " + line);
+                    continue;
+                }
+            }
+
+            if (NewTravelTimes != null)
+            {
+                NewTravelTimes(new TravelTimeEventArgs(parsed));
+            }
+        }
+        #endregion
     }
 }

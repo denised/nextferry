@@ -11,7 +11,7 @@ namespace NextFerry
     /// <summary>
     /// The collection of all routes.
     /// </summary>
-    public static class Routes
+    public static class RouteManager
     {
         /// <summary>
         /// The primary application state: a list of all the ferry routes and their schedules.

@@ -25,48 +25,39 @@ namespace NextFerry
 
         public static void requestInitUpdate()
         {
-            // if there's no network we don't do anything
-            if (((App)Application.Current).usingNetwork)
-            {
-                WebClient request = new WebClient();
-                string appVersion = ((App)Application.Current).appVersion;
-                Uri uri = new Uri(String.Format("{0}/{1}/{2}", initURL, appVersion, AppSettings.cacheVersion));
-                Log.write("Sending " + uri);
+            WebClient request = new WebClient();
+            string appVersion = ((App)Application.Current).appVersion;
+            Uri uri = new Uri(String.Format("{0}/{1}/{2}", initURL, appVersion, AppSettings.cacheVersion));
+            Log.write("Sending " + uri);
 
-                try
-                {
-                    ManualResetEvent mre = new ManualResetEvent(false);
-                    request.DownloadStringCompleted += processResponse;
-                    request.DownloadStringAsync(uri, mre);
-                    mre.WaitOne();  // wait until it completes --- this makes network activity sequential, which we want
-                }
-                catch (Exception e)
-                {
-                    Log.write("Error accessing Server (init): " + e);
-                }
+            try
+            {
+                request.DownloadStringCompleted += processResponse;
+                request.DownloadStringAsync(uri);
+            }
+            catch (Exception e)
+            {
+                Log.write("Error accessing Server (init): " + e);
             }
         }
 
 
         public static void requestTravelTimes(string loc)
         {
-            if (((App)Application.Current).usingNetwork)
+            WebClient request = new WebClient();
+            string appVersion = ((App)Application.Current).appVersion;
+
+            Uri uri = new Uri(String.Format("{0}/{1}/{2}", travelURL, appVersion, loc));
+            Log.write("Sending " + uri);
+
+            try
             {
-                WebClient request = new WebClient();
-                string appVersion = ((App)Application.Current).appVersion;
-
-                Uri uri = new Uri(String.Format("{0}/{1}/{2}", travelURL, appVersion, loc));
-                Log.write("Sending " + uri);
-
-                try
-                {
-                    request.DownloadStringCompleted += processResponse;
-                    request.DownloadStringAsync(uri,null);
-                }
-                catch (Exception e)
-                {
-                    Log.write("Error accessing Server (travel): " + e);
-                }
+                request.DownloadStringCompleted += processResponse;
+                request.DownloadStringAsync(uri);
+            }
+            catch (Exception e)
+            {
+                Log.write("Error accessing Server (travel): " + e);
             }
         }
 
@@ -97,8 +88,13 @@ namespace NextFerry
                 {
                     if (!controlLine.StartsWith("#"))
                     {
-                        Log.write("Error: expected control line, got " + controlLine);
-                        // abandon ship.
+                        // abandon ship --- write the response to the log
+                        Log.write("Error: expected control line, got ");
+                        while (controlLine != null)
+                        {
+                            Log.write(controlLine);
+                            controlLine = sr.ReadLine();
+                        }
                         return;
                     }
                     if (controlLine.StartsWith("#done"))
@@ -134,7 +130,7 @@ namespace NextFerry
                     else if (controlLine.StartsWith("#traveltimes"))
                     {
                         Log.write("received traveltimes");
-                        Terminal.storeTravelTimes(buffer.ToString());
+                        LocationMonitor.processTravelTimes(buffer.ToString());
                     }
                     else
                     {
@@ -147,13 +143,6 @@ namespace NextFerry
             catch (Exception e)
             {
                 Log.write("Unexpected exception in ServerIO " + e);
-            }
-            finally
-            {
-                if (args.UserState != null)
-                {
-                    ((ManualResetEvent)args.UserState).Set(); // tell original thread to continue.
-                }
             }
         }
     }

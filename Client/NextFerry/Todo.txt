@@ -5,13 +5,6 @@ What's next:
 		Investigation reveals this is an organic problem, simply linear in the number of times displayed.
 		Obvious solutions won't work for various reasons, so postponing indefinitely.
 
-	Observations of V2 client show that we seem to be sending multiple messages to server.
-		Particular observation:  my own phone sending an init/2.0 message (implies the message was sent before the
-		cached version was retrieved), and sending four successive init/2.0/version messages.
-		So far this is not resulting in crashes or inaccurate behavior, but probably is leading to delays, 
-		and eventually to server load.
-
-
 	Postponing features to V3:
 		Alerts
 		Travel times accomodate wait times.
@@ -19,7 +12,20 @@ What's next:
 		
 	Fix location for Pierce-west of narrows bridge.  (Server change)
 	Automate tooling for retrieving schedule (low priority)	
-	Add a "donate" button?		
+	Add a "donate" button?	
+	
+	A few graphical changes are required:  the settings and the "[All]" button are still invisible to most people.
+	Need to increase the size.
+
+	Currently if the server errors out, it simply aborts and does not send a response.  For traveltimes, it should
+	send an empty response so the client stops waiting for it.
+	
+	Consider making the alerts a paid feature?
+
+	Sometimes Mapquest is too slow, and GAE times out the server.  Consider either having the client tell the server
+	which routes it is interested in, and/or splitting the server code into front & back ends.
+
+	Improve the experience of fetching server logs to something repeatable.
 
 What's done:
 	Get it into git.
@@ -67,4 +73,7 @@ What's done:
 	Added help page.
 
 	Create a public repository, just for grins (maybe someone else will add features?)
+
+	Version 2.x
+	Solved duplicate message problem (we were creating multiple backgroundworkers)
 

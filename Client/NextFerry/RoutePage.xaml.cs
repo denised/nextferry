@@ -61,8 +61,8 @@ namespace NextFerry
 
             // We might get passed a wb name or an eb name;
             // cover all bases.
-            routeWB = Routes.getRoute(routeName, "wb");
-            routeEB = Routes.getRoute(routeName, "eb");
+            routeWB = RouteManager.getRoute(routeName, "wb");
+            routeEB = RouteManager.getRoute(routeName, "eb");
             if (routeWB == null) routeWB = routeEB.sibling();
             if (routeEB == null) routeEB = routeWB.sibling();
 
