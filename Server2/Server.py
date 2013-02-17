@@ -28,7 +28,7 @@ def needschedule(year,month,day):
     try:
         return date(int(year),int(month),int(day)) < CurrentSchedule.mindate
     except (ValueError, TypeError):
-        logging.warn('Garbled data version caught: {}/{}/{}', year, month, day)
+        logging.warn('Garbled data version caught: %s/%s/%s', year, month, day)
         return True
 
 
@@ -39,7 +39,7 @@ class GetTravelTimes(webapp2.RequestHandler):
             flat = float(lat)
             flon = float(lon)
         except (ValueError, TypeError):
-            logging.error('GetTravelTime received bad args: {}, {}', lat, lon)
+            logging.error('GetTravelTime received bad args: %s, %s', lat, lon)
         else:
             self.response.out.write('#traveltimes\n')
             self.response.out.write(MapQuestTT.getTravelTimes(flat,flon))

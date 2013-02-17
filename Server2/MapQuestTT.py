@@ -74,9 +74,9 @@ def getTravelTimes(lat,lon):
             uri += ',"{0[0]},{0[1]}"'.format(locationof(term))
             keep.append(codeof(term))
         else:
-            logging.debug("determined {} out of range", nameof(term))
+            logging.debug("determined %s out of range", nameof(term))
     if len(keep) == 0:   # bail, nothing to do here
-        logging.info("client too far away to estimate: {}, {}", lat, lon)
+        logging.info("client too far away to estimate: %s, %s", lat, lon)
         return "";
     uri += "]}"
     logging.debug("mq url is: " + repr(uri))
