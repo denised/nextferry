@@ -58,7 +58,6 @@ app = webapp2.WSGIApplication(debug=True)
 app.router.add((r'/init/(.{3,20}?)/(\d\d\d\d).(\d\d).(\d\d)', GetInitUpdate))
 app.router.add((r'/init/(.{3,20}?)/', GetInitUpdate))
 app.router.add((r'/traveltimes/(.{3,20}?)/([+-]?[\d.]{3,11}),([+-]?[\d.]{3,11})', GetTravelTimes))
-app.router.add((r'/stayawake/', IamAwake))
 
 if __name__ == '__main__':
     app.run()
