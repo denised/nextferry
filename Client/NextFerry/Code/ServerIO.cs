@@ -20,8 +20,8 @@ namespace NextFerry
     /// </summary>
     public static class ServerIO
     {
-        private const string initURL = "http://nextferry.appspot.com/init";
-        private const string travelURL = "http://nextferry.appspot.com/traveltimes";
+        private const string initURL = "http://server.nextferry.appspot.com/init";
+        private const string travelURL = "http://server.nextferry.appspot.com/traveltimes";
 
         public static void requestInitUpdate()
         {
