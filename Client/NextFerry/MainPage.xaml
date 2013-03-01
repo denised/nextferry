@@ -165,14 +165,12 @@
     </Grid>
 
     <phone:PhoneApplicationPage.ApplicationBar>
-        <shell:ApplicationBar IsVisible="True" Mode="Minimized" IsMenuEnabled="True" 
+        <shell:ApplicationBar IsVisible="True" 
                               BackgroundColor="{StaticResource PugetGreyColor}"
                               ForegroundColor="{StaticResource MilkySkyColor}">
-            <shell:ApplicationBar.MenuItems>
-                <shell:ApplicationBarMenuItem Text="choose routes" Click="gotoChoose"/>
-                <shell:ApplicationBarMenuItem Text="settings" Click="gotoSettings"/>
-                <shell:ApplicationBarMenuItem Text="help" Click="gotoHelp"/>
-            </shell:ApplicationBar.MenuItems>
+        	<shell:ApplicationBarIconButton IconUri="/icons/appbar.check.rest.png" Text="routes" Click="gotoChoose"/>
+        	<shell:ApplicationBarIconButton IconUri="/icons/appbar.feature.settings.rest.png" Text="settings" Click="gotoSettings"/>
+        	<shell:ApplicationBarIconButton IconUri="/icons/appbar.questionmark.rest.png" Text="help" Click="gotoHelp"/>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 
