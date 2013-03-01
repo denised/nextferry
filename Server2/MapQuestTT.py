@@ -2,6 +2,7 @@
 import urllib2
 import logging
 import json
+import WSF
 
 """
 Determine the travel times to ferry terminals from the client's current location.
@@ -14,51 +15,6 @@ Determine the travel times to ferry terminals from the client's current location
 # is required to get there).   We use a set of heuristics to filter out the unreasonable ones,
 # and generally reduce the result to the minimal information the client needs.
 
-# Terminals:  WSDOT code, name, location, [list of counties from which it makes sense to drive]
-terminals = (
-    (1, "Anacortes", (48.502220,-122.679455), ("Whatcom", "Skagit", "Snohomish", "King")),
-    (3, "Bainbridge", (47.623046,-122.511377), ("Jefferson", "Kitsap", "Mason")),
-    (4, "Bremerton", (47.564990,-122.627012), ("Mason","Kitsap","Thurston", "Pierce")),
-    (5, "Clinton", (47.974785,-122.352139), ("Island")),
-    (8, "Edmonds", (47.811240,-122.382631), ("Skagit", "Snohomish", "King")),
-    (9, "Fauntleroy", (47.523115,-122.392952), ("Snohomish","King","Pierce")),
-    (10, "Friday Harbor", (48.535010,-123.014645), ("San Juan")),
-    (11, "Keystone", (48.160592,-122.674305), ("Island")),
-    (12, "Kingston", (47.796943,-122.496785), ("Jefferson","Mason","Kitsap")),
-    (13, "Lopez Island", (48.570447,-122.883646), ("San Juan")),
-    (14, "Mukilteo", (47.947758,-122.304138), ("Skagit","Snohomish","King")),
-    (15, "Orcas Island", (48.597971,-122.943985), ("San Juan")),
-    (16, "Point Defiance", (47.305414,-122.514123), ("Thurston","Pierce","King")),
-    (17, "Port Townsend", (48.112648,-122.760715), ("Clallam","Jefferson","Mason","Kitsap")),
-    ( 7, "Seattle", (47.601767,-122.336089), ("Skagit","Snohomish","King","Pierce")),
-    (18, "Shaw Island", (48.583991,-122.929351), ("San Juan")),
-    (20, "Southworth", (47.512130,-122.500970), ("Jefferson","Mason","Thurston","Kitsap","Pierce")),
-    (21, "Tahlequah", (47.333023,-122.506999), ("King")),
-    (22, "Vashon Island", (47.508616,-122.464127), ("King"))   
-)
-
-def codeof(terminal):
-    return terminal[0]
-
-def nameof(terminal):
-    return terminal[1]
-
-def locationof(terminal):
-    return terminal[2]
-
-def drivingcounties(terminal):
-    return terminal[3]
-
-def reverselookup(datum):
-    """Return the terminal corresponding to the supplied datum (which may be name or code)."""
-    for term in terminals:
-        if datum in term:
-            return term
-    logging.warn("Attempted to look up a non-existent terminal field! " + repr(datum))
-    return None
-
-
-
 def getTravelTimes(lat,lon):
     """Return a set of travel times from the given lat, lon position.
     The return value is a json-able object
@@ -69,12 +25,12 @@ def getTravelTimes(lat,lon):
     uri = '{0}&json={{locations:["{1},{2}"'.format(mqURIprefix,lat,lon)
     # add terminals that are within "reasonable range"
     keep = []
-    for term in terminals:
-        if closeEnough(lat,lon,locationof(term)):
-            uri += ',"{0[0]},{0[1]}"'.format(locationof(term))
-            keep.append(codeof(term))
+    for term in WSF.Terminals:
+        if closeEnough(lat,lon,term.location):
+            uri += ',"{0[0]},{0[1]}"'.format(term.location)
+            keep.append(term.code)
         else:
-            logging.debug("determined %s out of range", nameof(term))
+            logging.debug("determined %s out of range", term.name)
     if len(keep) == 0:   # bail, nothing to do here
         logging.info("client too far away to estimate: %s, %s", lat, lon)
         return "";
@@ -111,7 +67,7 @@ def getTravelTimes(lat,lon):
     ## Extract the bits we want and build our own response from that
     ourresponse = ""
     for i in range(0,len(keep)):
-        term = reverselookup(keep[i])
+        term = WSF.terminal.lookup(keep[i])
         
         # determine what is on the same side of the water:
         # generally we use counties to determine reachability, but there are a few special cases:
@@ -120,20 +76,20 @@ def getTravelTimes(lat,lon):
         #    The San Juan Islands are not contiguous
         #    I haven't double checked that "Vashon" is the only city name on Vashon Island
         #    Or that there isn't another city in between / around Tacoma and Gig Harbor
-        if nameof(term) in ["Vashon Island","Tahlequah"]:
+        if term.name in ["Vashon Island","Tahlequah"]:
             if clientcity != "Vashon":
                 continue
         elif clientcity == "Vashon":
-            if nameof(term) not in ["Vashon Island","Tahlequah"]:
+            if term.name not in ["Vashon Island","Tahlequah"]:
                 continue
-        elif nameof(term) == "Southworth" and clientcounty == "Pierce":
+        elif term.name == "Southworth" and clientcounty == "Pierce":
             if clientcity not in ["Gig Harbor","Tacoma"]:
                 continue
-        elif clientcounty not in drivingcounties(term):
+        elif clientcounty not in term.counties:
             continue            
         
         #if we get here, we want to return this value.
-        ourresponse += "{}:{}\n".format(codeof(term), int(times[i+1]/60))
+        ourresponse += "{}:{}\n".format(term.code, int(times[i+1]/60))
     
     ## Return our response
     return ourresponse
