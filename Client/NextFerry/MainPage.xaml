@@ -143,8 +143,9 @@
         
         <!-- No-network notification -->
         <Canvas x:Name="nonetwork" Margin="80,20,79,118" Grid.Row="1" Width="320" Height="410" Visibility="Collapsed">
-            <Rectangle Fill="{StaticResource PaleYellow}" RadiusX="20" RadiusY="20" Width="320" Height="410"/>
-            <TextBlock TextWrapping="Wrap" Foreground="{StaticResource PugetGrey}" Width="240" Height="216" Canvas.Left="55" Canvas.Top="95"><Run Text="We're sorry: network access is required to obtain ferry schedules."/><LineBreak/><Run Text="Please re-open the app when you have a network connection."/></TextBlock>
+            <Rectangle Fill="{StaticResource PaleYellow}" RadiusX="20" RadiusY="20" Width="390" Height="227" Canvas.Top="61" Canvas.Left="-39"/>
+            <TextBlock TextWrapping="Wrap" Foreground="{StaticResource PugetGrey}" Width="252" Height="177" Canvas.Left="34" Canvas.Top="95"><Run Text="We're sorry: network access is required to obtain ferry schedules."/><LineBreak/><Run Text="Please re-open the app when you have a network connection."/></TextBlock>
+            <Image Height="35" Width="35" HorizontalAlignment="Left" Source="Resources/warning.png" Stretch="Uniform" Canvas.Left="-27" Canvas.Top="72"/>
         </Canvas>
 
 
@@ -155,12 +156,12 @@
         </StackPanel>
 
         <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
-            <Rectangle Height="33" Width="395" Fill="{StaticResource PaleYellow}" RadiusX="5" RadiusY="5" Canvas.Left="-190"/>
+            <Rectangle Height="25" Width="340" Fill="{StaticResource PaleYellow}" RadiusX="5" RadiusY="5" Canvas.Left="-171" Canvas.Top="5"/>
             <TextBlock x:Name="warningText" Foreground="{StaticResource DarkerPugetGrey}" 
-                       TextWrapping="NoWrap" TextAlignment="Center" Canvas.Left="-134" Canvas.Top="3">
-                Travel time information is stale
+                       TextWrapping="NoWrap" TextAlignment="Center" Canvas.Top="4" Height="27" Width="270" Canvas.Left="-135">
+                Waiting for travel times
             </TextBlock>
-            <Image Height="35" Width="35" HorizontalAlignment="Left" Source="Resources\warning.png" Stretch="Uniform" Canvas.Left="-190" Canvas.Top="-2"/>
+            <Image Height="35" Width="35" HorizontalAlignment="Left" Source="Resources\warning.png" Stretch="Uniform" Canvas.Left="-185" Canvas.Top="-1"/>
         </Canvas>
     </Grid>
 

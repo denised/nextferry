@@ -20,6 +20,7 @@ namespace NextFerry
     {
         private ObservableCollection<Route> displayRoutes = new ObservableCollection<Route>();
         private DispatcherTimer travelTimeWatcher = new DispatcherTimer();
+        private DispatcherTimer scheduleWatcher = new DispatcherTimer();
 
         public MainPage()
         {
@@ -37,7 +38,8 @@ namespace NextFerry
 
             WP7Contrib.Diagnostics.RuntimeDebug.Initialize(true, false, "denisesandbox@mailup.net", "");
 
-            initWatcher();
+            initTTWatcher();
+            initScheduleWatcher();
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -123,12 +125,18 @@ namespace NextFerry
         #endregion
 
         #region travel time management
+        // We have a ping-pong like arrangement between receiving travel times and showing warnings,
+        // and the timer is the ping-pong ball in between them.
+        // When we receive travel times, we turn off any warning, and turn the timer on
+        // When the timer goes off, it turns the warning on and turns itself off
 
         private TimeSpan shortInterval = new TimeSpan(0, 0, 10);
         private TimeSpan longInterval = new TimeSpan(0, 3, 0);
 
-        private void initWatcher()
+        private void initTTWatcher()
         {
+            // create the timer here
+            // start it in OnNavigatedTo (and timesReceived)
             travelTimeWatcher.Interval = shortInterval;
             travelTimeWatcher.Tick += (o, a) =>
                 {
@@ -187,6 +195,31 @@ namespace NextFerry
             warning.Visibility = System.Windows.Visibility.Collapsed;
         }
 
+
+        private void initScheduleWatcher()
+        {
+            // Schedule watcher is a one-time event to make sure we are actually
+            // displaying a schedule to the user.  If not, we show an error message.
+            // This should only occur if (a) there is no cached version of the schedule
+            // and (b) there is no network access.
+            scheduleWatcher.Interval = new TimeSpan(0,2,0);
+            scheduleWatcher.Tick += (o, a) =>
+                {
+                    scheduleWatcher.Stop();
+                    scheduleWatcher = null;
+                    // See if we have any schedules at all.
+                    foreach (Route r in RouteManager.AllRoutes)
+                    {
+                        if (r.weekday.times.Count >0 || r.weekend.times.Count > 0)
+                        {
+                            return;
+                        }
+                    }
+                    // if we reach here, there are no schedules! poor user!
+                    this.nonetwork.Visibility = System.Windows.Visibility.Visible;
+                };
+            scheduleWatcher.Start();
+        }
 
         #endregion
         
