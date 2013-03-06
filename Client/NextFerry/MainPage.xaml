@@ -84,8 +84,8 @@
         <!-- Notification Button -->             
         <Canvas x:Name="notifications" Height="38" Width="55" Margin="0,8,26,0" VerticalAlignment="Top" HorizontalAlignment="Right"
                 Tap="notifications_Tap" Visibility="Collapsed">
-            <Rectangle Height="38" Width="55" RadiusX="10" RadiusY="10" Fill="{StaticResource PhoneAccentBrush}"/>
-            <TextBlock x:Name="notificationCount" Foreground="{StaticResource PhoneChromeBrush}" Margin="18,2,0,0"
+            <Rectangle Height="38" Width="55" RadiusX="10" RadiusY="10" Fill="{StaticResource DarkerPugetGrey}" Stroke="{StaticResource PhoneAccentBrush}" StrokeThickness="3"/>
+            <TextBlock x:Name="notificationCount" Foreground="{StaticResource PhoneAccentBrush}" Margin="18,2,0,0"
                        FontSize="22" FontWeight="Bold" Text="11"/>
         </Canvas>
             
@@ -151,8 +151,8 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Height="72" Margin="0,0,0,20" 
                     VerticalAlignment="Bottom" HorizontalAlignment="Center">
-            <Button Content="westbound" x:Name="buttonWB" Click="switchToWB" Style="{StaticResource toggleSelected}"/>
-            <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}"/>
+            <Button Content="westbound" x:Name="buttonWB" Click="switchToWB" Style="{StaticResource toggleSelected}" BorderBrush="{StaticResource PhoneAccentBrush}"/>
+            <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}" BorderBrush="{StaticResource PhoneAccentBrush}"/>
         </StackPanel>
 
         <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">

@@ -3,7 +3,7 @@ import re
 import logging
 import webapp2
 import email
-from datetime import date
+import datetime
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 from google.appengine.ext import db
 import WSF
@@ -12,16 +12,23 @@ class Alert(db.Model):
     body = db.TextProperty()      # alert content
     routes = db.IntegerProperty()   # routes affected by this alert
     posted = db.DateTimeProperty(auto_now_add=True)
+    
+    def __str__(self):
+        # not a general purpose format...
+        return "__ %s %d\n%s\n" % (str(self.posted.time()), self.routes, self.body)
 
     
 def hasAlerts(recent=False):
-    return False
+    q = Alert.all()
+    if recent:
+        q.filter("posted >", datetime.datetime.now() - datetime.timedelta(minutes=5))
+    return q.count(limit=1) > 0
 
-def allAlerts():
-    return []
-
-def recentAlerts():
-    return []
+def allAlerts(recent=False):
+    q = Alert.all()
+    if recent:
+        q.filter("posted >", datetime.datetime.now() - datetime.timedelta(minutes=5))
+    return q.run(limit=15)
 
 
 # Temporarily, at least, keep mail we error out on, so we can figure out what happened.
@@ -36,9 +43,9 @@ def postBadMail(message):
 
 class NewAlertHandler(InboundMailHandler):
     
-    # currently I have the alerts sent to me and then auto-forwarded, so they
-    # always appear to come from me.
-    KnownSenderList = ['"Denise Draper" <draperd@acm.org>']
+    # Me and WSDOT.
+    KnownSenderList = ['"Denise Draper" <draperd@acm.org>',
+                       'Washington State Ferries <WSFAlert@wsdot.wa.gov>']
        
     
     def receive(self, message):
@@ -83,7 +90,7 @@ class NewAlertHandler(InboundMailHandler):
                 
             # so far so good.
             newAlert = Alert()
-            newAlert.body = subject + "\n" + ("\n".join(parts[:-1]))   # that approaches obfuscation!
+            newAlert.body = subject + "\n" + ("\n".join(parts[:-1]))   # ok, that's getting hard to read...
             newAlert.routes = routes
             return newAlert
         

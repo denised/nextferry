@@ -16,12 +16,17 @@ class GetInitUpdate(webapp2.RequestHandler):
     """
     def get(self, clientversion, year=None, month=None, day=None):
         self.response.headers['Content-Type'] = 'text/plain'
+        if needsroutes(clientversion,year,month,day):
+            self.response.out.write('#routes\n')
+            for route in WSF.Routes:
+                self.response.out.write(str(route) + '\n')
         if needschedule(year,month,day):
             self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
             self.response.out.write(CurrentSchedule.text())
         if Alert.hasAlerts():
             self.response.out.write('#allalerts\n')
-            self.response.out.write(Alert.allAlerts())
+            for alert in Alert.allAlerts():
+                self.response.out.write(str(alert))
         self.response.out.write('#done\n')
 
 def needschedule(year,month,day):
@@ -57,7 +62,8 @@ class GetTravelTimes(webapp2.RequestHandler):
             self.response.out.write(MapQuestTT.getTravelTimes(flat,flon))
         if Alert.hasAlerts(recent=True):
             self.response.out.write('#newalerts\n')
-            self.response.out.write(Alert.recentAlerts())
+            for alert in Alert.allAlerts(recent=True):
+                self.response.out.write(str(alert))
         self.response.out.write('#done\n')
 
 
