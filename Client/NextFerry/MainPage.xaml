@@ -107,7 +107,7 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Height="74">
-                                <TextBlock Text="{Binding name}" FontSize="32" Foreground="{StaticResource DarkerPugetGrey}"
+                                <TextBlock Text="{Binding displayName}" FontSize="32" Foreground="{StaticResource DarkerPugetGrey}"
                                        VerticalAlignment="Bottom"/>
                                 <TextBlock Text="[All]" FontSize="18.667" Foreground="{StaticResource DarkerPugetGrey}"/>
                             </StackPanel>

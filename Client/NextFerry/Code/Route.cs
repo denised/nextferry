@@ -9,133 +9,138 @@ using System.Threading;
 namespace NextFerry
 {
     /// <summary>
-    /// Everything we know about ferry route.  This includes both the "static" part (identification)
-    /// and the "dynamic" part (current schedule)
+    /// Everything we know about a ferry route.
+    /// Note that a single Route actually encompasses multiple schedules:
+    ///    weekend / weekday
+    ///    eastbound / westbound
     /// </summary>
     public class Route : INotifyPropertyChanged
     {
-        #region state
-        // change notified properties
-        private bool _display;
+        #region change notified properties
+        /// <summary>
+        /// True if the user has selected to see this route on the display
+        /// </summary>
         public bool display
         {
             get { return _display; }
             set { if (value != _display) { _display = value; OnChanged("display"); } }
         }
-
-        private Schedule _weekday = new Schedule(false);
-        public Schedule weekday
-        {
-            get { return _weekday; }
-            set {
-                _weekday = value;
-                OnChanged("weekday");
-                if (!useWeekendScheduleToday)
-                {
-                    stateRefresh();
-                    OnChanged("departuresToday");
-                    OnChanged("recentPastDepartures");
-                    OnChanged("futureDepartures");
-                }
-            }
-        }
-
-
-        private Schedule _weekend = new Schedule(true);
-        public Schedule weekend
-        {
-            get { return _weekend; }
-            set {
-                _weekend = value;
-                OnChanged("weekend");
-                if (useWeekendScheduleToday)
-                {
-                    stateRefresh();
-                    OnChanged("departuresToday");
-                    OnChanged("recentPastDepartures");
-                    OnChanged("futureDepartures");
-                }
-            }
-        }
+        private bool _display;
 
         /// <summary>
-        /// A setter for use from other threads.  Synchronous if the wait
-        /// parameter is true.   (Note that synchronous means waiting for
-        /// all the changed events to be processed too, not just the actual assignment.
-        /// Not ideal, but it will work.)
+        /// Departures we should display on the main page, namely:
+        /// departures happening today, after now, in the direction we care about.
         /// </summary>
-        public void setScheduleMT(Schedule news, bool wait)
+        public IEnumerable<DepartureTime> futureDepartures
         {
-            ManualResetEvent wh = null;
-            if (wait)
-                wh = new ManualResetEvent(false);
+            // futureDepartures gets change notified (and hence recomputed)
+            // if the schedule is changed (in setTimeList)
+            // or if the eb/wb changes (in appSettingsChanged)
+            // Note that we do *not* track changes to "Now" --- in theory we could,
+            // but the added complexity isn't worth it.
 
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    try
-                    {
-                        if (news.isWeekend)
-                            this.weekend = news;
-                        else
-                            this.weekday = news;
-                    }
-                    finally
-                    {
-                        if (wait)
-                            wh.Set();
-                    }
-                });
-
-            if (wait)
-                wh.WaitOne();
+            get
+            {
+                return (AppSettings.displayWB ?
+                    today.timesWest.afterNow() :
+                    today.timesEast.afterNow());
+            }
         }
 
+        public string displayName { get { return (AppSettings.displayWB ? wbName : ebName); }}
 
-        // these are immutable, so we don't actually do notification
-        public string direction { get; private set; }
-        public string name { get; private set; }
-        public int sourceCode { get; private set; }
-        public int destCode { get; private set; }
-        public bool useWeekendScheduleToday { get; private set; }
-        // note we assume that the app does not remain open for hours on end, hence isWeekend does not change.
+        #endregion
 
-        public Route(string dir, string name, int src, int dest)
+        #region non-change notified properties
+
+        public Schedule weekday { get; private set; }
+        public Schedule weekend { get; private set; }
+        public Schedule special { get; private set; }
+
+        // TODO: see how many of these can be made private.
+        public int routeCode { get; private set; }  // route code.  bits, may be OR'd together
+        public int eastCode { get; private set; }   // code for east-most terminal
+        public int westCode { get; private set; }   // code for west-most terminal
+
+        public string wbName { get; private set; }  // name of route when traveling west
+        public string ebName { get; private set; }  // name of route when traveling east
+
+        // convenient shortcuts
+        public Schedule today { get { return (special == null ? (Schedule.useWeekendSchedule() ? weekend : weekday ) : special); }}
+        public Terminal departureTerminal { get { return Terminal.lookup(AppSettings.displayWB ? eastCode : westCode); }}
+        public Terminal destinationTerminal { get { return Terminal.lookup(AppSettings.displayWB ? westCode : eastCode); }}
+
+        #endregion
+
+        #region state management
+
+        public Route(int code, int east, int west, string wName, string eName)
         {
-            direction = dir;
-            this.name = name;
-            sourceCode = src;
-            destCode = dest;
-            useWeekendScheduleToday = initWeekendHoliday();
+            routeCode = code;
+            eastCode = east;
+            westCode = west;
+            wbName = wName;
+            ebName = eName;
+            clearSchedules();
             AppSettings.PropertyChanged += appSettingsChanged;
         }
 
-        #endregion
-
-        #region magic properties
-        // These properties are computed on demand.
-
-        public IEnumerable<DepartureTime> departuresToday
+        /// <summary>
+        /// Accept a new schedule.  This method can be called from other threads.
+        /// </summary>
+        public void setTimeList(bool isSpecial, bool isWeekend, bool isWest, int[] times)
         {
-            get { return useWeekendScheduleToday ? weekend.times : weekday.times ; }
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                if (isSpecial)
+                {
+                    if (special == null)
+                        special = new Schedule(false, true);
+                    special.setTimeList(isWest, times);
+                }
+                else if (isWeekend)
+                    weekend.setTimeList(isWest, times);
+                else
+                    weekday.setTimeList(isWest, times);
+
+                OnChanged("futureDepartures");  // noisy: will signal unnecessarily, but not really a problem.
+            });
+        }
+
+
+        /// <summary>
+        /// Remove schedules.  Used to clean up/reload.  Must be called on UI thread.
+        /// </summary>
+        public void clearSchedules()
+        {
+            weekday = new Schedule(false, false);
+            weekend = new Schedule(true, false);
+            special = null;
         }
 
         /// <summary>
-        /// Return a set of the most recent departures.
+        /// Recompute the visible goodness of each departure time.
         /// </summary>
-        public IEnumerable<DepartureTime> recentPastDepartures
+        public void updateGoodness()
         {
-            get { return Departures.between(departuresToday, DepartureTime.Now - 50, DepartureTime.Now); }
-        }
+            int now = DepartureTime.Now;
+            int buffer = AppSettings.bufferTime;
+            int tt = -1; // signal value for "don't use"
 
-        public IEnumerable<DepartureTime> futureDepartures
-        {
-            get { return Departures.after(departuresToday, DepartureTime.Now); }
+            if (AppSettings.useLocation && departureTerminal.hasTT)
+                tt = departureTerminal.tt;
+
+            foreach (DepartureTime d in futureDepartures)
+            {
+                d.computeGood(now, tt, buffer);
+            }
         }
 
         #endregion
 
-        #region change notification event
+        #region event management
 
+        // events we send
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnChanged(string s)
         {
@@ -145,98 +150,22 @@ namespace NextFerry
             }
         }
 
-        #endregion
-
-        #region state refresh
-        /// <summary>
-        /// Update state changes that occur due to the passage of time.   Basically means computing the "goodness"
-        /// of departure times.
-        /// </summary>
-        public void stateRefresh()
-        {
-            int now = DepartureTime.Now;
-            int buffer = AppSettings.bufferTime;
-            int tt = (AppSettings.useLocation ? Terminal.gettt(sourceCode) : -1);
-
-            foreach (DepartureTime d in departuresToday)
-            {
-                d.computeGood(now, tt, buffer);
-            }
-        }
-
+        // events we listen to
         public void appSettingsChanged(Object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == AppSettings.KbufferTime ||
-                e.PropertyName == AppSettings.KuseLocation )
-                stateRefresh();
+                e.PropertyName == AppSettings.KuseLocation)
+            {
+                updateGoodness();
+            }
+            else if (e.PropertyName == AppSettings.KdisplayWB)
+            {
+                OnChanged("futureDepartures");
+                OnChanged("displayName");
+                updateGoodness();
+            }
         }
 
         #endregion
-
-        #region utilities
-
-        /// <summary>
-        /// Remove schedules.  Used to clean up/reload.  Must be called on UI thread.
-        /// </summary>
-        public void clearSchedules()
-        {
-            weekday = new Schedule(false);
-            weekend = new Schedule(true);
-        }
-        
-        /// <summary>
-        /// Return the terminal on the eastern end of the route.
-        /// </summary>
-        public Terminal eastTerminal()
-        {
-            return Terminal.lookup(direction[0] == 'w' ? sourceCode : destCode);
-        }
-
-
-        /// <summary>
-        /// Return the terminal on the eastern end of the route.
-        /// </summary>
-        public Terminal westTerminal()
-        {
-            return Terminal.lookup(direction[0] == 'w' ? destCode : sourceCode);
-        }
-
-        public Route sibling()
-        {
-            return RouteManager.getSibling(this);
-        }
-
-        /// <summary>
-        /// Return true if the weekend schedule should be used today, i.e. today is a weekend or holiday.
-        /// </summary>
-        /// <returns></returns>
-        private bool initWeekendHoliday()
-        {
-            DateTime today = DateTime.Today;
-            return today.DayOfWeek == DayOfWeek.Saturday
-                   || today.DayOfWeek == DayOfWeek.Sunday
-                   || (Holiday.isHoliday(today) && (String.Equals(this.name, "bainbridge") ||
-                                                    String.Equals(this.name, "pt defiance") ||
-                                                    String.Equals(this.name, "mukilteo")));
-            // yup, only some of the routes have holiday schedules.
-            // I didn't know that either until I was trying to code this up...
-        }
-        #endregion
-    }
-
-    /// <summary>
-    /// A target schedule for a specific route and weekday or weekend, valid through the expiration date.
-    /// Schedules are immutable once fully initialized, so notifications happen a level up.
-    /// </summary>
-    public class Schedule
-    {
-        public bool isWeekend { get; private set; }
-        public List<DepartureTime> times { get; private set; }
-
-        public Schedule(bool isw)
-        {
-            isWeekend = isw;
-            times = new List<DepartureTime>();
-        }
     }
 }

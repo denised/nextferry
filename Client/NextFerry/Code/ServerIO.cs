@@ -22,11 +22,17 @@ namespace NextFerry
     {
         private const string initURL = "http://server.nextferry.appspot.com/init";
         private const string travelURL = "http://server.nextferry.appspot.com/traveltimes";
+        // How to test with debug server
+        // private const string initURL = "http://localhost:8080/init";
+        // private const string travelURL = "http://localhost:8080/traveltimes";
 
         public static void requestInitUpdate()
         {
             WebClient request = new WebClient();
             string appVersion = ((App)Application.Current).appVersion;
+            // for debugging, this is sometimes useful: it makes this client unique to the server
+            // appVersion = "debug";
+
             Uri uri = new Uri(String.Format("{0}/{1}/{2}", initURL, appVersion, AppSettings.cacheVersion));
             Log.write("Sending " + uri);
 
@@ -64,6 +70,7 @@ namespace NextFerry
 
         /// <summary>
         /// Common routine to handle the response from the server, for all requests.
+        /// Note that a single request may get multiple kinds of responses.
         /// </summary>
         public static void processResponse(Object sender, DownloadStringCompletedEventArgs args)
         {

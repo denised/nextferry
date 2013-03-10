@@ -22,7 +22,7 @@ namespace NextFerry
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            rlist.ItemsSource = AppSettings.displaySettings;
+            rlist.ItemsSource = RouteManager.AllRoutes;
         }
     }
 }

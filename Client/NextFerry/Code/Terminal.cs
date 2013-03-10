@@ -103,16 +103,6 @@ namespace NextFerry
                 t.clearTT();
             }
         }
-
-        /// <summary>
-        /// Convenience method:  return travel time from code.
-        /// </summary>
-        /// <returns>Travel time in minutes, or -1 if none.</returns>
-        public static int gettt(int code)
-        {
-            Terminal term = lookup(code);
-            return (term.hasTT ? term.tt : -1);
-        }
         #endregion
     }
 }

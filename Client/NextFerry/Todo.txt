@@ -1,6 +1,10 @@
 ﻿
 What's next:
 	
+	Detour:  refactor client representation of Routes so that it agrees with server, so that server
+	can be the master of routes.   Then back to the ongoing changes.
+	
+	
 	We've got a performance problem: drawing the main display can take as much as 0.5 second.
 		Investigation reveals this is an organic problem, simply linear in the number of times displayed.
 		Obvious solutions won't work for various reasons, so postponing indefinitely.
@@ -26,6 +30,9 @@ What's next:
 	which routes it is interested in, and/or splitting the server code into front & back ends.
 
 	Improve the experience of fetching server logs to something repeatable.
+
+        Here's a cute little help:  if the user opens the app, and there are no routes selected,
+        take them directly to the choose routes page.
 
 What's done:
 	Get it into git.

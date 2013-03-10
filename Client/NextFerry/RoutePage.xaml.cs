@@ -17,8 +17,7 @@ namespace NextFerry
 {
     public partial class RoutePage : PhoneApplicationPage
     {
-        private Route routeWB = null;
-        private Route routeEB = null;
+        private Route r = null;
 
         // Note that the data on this page is "dead".  If the schedule is updated while the 
         // user is on this page (or while the page is tombstoned), the page will not update.
@@ -35,7 +34,7 @@ namespace NextFerry
             bool recovered = false;
 
             // if our state is already set, we don't need to do anything
-            if (routeWB != null)
+            if (r != null)
                 return;
 
             // This is either a new page, or we're being restored from tombstoning.
@@ -59,15 +58,9 @@ namespace NextFerry
                 throw new InvalidOperationException();
             }
 
-            // We might get passed a wb name or an eb name;
-            // cover all bases.
-            routeWB = RouteManager.getRoute(routeName, "wb");
-            routeEB = RouteManager.getRoute(routeName, "eb");
-            if (routeWB == null) routeWB = routeEB.sibling();
-            if (routeEB == null) routeEB = routeWB.sibling();
-
-            eastport.Text = routeWB.eastTerminal().name;
-            westport.Text = routeWB.westTerminal().name;
+            r = RouteManager.lookup(routeName);
+            eastport.Text = Terminal.lookup(r.eastCode).name;
+            westport.Text = Terminal.lookup(r.westCode).name;
 
             if (!recovered)
             {
@@ -79,20 +72,20 @@ namespace NextFerry
         #region content management
         private void assignLists()
         {
-            wbwdam.Text = computeString(Departures.beforeNoon(routeWB.weekday.times));
-            wbwdpm.Text = computeString(Departures.afterNoon(routeWB.weekday.times));
-            wbweam.Text = computeString(Departures.beforeNoon(routeWB.weekend.times));
-            wbwepm.Text = computeString(Departures.afterNoon(routeWB.weekend.times));
+            wbwdam.Text = computeString(r.weekday.timesWest.beforeNoon());
+            wbwdpm.Text = computeString(r.weekday.timesWest.afterNoon());
+            wbweam.Text = computeString(r.weekend.timesWest.beforeNoon());
+            wbwepm.Text = computeString(r.weekend.timesWest.afterNoon());
 
-            ebwdam.Text = computeString(Departures.beforeNoon(routeEB.weekday.times));
-            ebwdpm.Text = computeString(Departures.afterNoon(routeEB.weekday.times));
-            ebweam.Text = computeString(Departures.beforeNoon(routeEB.weekend.times));
-            ebwepm.Text = computeString(Departures.afterNoon(routeEB.weekend.times));
+            ebwdam.Text = computeString(r.weekday.timesEast.beforeNoon());
+            ebwdpm.Text = computeString(r.weekday.timesEast.afterNoon());
+            ebweam.Text = computeString(r.weekend.timesEast.beforeNoon());
+            ebwepm.Text = computeString(r.weekend.timesEast.afterNoon());
         }
 
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
         {
-            State["route"] = routeWB.name;
+            State["route"] = r.wbName;
             State["wbwdam"] = wbwdam.Text;
             State["wbwdpm"] = wbwdpm.Text;
             State["wbweam"] = wbweam.Text;

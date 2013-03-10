@@ -7,6 +7,133 @@ using System.ComponentModel;
 
 namespace NextFerry
 {
+    // A Schedule consists of two DepartureLists (one in each direction)
+    // A DepartureList is a list of DepartureTimes.
+    // DepartureTimes are times, but they also know how "good" they are, which depends on a variety
+    // of things, including the terminal they originate from.
+    // 
+    // Commentary:  this architecture has a fundamental inversion, in that the smallest granularity
+    // thing, the DepartureTime, carries information related to the global scope.   But that allows
+    // for a decoupling between the logic that computes "goodness", and the logic that displays it.
+    // Specifically, goodness is calculated when schedules are "refreshed", based on data that is
+    // fed to each departureTime.
+    // More commentary:  Individual DepartureTimes signal when their goodness has changed, leading
+    // to redrawing if the MainPage is visible.  This might seem like a lot of signaling, given that
+    // there are a lot of DepartureTimes.  However in real life this will rarely be signaled at all, 
+    // and when it is, only one or a couple of times will change.  So we don't worry about it.
+
+    
+    /// <summary>
+    /// A schedule for a specific route, which consists of a set of DepartureTimes.
+    /// Schedules may be ordinary weekday, ordinary weekend, 
+    /// or special ("today only", used to handle holidays, etc.).
+    /// </summary>
+    public class Schedule
+    {
+        public bool isWeekend { get; set; }
+        public bool isSpecial { get; set; }
+        public DepartureList timesWest { get; private set; }
+        public DepartureList timesEast { get; private set; }
+
+        public Schedule(bool isw, bool iss)
+        {
+            isWeekend = isw;
+            isSpecial = iss;
+            timesWest = new DepartureList();
+            timesEast = new DepartureList();
+        }
+
+        public void setTimeList(bool isWest, int[] times)
+        {
+            DepartureList lst = (isWest ? timesWest : timesEast);
+            lst._times.Clear();
+            foreach (int t in times)
+                lst._times.Add(new DepartureTime(t));
+        }
+
+        public bool isEmpty()
+        {
+            return timesWest._times.Count == 0;
+        }
+        /// <summary>
+        /// Return true if the weekend schedule should be used right now.
+        /// Uses the day cutoff logic.
+        /// </summary>
+        public static bool useWeekendSchedule()
+        {
+            DateTime now = DateTime.Now;
+            bool correctionReqd = (now.TimeOfDay.TotalMinutes < DepartureList.MorningCutoff);
+            switch (now.DayOfWeek)
+            {
+                case DayOfWeek.Sunday: return true;
+                case DayOfWeek.Saturday: return (!correctionReqd);
+                case DayOfWeek.Monday: return correctionReqd;
+                default: return false;
+            }
+        }
+    }
+
+    
+    /// <summary>
+    /// Management of sequences of departure times.
+    /// </summary>
+    public class DepartureList
+    {
+        // There's this weirdness with WSDOT numbers that they put the just-after-midnight times at the 
+        // end of the list.   But that is actually really useful, so we maintain the behavior.
+        // Which means our "AM" and "PM" are useful but not entirely accurate.
+        // This has a useful side effect that elsewhere in the code we can add times (like t + 120 to add two hours)
+        // and not have to check whether the time passed midnight --- "it just works"
+        // (but I'm sure it will be the source of some hideous bug someday...)
+
+        private const int Noon = 12 * 60;
+        internal const int MorningCutoff = 150;  // 2:30 am: the real "break" between days
+ 
+        // pseudo property
+        internal List<DepartureTime> _times = new List<DepartureTime>();  // use for setting
+        public IEnumerable<DepartureTime> alltimes()  // use for reading
+        {
+            return _times;
+        }
+
+        // NB:  Before is '<'
+        //      After is '>='
+
+        public IEnumerable<DepartureTime> before(int target)
+        {
+            if (target < MorningCutoff)
+                target += (24 * 60);
+
+            foreach (DepartureTime t in _times)
+            {
+                if (t.value < target)
+                    yield return t;
+                else
+                    break;
+            }
+        }
+
+        public IEnumerable<DepartureTime> after(int target)
+        {
+            if (target < MorningCutoff)
+                target += (24 * 60);
+
+            foreach (DepartureTime t in _times)
+            {
+                if (t.value < target)
+                    continue;
+                else
+                    yield return t;
+            }
+        }
+
+        public IEnumerable<DepartureTime> beforeNoon()  { return before(Noon);  }
+        public IEnumerable<DepartureTime> afterNoon()   { return after(Noon);   }
+        public IEnumerable<DepartureTime> afterNow()    { return after(DepartureTime.Now); }
+    }
+
+
+    
     /// <summary>
     /// Convert departure times into useful things.   
     /// Note that a time, once established, never changes.
@@ -16,7 +143,7 @@ namespace NextFerry
     /// </summary>
     public class DepartureTime : INotifyPropertyChanged
     {
-        #region properties
+        #region basic properties
 
         /// <summary>
         /// The time of departure, in minutes past midnight.
@@ -24,14 +151,14 @@ namespace NextFerry
         public int value { get; private set; }
 
         /// <summary>
-        /// The current time, in minutes past midnight, corrected for "WSDOT time" (see comments under Departures).
+        /// The current time, in minutes past midnight, corrected for "WSDOT time" (see comments under DepartureList).
         /// </summary>
         public static int Now 
         { 
             get 
             { 
                 int x = DateTime.Now.Hour * 60 + DateTime.Now.Minute;
-                if (x < Departures.MorningCutoff) // see comments at Departures for why we do this.
+                if (x < DepartureList.MorningCutoff) // see comments at DepartureList for why we do this.
                     x += 24 * 60;
                 return x;
             } 
@@ -196,71 +323,5 @@ namespace NextFerry
         }
 
         #endregion
-    }
-
-
-    /// <summary>
-    /// Management of sequences of departure times.
-    /// </summary>
-    public static class Departures
-    {
-        // There's this weirdness with WSDOT numbers that they put the just-after-midnight times at the 
-        // end of the list.   But that is actually really useful, so we maintain the behavior.
-        // Which means our "AM" and "PM" are useful but not entirely accurate.
-        // This has a useful side effect that elsewhere in the code we can add times (like t + 120 to add two hours)
-        // and not have to check whether the time passed midnight --- "it just works"
-        // (but I'm sure it will be the source of some hideous bug someday...)
-
-        private const int Noon = 12 * 60;
-        internal const int MorningCutoff = 150;  // 2:30 am: the real "break" between days
-
-        // NB:  Before is '<'
-        //      After is '>='
-
-        public static IEnumerable<DepartureTime> before(IEnumerable<DepartureTime> list, int target)
-        {
-            if (target < MorningCutoff)
-                target += (24 * 60);
-
-            foreach (DepartureTime t in list)
-            {
-                if (t.value < target)
-                    yield return t;
-                else
-                    break;
-            }
-        }
-
-        public static IEnumerable<DepartureTime> after(IEnumerable<DepartureTime> list, int target)
-        {
-            if (target < MorningCutoff)
-                target += (24 * 60);
-
-            foreach (DepartureTime t in list)
-            {
-                if (t.value < target)
-                    continue;
-                else
-                    yield return t;
-            }
-        }
-
-        /// <summary>
-        /// Return the set of times starting at the beginning and proceeding up to no more than interval.
-        /// </summary>
-        public static IEnumerable<DepartureTime> between(IEnumerable<DepartureTime> list, int start, int end)
-        {
-            return before(after(list, start), end);
-        }
-
-        public static IEnumerable<DepartureTime> beforeNoon(IEnumerable<DepartureTime> list)
-        {
-            return before(list, Noon);
-        }
-
-        public static IEnumerable<DepartureTime> afterNoon(IEnumerable<DepartureTime> list)
-        {
-            return after(list, Noon);
-        }
     }
 }
