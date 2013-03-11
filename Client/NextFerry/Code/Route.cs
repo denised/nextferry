@@ -57,7 +57,6 @@ namespace NextFerry
         public Schedule weekend { get; private set; }
         public Schedule special { get; private set; }
 
-        // TODO: see how many of these can be made private.
         public int routeCode { get; private set; }  // route code.  bits, may be OR'd together
         public int eastCode { get; private set; }   // code for east-most terminal
         public int westCode { get; private set; }   // code for west-most terminal

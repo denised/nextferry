@@ -163,11 +163,11 @@ namespace NextFerry
 
         #region route display preferences
         // Route display is handled a bit differently: we load and store route display
-        // information on startup and exit only.
+        // information on startup and exit rather than on each change.
         // Note we store information for which routes are *not* displayed.  That way
-        // if there should be any new routes covered, they will default to display=true.
+        // if there should be any new routes introduced, they will default to display=true.
 
-        private static void storeDisplaySettings()
+        public static void storeDisplaySettings()
         {
             foreach (Route r in RouteManager.AllRoutes)
             {
@@ -176,20 +176,53 @@ namespace NextFerry
                     IsolatedStorageSettings.ApplicationSettings.Remove(key);
                 else
                     IsolatedStorageSettings.ApplicationSettings[key] = "false";
-
             }
         }
 
-        private static void recoverDisplaySettings()
+        public static void recoverDisplaySettings()
         {
             int count = 0;
-            string dummy;
             foreach (Route r in RouteManager.AllRoutes)
             {
                 string key = r.routeCode.ToString();
-                r.display = (! IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(key, out dummy));
+                r.display = (!IsolatedStorageSettings.ApplicationSettings.Contains(key));
                 if (r.display)
                     count++;
+            }
+        }
+        #endregion
+
+        #region legacy class
+        // We need this here to be able to read settings as stored in V2.0
+        // Lesson learned: don't store class objects unless you really, really, need to.
+        public class RouteSetting
+        {
+            public string wbname { get; set; }
+            private bool _display;
+            public bool display
+            {
+                get { return _display; }
+                set { _display = value; }
+            }
+
+            /// <summary>
+            /// Convert V2.0 settings to V3.0 format
+            /// </summary>
+            public static void upgrade()
+            {
+                IsolatedStorageSettings settings = IsolatedStorageSettings.ApplicationSettings;
+                List<AppSettings.RouteSetting> dlist;
+                if (settings.TryGetValue<List<AppSettings.RouteSetting>>("displaySettings", out dlist))
+                {
+                    foreach (AppSettings.RouteSetting rs in dlist)
+                    {
+                        // actually set the route, which in turn will cause the settings to be changed.
+                        // this way no chance of inconsistency between the two.
+                        Route r = RouteManager.lookup(rs.wbname);
+                        r.display = rs.display;
+                    }
+                    settings.Remove("displaySettings");
+                }
             }
         }
         #endregion

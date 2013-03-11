@@ -18,9 +18,8 @@ namespace NextFerry
         /// </summary>
         public static ObservableCollection<Route> AllRoutes = new ObservableCollection<Route>()
         {
-            // In theory we don't need to have this list here --- it could be obtained from
-            // the server.  But duplicating it here makes the app start faster.
-
+            // Some day we may want to read these from the server, rather than hard code them.
+            // Today is not that day.
             new Route(1,     7,  3, "bainbridge","bainbridge"),
             new Route(1<<2,  8, 12, "edmonds","edmonds"),
             new Route(1<<3, 14,  5, "mukilteo","mukilteo"),
@@ -73,21 +72,20 @@ namespace NextFerry
         }
 
         /// <summary>
-        /// Return true if we have schedules.   We cheat and say yes if we have *any* schedules
+        /// Return true if we have at least some schedules.
         /// </summary>
-        /// <returns></returns>
         public static bool haveSchedules()
         {
             foreach (Route r in AllRoutes)
             {
-                if (r.display && (!r.weekday.isEmpty()))
+                if (!r.weekday.isEmpty())
                     return true;
             }
             return false;
         }
 
         /// <summary>
-        /// Perform update action on all routes that are displayed.
+        /// Update visual appearance of visable routes.
         /// </summary>
         public static void updateDisplay()
         {

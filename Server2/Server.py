@@ -19,6 +19,9 @@ class GetInitUpdate(webapp2.RequestHandler):
         if needschedule(year,month,day):
             self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
             self.response.out.write(CurrentSchedule.text())
+        if CurrentSchedule.isHoliday():
+            self.response.out.write("#special\n")
+            self.response.out.write(CurrentSchedule.holidaySchedule())
         if Alert.hasAlerts():
             self.response.out.write('#allalerts\n')
             self.response.out.write(Alert.allAlerts())

@@ -8,7 +8,7 @@ namespace NextFerry
     /// <summary>
     /// Parse schedules from text, and read/write IsolatedStorage copy.
     /// </summary>
-    public static class RouteIO
+    public static class ScheduleIO
     {
         // We get the ferrry schedule from a web service, and store it locally.
         // The schedule format is simple text: a sequence of lines of the form:
@@ -70,8 +70,8 @@ namespace NextFerry
         /// <returns>True if we successfully parsed all routes.</returns>
         public static bool deserialize(TextReader s)
         {
-            try
-            {
+            //try
+            //{
                 int count = 0;
                 while (true)
                 {
@@ -87,12 +87,12 @@ namespace NextFerry
                 }
                 Log.write("Deserialize successful (" + count + ")");
                 return (count == RouteManager.AllRoutes.Count * 4);  // four departurelists per route
-            }
-            catch (Exception e)
-            {
-                Log.write("Unexpected exception in Route deserialize " + e);
-                return false;
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    Log.write("Unexpected exception in Route deserialize " + e);
+            //    return false;
+            //}
         }
 
 

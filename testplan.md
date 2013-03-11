@@ -1,3 +1,16 @@
+Server-Client Interaction
+=========================
+
+Test in this order:
+* Check that new client works with new server in emulation mode
+* During downtime (e.g. at night), upload new server.  Check that old client (on phone) works with
+  new server.
+* Check that old client updates to new client
+* Check that new client works with new server
+
+For more complex & complete testing, check out out version(s) of the client and build and install 
+them on the phone separately.
+
 Test Cases for Client
 =====================
 

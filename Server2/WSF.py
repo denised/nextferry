@@ -69,12 +69,12 @@ Routes = (
     route('bainbridge',1,'Seattle','Bainbridge'),
     route('edmonds',1<<2,'Edmonds','Kingston'),
     route('mukilteo',1<<3,'Mukilteo','Clinton'),
-    route('pt townsend',1<<4,'Port Townsend','Keystone'),
+    route('pt townsend',1<<4,'Keystone','Port Townsend'),
     route('fauntleroy-southworth',1<<5,'Fauntleroy','Southworth'),
     route('fauntleroy-vashon', 1<<6,'Fauntleroy','Vashon Island'),
     route('vashon-southworth',1<<7,'Vashon Island','Southworth'),
     route('bremerton',1<<8,'Seattle','Bremerton'),
-    route('vashon-pt defiance',1<<9,'Point Defiance','Tahlequah'),
+    route('vashon-pt defiance',1<<9,'Tahlequah','Point Defiance'),
     route('friday harbor',1<<10,'Anacortes','Friday Harbor'),
     route('orcas',1<<11,'Anacortes','Orcas Island')
 )

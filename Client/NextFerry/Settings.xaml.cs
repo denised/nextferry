@@ -29,7 +29,7 @@ namespace NextFerry
             setDebugAppearance(AppSettings.debug);
 
 
-            cacheStatus.Text = RouteIO.cacheStatus();
+            cacheStatus.Text = ScheduleIO.cacheStatus();
         }
 
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
@@ -45,9 +45,9 @@ namespace NextFerry
 
         private void deleteCache(object sender, EventArgs e)
         {
-            RouteIO.deleteCache();
+            ScheduleIO.deleteCache();
             RouteManager.clearSchedules();
-            cacheStatus.Text = RouteIO.cacheStatus();
+            cacheStatus.Text = ScheduleIO.cacheStatus();
         }
 
         private void switchTo12hr(object sender, RoutedEventArgs e)
@@ -94,8 +94,6 @@ namespace NextFerry
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            ((App)Application.Current).usingNetwork = !((App)Application.Current).usingNetwork;
-            RouteManager.clearSchedules();
             //((App)Application.Current).verifySchedule();
             //((App)Application.Current).theMainPage.addWarning("hi there!");
         }

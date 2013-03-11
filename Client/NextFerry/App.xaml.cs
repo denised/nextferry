@@ -5,10 +5,7 @@ using System.Windows;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using System.IO.IsolatedStorage;
-using System.Net.NetworkInformation;
 using System.Windows.Threading;
-using System.Reflection;
 using System.ComponentModel;
 
 
@@ -17,8 +14,7 @@ namespace NextFerry
     public partial class App : Application
     {
         public PhoneApplicationFrame RootFrame { get; private set; }
-        public bool usingNetwork = false;
-        public string appVersion = "2.0";  // TODO: set via reflection?  (didn't work?)
+        public string appVersion = "3.0";  // TODO: set via reflection?  (didn't work?)
         public MainPage theMainPage = null;
 
         public App()
@@ -37,9 +33,16 @@ namespace NextFerry
             Log.write("Launching");
             if (! appVersion.Equals(AppSettings.lastAppVersion))
             {
-                // Clear the cache --- it will have bad route data.
-                Log.write("upgrading from V1");
-                RouteIO.deleteCache();
+                Log.write("Upgrading");
+                if (AppSettings.lastAppVersion.StartsWith("1"))
+                {
+                    Log.write("...from V1");
+                    // Clear the cache --- it will have bad route data.
+                    ScheduleIO.deleteCache();
+                }
+                // For either V1 or V2, update display information
+                AppSettings.RouteSetting.upgrade();
+
                 AppSettings.lastAppVersion = appVersion;
             }
             startBackground();
@@ -160,28 +163,13 @@ namespace NextFerry
                 {
                     if (!RouteManager.haveSchedules())
                     {
-                        RouteIO.readCache();
+                        ScheduleIO.readCache();
                         ServerIO.requestInitUpdate();
                     }
                     LocationMonitor.start();
                 };
             bw.RunWorkerAsync();
         }
-
-
-        ///// <summary>
-        ///// Show a pop-up message if we failed to get a schedule.
-        ///// </summary>
-        //public void verifySchedule()
-        //{
-        //    if (!RouteManager.haveSchedules())
-        //    {
-        //        Deployment.Current.Dispatcher.BeginInvoke(() =>
-        //        {
-        //            theMainPage.nonetwork.Visibility = System.Windows.Visibility.Visible;
-        //        });
-        //    }
-        //}
 
         #endregion
     }
