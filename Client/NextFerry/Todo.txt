@@ -8,24 +8,27 @@ What's next:
 	Postponing features to V3:
 		Alerts
 		Travel times accomodate wait times.
-		One-off schedules for holidays and other events
 		
 	Fix location for Pierce-west of narrows bridge.  (Server change)
 	Automate tooling for retrieving schedule (low priority)	
 	Add a "donate" button?	
+	Consider making the alerts a paid feature?
 	
-	A few graphical changes are required:  the settings and the "[All]" button are still invisible to most people.
+	A few graphical changes are required: the "[All]" button is still invisible to most people.
 	Need to increase the size.
 
-	Currently if the server errors out, it simply aborts and does not send a response.  For traveltimes, it should
-	send an empty response so the client stops waiting for it.
-	
-	Consider making the alerts a paid feature?
-
-	Sometimes Mapquest is too slow, and GAE times out the server.  Consider either having the client tell the server
-	which routes it is interested in, and/or splitting the server code into front & back ends.
-
 	Improve the experience of fetching server logs to something repeatable.
+
+	Standing issues:
+	
+I think we may only be providing timing hints with location, in spite of the suggestion that buffer time is meaningful w/o it.
+
+We may want to do a dialog pop-up for no routes displayed on MainPage, given the reversal of the defaults.
+
+We need to add "downloading schedules" popup for when there is no cache.
+
+Bug: changing theme type from light to dark did not change background on routepage (though it did change the background on the top bar and app bar).
+
 
 What's done:
 	Get it into git.
@@ -76,4 +79,13 @@ What's done:
 
 	Version 2.x
 	Solved duplicate message problem (we were creating multiple backgroundworkers)
+	Moved server to "backend" server type, so MapQuest won't be time constrained.  Currently only I use it.
+
+	Version 3.0 (client & server)
+	Added an official test plan document
+	Refactored Route.  In the future could download routes from server.
+	Moved holiday logic to Server, and added generalized capability for "special" routes.
+	Changed MainPage app menu to app bar buttons
+	Changed client to address new "backend" server natively.
+
 

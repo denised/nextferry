@@ -16,60 +16,50 @@ namespace NextFerry
         /// <summary>
         /// The primary application state: a list of all the ferry routes and their schedules.
         /// </summary>
-        public static ObservableCollection<Route> AllRoutes = new ObservableCollection<Route>
+        public static ObservableCollection<Route> AllRoutes = new ObservableCollection<Route>()
         {
-            new Route("wb", "bainbridge", 7, 3 ), 
-            new Route("eb", "bainbridge", 3, 7 ),
-            new Route("wb", "edmonds", 8, 12 ),
-            new Route("eb", "edmonds", 12, 8 ),
-            new Route("wb", "mukilteo", 14, 5 ),
-            new Route("eb", "mukilteo", 5, 14 ),
-            new Route("wb", "pt townsend", 11, 17 ),
-            new Route("eb", "pt townsend", 17, 11 ),
-            new Route("wb", "fauntleroy-southworth", 9, 20 ),
-            new Route("eb", "southworth-fauntleroy", 20, 9 ),
-            new Route("wb", "fauntleroy-vashon", 9, 22 ),
-            new Route("eb", "vashon-fauntleroy", 22, 9 ),
-            new Route("wb", "vashon-southworth", 22, 20 ),
-            new Route("eb", "southworth-vashon", 20, 22 ),
-            new Route("wb", "bremerton", 7, 4 ),
-            new Route("eb", "bremerton", 4, 7 ),
-            new Route("wb", "vashon-pt defiance", 21, 16 ),  // OK, so WB/EB doesn't make sense in this case...
-            new Route("eb", "pt defiance-vashon", 16, 21 ),
-            new Route("wb", "friday harbor", 1, 10 ),   // these aren't perfect either, but hopefully useful enough
-            new Route("eb", "friday harbor", 10, 1 ),   
-            new Route("wb", "orcas", 1, 15 ),
-            new Route("eb", "orcas", 15, 1 )
+            // Some day we may want to read these from the server, rather than hard code them.
+            // Today is not that day.
+            new Route(1,     7,  3, "bainbridge","bainbridge"),
+            new Route(1<<2,  8, 12, "edmonds","edmonds"),
+            new Route(1<<3, 14,  5, "mukilteo","mukilteo"),
+            new Route(1<<4, 11, 17, "pt townsend","pt townsend"),
+            new Route(1<<5,  9, 20, "fauntleroy-southworth","southworth-fauntleroy"),
+            new Route(1<<6,  9, 22, "fauntleroy-vashon","vashon-fauntleroy"),
+            new Route(1<<7, 22, 20, "vashon-southworth","southworth-vashon"),
+            new Route(1<<8,  7,  4, "bremerton","bremerton"),
+            new Route(1<<9, 21, 16, "vashon-pt defiance","pt defiance-vashon"),
+            new Route(1<<10, 1, 10, "friday harbor","friday harbor"),
+            new Route(1<<11, 1, 15, "orcas","orcas")
         };
 
+
         /// <summary>
-        /// Return route by preferred name.
+        /// Return the route that corresponds to this name (which may be either a wb or eb name)
         /// </summary>
-        public static Route getRoute(string name, string dir)
+        public static Route lookup(string name)
         {
             foreach (Route r in AllRoutes)
-                if (r.name.CompareTo(name) == 0 && r.direction.CompareTo(dir) == 0)
+            {
+                if (r.ebName == name || r.wbName == name)
+                {
                     return r;
+                }
+            }
             return null;
         }
 
         /// <summary>
-        /// Search by source and destination codes.
+        /// Return the route that corresponds to this route code.
         /// </summary>
-        public static Route getRoute(int sCode, int dCode)
+        public static Route lookup(int code)
         {
             foreach (Route r in AllRoutes)
-                if (r.sourceCode == sCode && r.destCode == dCode)
+            {
+                if (r.routeCode == code)
                     return r;
+            }
             return null;
-        }
-
-        /// <summary>
-        /// Get the matching route in the other dirction
-        /// </summary>
-        public static Route getSibling(Route r)
-        {
-            return getRoute(r.destCode, r.sourceCode);
         }
 
         /// <summary>
@@ -82,28 +72,27 @@ namespace NextFerry
         }
 
         /// <summary>
-        /// Return true if we have schedules.   We cheat and say yes if we have *any* schedules
+        /// Return true if we have at least some schedules.
         /// </summary>
-        /// <returns></returns>
         public static bool haveSchedules()
         {
             foreach (Route r in AllRoutes)
             {
-                if (r.display && r.weekday.times.Count > 0)
+                if (!r.weekday.isEmpty())
                     return true;
             }
             return false;
         }
 
         /// <summary>
-        /// Perform update action on all routes that are displayed.
+        /// Update visual appearance of visable routes.
         /// </summary>
         public static void updateDisplay()
         {
             foreach (Route r in AllRoutes)
             {
                 if (r.display)
-                    r.stateRefresh();
+                    r.updateGoodness();
             }
         }
     }

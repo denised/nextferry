@@ -47,6 +47,14 @@ namespace NextFerry
             SystemTray.BackgroundColor = (Color)this.Resources["PugetGreyColor"];
             SystemTray.ForegroundColor = (Color)this.Resources["MilkySkyColor"];
 
+            // We could do something fancy and LINQ --- this is easier and lighter-weight
+            displayRoutes.Clear();
+            foreach (Route r in RouteManager.AllRoutes)
+            {
+                if (r.display)
+                    displayRoutes.Add(r);
+            }
+
             if (AppSettings.displayWB)
                 switchToWB(this, null);
             else
@@ -65,13 +73,6 @@ namespace NextFerry
         private void switchToWB(object sender, RoutedEventArgs e)
         {
             AppSettings.displayWB = true;
-            displayRoutes.Clear();
-            foreach (Route r in RouteManager.AllRoutes)
-            {
-                if (r.display && String.Equals(r.direction, "wb"))
-                    displayRoutes.Add(r);
-            }
-
             buttonWB.Style = (Style)this.Resources["toggleSelected"];
             buttonEB.Style = (Style)this.Resources["toggleUnselected"];
             ewsign.Opacity = 0;
@@ -82,13 +83,6 @@ namespace NextFerry
         private void switchToEB(object sender, RoutedEventArgs e)
         {
             AppSettings.displayWB = false;
-            displayRoutes.Clear();
-            foreach (Route r in RouteManager.AllRoutes)
-            {
-                if (r.display && String.Equals(r.direction, "eb"))
-                    displayRoutes.Add(r);
-            }
-
             buttonWB.Style = (Style)this.Resources["toggleUnselected"];
             buttonEB.Style = (Style)this.Resources["toggleSelected"];
             ewsign.Opacity = 0;
@@ -104,7 +98,7 @@ namespace NextFerry
             Route r = (Route)item.DataContext;
             if (r == null) return;
 
-            string urlWithData = string.Format("/RoutePage.xaml?route={0}", r.name);
+            string urlWithData = string.Format("/RoutePage.xaml?route={0}", r.wbName);
             NavigationService.Navigate(new Uri(urlWithData, UriKind.Relative));
         }
 
@@ -207,16 +201,8 @@ namespace NextFerry
                 {
                     scheduleWatcher.Stop();
                     scheduleWatcher = null;
-                    // See if we have any schedules at all.
-                    foreach (Route r in RouteManager.AllRoutes)
-                    {
-                        if (r.weekday.times.Count >0 || r.weekend.times.Count > 0)
-                        {
-                            return;
-                        }
-                    }
-                    // if we reach here, there are no schedules! poor user!
-                    this.nonetwork.Visibility = System.Windows.Visibility.Visible;
+                    if ( ! RouteManager.haveSchedules() )
+                        this.nonetwork.Visibility = System.Windows.Visibility.Visible;
                 };
             scheduleWatcher.Start();
         }

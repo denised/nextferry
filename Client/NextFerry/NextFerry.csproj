@@ -75,8 +75,7 @@
       <DependentUpon>Choose.xaml</DependentUpon>
     </Compile>
     <Compile Include="Code\AppSettings.cs" />
-    <Compile Include="Code\RouteIO.cs" />
-    <Compile Include="Code\Holiday.cs" />
+    <Compile Include="Code\ScheduleIO.cs" />
     <Compile Include="Code\RunTimeDebug.cs" />
     <Compile Include="Code\RunTimeDebugDisplay.cs" />
     <Compile Include="Code\ServerIO.cs" />
@@ -95,7 +94,7 @@
     <Compile Include="Code\Route.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Code\RouteManager.cs" />
-    <Compile Include="Code\DepartureTime.cs" />
+    <Compile Include="Code\Schedule.cs" />
     <Compile Include="RoutePage.xaml.cs">
       <DependentUpon>RoutePage.xaml</DependentUpon>
     </Compile>

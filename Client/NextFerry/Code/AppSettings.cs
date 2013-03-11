@@ -15,7 +15,6 @@ namespace NextFerry
         public const string KdisplayWB = "displayWB";
         public const string Kdisplay12hr = "display12hr";
         public const string KbufferTime = "bufferTime";
-        public const string KdisplaySettings = "displaySettings";
         public const string KcacheVersion = "cacheVersion";
         public const string KuseLocation = "useLocation";
         public const string Kdebug = "debug";
@@ -55,14 +54,6 @@ namespace NextFerry
                 IsolatedStorageSettings.ApplicationSettings[KbufferTime] = value;
                 OnChanged(KbufferTime);
             }
-        }
-
-        // displaySettings changes are propagated differently --- no notification here.
-        private static List<RouteSetting> _displaySettings = new List<RouteSetting>();
-        public static List<RouteSetting> displaySettings
-        {
-            get { return _displaySettings; }
-            private set { displaySettings = value; }
         }
 
         private static string _cacheVersion = "";
@@ -140,8 +131,7 @@ namespace NextFerry
             init<bool>(KuseLocation);
             init<bool>(Kdebug);
             init<string>(KlastAppVersion);
-            init<List<RouteSetting>>(KdisplaySettings);
-            RouteSetting.init(_displaySettings);
+            recoverDisplaySettings();
             Log.write("Application Settings restored");
         }
 
@@ -168,65 +158,82 @@ namespace NextFerry
 
         public static void close()
         {
-            // Displaysettings is the only one we don't write atomically
-            IsolatedStorageSettings.ApplicationSettings[KdisplaySettings] = displaySettings;
+            storeDisplaySettings();
         }
-    }
 
+        #region route display preferences
+        // Route display is handled a bit differently: we load and store route display
+        // information on startup and exit rather than on each change.
+        // Note we store information for which routes are *not* displayed.  That way
+        // if there should be any new routes introduced, they will default to display=true.
 
-
-    public class RouteSetting
-    {
-        public string wbname { get; set; }
-        private bool _display;
-        public bool display
+        public static void storeDisplaySettings()
         {
-            get { return _display; }
-            set // set here, and also update the routes themselves.
+            foreach (Route r in RouteManager.AllRoutes)
             {
-                _display = value;
-                propagate();
+                string key = r.routeCode.ToString();
+                if (r.display)
+                    IsolatedStorageSettings.ApplicationSettings.Remove(key);
+                else
+                    IsolatedStorageSettings.ApplicationSettings[key] = "false";
             }
         }
 
-        // Instead of a general eventing mechanism, we have this hard-wired:
-        // when the display value is updated, set the corresponding values in the RouteManager.
-        // Maybe someday rewrite as an event...
-        public void propagate()
+        public static void recoverDisplaySettings()
         {
-            // when deserializing, sometimes name is not set yet.
-            if (wbname != null)
+            int count = 0;
+            foreach (Route r in RouteManager.AllRoutes)
             {
-                Route r = RouteManager.getRoute(wbname, "wb");
-                r.display = _display;
-                r.sibling().display = _display;
+                string key = r.routeCode.ToString();
+                r.display = (!IsolatedStorageSettings.ApplicationSettings.Contains(key));
+                if (r.display)
+                    count++;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// If dlist is empty, initialize it to the proper set of routes, and 
-        /// set their display values appropriately.
-        /// Also make sure that the display values are propagated to the routes
-        /// themselves.
-        /// </summary>
-        public static void init(List<RouteSetting> dlist)
+        #region legacy class
+        // We need this here to be able to read settings as stored in V2.0
+        // Lesson learned: don't store class objects unless you really, really, need to.
+        public class RouteSetting
         {
-            if (dlist.Count == 0)
+            public string wbname { get; set; }
+            private bool _display;
+            public bool display
             {
-                Log.write("no display settings found; initializing");
-                foreach (Route r in RouteManager.AllRoutes)
+                get { return _display; }
+                set { _display = value; }
+            }
+
+            /// <summary>
+            /// Convert V2.0 settings to V3.0 format
+            /// </summary>
+            public static void upgrade()
+            {
+                //since I have no way to test this (thank you Microsoft),
+                //surround everything in a try catch
+                try
                 {
-                    if (String.Equals(r.direction, "wb")) // get only the westbound routes.
-                        dlist.Add(new RouteSetting { wbname = r.name, display = false });
+                    IsolatedStorageSettings settings = IsolatedStorageSettings.ApplicationSettings;
+                    List<AppSettings.RouteSetting> dlist;
+                    if (settings.TryGetValue<List<AppSettings.RouteSetting>>("displaySettings", out dlist))
+                    {
+                        foreach (AppSettings.RouteSetting rs in dlist)
+                        {
+                            // actually set the route, which in turn will cause the settings to be changed.
+                            // this way no chance of inconsistency between the two.
+                            Route r = RouteManager.lookup(rs.wbname);
+                            r.display = rs.display;
+                        }
+                        settings.Remove("displaySettings");
+                    }
                 }
-                // First time display just a couple of routes to keep things simple
-                // This happens to be Bainbridge and Edmonds, the most popular.
-                dlist[0].display = true;
-                dlist[1].display = true;
+                catch (Exception)
+                {
+                    Log.write("Upgrade of displaySettings failed");
+                }
             }
-            // Propagate (in case deserialization didn't do it properly).
-            foreach (RouteSetting rs in dlist)
-                rs.propagate();
         }
+        #endregion
     }
 }

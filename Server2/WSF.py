@@ -77,20 +77,18 @@ class route(object):
             if term.name == route.term1 or term.name == route.term2:
                 yield route
     
-    def __str__(self):
-        
             
 
 Routes = (
     route(1,'Seattle','Bainbridge','bainbridge','bainbridge'),
     route(1<<2,'Edmonds','Kingston','edmonds','edmonds'),
     route(1<<3,'Mukilteo','Clinton','mukilteo','mukilteo'),
-    route(1<<4,'Port Townsend','Keystone','pt townsend','pt townsend'),
+    route(1<<4,'Keystone','Port Townsend','pt townsend','pt townsend'),
     route(1<<5,'Fauntleroy','Southworth','fauntleroy-southworth','southworth-fauntleroy'),
     route(1<<6,'Fauntleroy','Vashon Island','fauntleroty-vashon','vashon-fauntleroy'),
     route(1<<7,'Vashon Island','Southworth','vashon-southworth','southworth-vashon'),
     route(1<<8,'Seattle','Bremerton','bremerton','bremerton'),
-    route(1<<9,'Point Defiance','Tahlequah','pt defiance','pt defiance'),
+    route(1<<9,'Tahlequah','Point Defiance','pt defiance','pt defiance'),
     route(1<<10,'Anacortes','Friday Harbor','friday harbor','friday harbor'),
     route(1<<11,'Anacortes','Orcas Island','orcas','orcas')
 )
