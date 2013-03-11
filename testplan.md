@@ -1,3 +1,5 @@
+<!-- vim: set filetype=markdown : -->
+
 Server-Client Interaction
 =========================
 
@@ -8,8 +10,8 @@ Test in this order:
 * Check that old client updates to new client
 * Check that new client works with new server
 
-For more complex & complete testing, check out out version(s) of the client and build and install 
-them on the phone separately.
+Unfortunately, there appears to be no way to test upgrades of ApplicationSettings (there are tools
+that work for Windows 8/Windows Phone 8 only).
 
 Test Cases for Client
 =====================

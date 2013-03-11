@@ -21,11 +21,11 @@ namespace NextFerry
     /// </summary>
     public static class ServerIO
     {
-        //private const string initURL = "http://server.nextferry.appspot.com/init";
-        //private const string travelURL = "http://server.nextferry.appspot.com/traveltimes";
+        private const string initURL = "http://server.nextferry.appspot.com/init";
+        private const string travelURL = "http://server.nextferry.appspot.com/traveltimes";
         // How to test with debug server
-        private const string initURL = "http://localhost:8080/init";
-        private const string travelURL = "http://localhost:8080/traveltimes";
+        //private const string initURL = "http://localhost:8080/init";
+        //private const string travelURL = "http://localhost:8080/traveltimes";
 
         private static string appVersion = ((App)Application.Current).appVersion;
         // official version:  appVersion = ((App)Application.Current).appVersion;

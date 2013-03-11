@@ -210,18 +210,27 @@ namespace NextFerry
             /// </summary>
             public static void upgrade()
             {
-                IsolatedStorageSettings settings = IsolatedStorageSettings.ApplicationSettings;
-                List<AppSettings.RouteSetting> dlist;
-                if (settings.TryGetValue<List<AppSettings.RouteSetting>>("displaySettings", out dlist))
+                //since I have no way to test this (thank you Microsoft),
+                //surround everything in a try catch
+                try
                 {
-                    foreach (AppSettings.RouteSetting rs in dlist)
+                    IsolatedStorageSettings settings = IsolatedStorageSettings.ApplicationSettings;
+                    List<AppSettings.RouteSetting> dlist;
+                    if (settings.TryGetValue<List<AppSettings.RouteSetting>>("displaySettings", out dlist))
                     {
-                        // actually set the route, which in turn will cause the settings to be changed.
-                        // this way no chance of inconsistency between the two.
-                        Route r = RouteManager.lookup(rs.wbname);
-                        r.display = rs.display;
+                        foreach (AppSettings.RouteSetting rs in dlist)
+                        {
+                            // actually set the route, which in turn will cause the settings to be changed.
+                            // this way no chance of inconsistency between the two.
+                            Route r = RouteManager.lookup(rs.wbname);
+                            r.display = rs.display;
+                        }
+                        settings.Remove("displaySettings");
                     }
-                    settings.Remove("displaySettings");
+                }
+                catch (Exception)
+                {
+                    Log.write("Upgrade of displaySettings failed");
                 }
             }
         }

@@ -8,6 +8,14 @@ import MapQuestTT
 import Alert
 
 logging.getLogger().setLevel(logging.INFO)
+
+# protocol:
+# commit the server code.
+# issue command "git describe --tags"
+# put the result in to this string
+# upload that
+# grr. automate grr.
+appversion = "tmp-3-ge6d5351"
     
 class GetInitUpdate(webapp2.RequestHandler):
     """
@@ -62,6 +70,11 @@ class GetTravelTimes(webapp2.RequestHandler):
             self.response.out.write('#newalerts\n')
             self.response.out.write(Alert.recentAlerts())
         self.response.out.write('#done\n')
+        
+class Version(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write('#version: |' + appversion + '|\n#done\n')
 
 
 app = webapp2.WSGIApplication(debug=True)
@@ -71,6 +84,7 @@ app.router.add((r'/init/(.{3,20}?)/(\d\d\d\d).(\d\d).(\d\d)', GetInitUpdate))
 app.router.add((r'/init/(.{3,20}?)/', GetInitUpdate))
 app.router.add((r'/traveltimes/(.{3,20}?)/([+-]?[\d.]{3,11}),([+-]?[\d.]{3,11})', GetTravelTimes))
 app.router.add((r'/_ah/mail/alert@nextferry.appspotmail.com', Alert.NewAlertHandler))
+app.router.add((r'/version',Version))
 
 if __name__ == '__main__':
     app.run()
