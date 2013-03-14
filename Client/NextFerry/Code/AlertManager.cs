@@ -1,22 +1,162 @@
 ﻿using System;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.IsolatedStorage;
+using System.Threading;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace NextFerry
 {
     public class Alert
     {
+        public string content;
+        public bool read;
+        public string id;
     }
 
+    /// <summary>
+    /// Manage the in-memory collection of alerts, and the caching of alerts in IsolatedStorage.
+    /// <para>
+    /// An alert is a message issued by WSF commenting on the schedule or other issues for 
+    /// specific route(s) on a specific day.  An alert body is free-form text, typically 2-8 
+    /// sentences long.  There is no structure to the text.   Often alerts refer to a specific 
+    /// departure or set of departures, but due to the nature of the text, we cannot determine 
+    /// that, so we simply allow alerts to have a full day lifetime.
+    /// </para>
+    /// <para>
+    /// Alerts are displayed by the AlertPage.  The only interesting things we do with them
+    /// is keep track of which one(s) users have read.
+    /// </para>
+    /// <para>
+    /// As for schedules, we persist Alerts in isolated storage primarily as a form of caching,
+    /// in case there are issues with connecting to the server when the application starts.
+    /// </summary>
     public static class AlertManager
     {
+        public static Dictionary<String, Alert> AllAlerts = new Dictionary<String, Alert>();
+        public static Dictionary<Route, List<Alert>> RouteAlerts = new Dictionary<Route, List<Alert>>();
+        private static Object lockable = new Object();
+        private static DateTime lastReceived = DateTime.MinValue;
 
+        public static event EventHandler newAlerts;
+
+        #region managing "read" bits
+        #endregion
+
+        #region caching or receiving
+        private readonly static IsolatedStorageFile myStore = IsolatedStorageFile.GetUserStoreForApplication();
+        private const string alertsFile = "CachedAlerts.txt";  // where on disk to store it.
+
+        public static void recoverCache()
+        {
+            Util.Asynch(() =>
+                {
+                    // Wait awhile to see if init has returned new data anyway
+                    Thread.Sleep(1000 * 60); // one minute
+                    if (lastReceived == DateTime.MinValue &&   // no new data
+                         myStore.FileExists(alertsFile) &&     // we have a cache
+                         myStore.GetCreationTime(alertsFile).Date == DateTime.Today)  // and it is fresh
+                    {
+                        bool newones = false;
+                        lock (lockable)
+                        {
+                            string alertsbody = Util.readText(alertsFile);
+                            newones = parseAlerts(alertsbody);
+                        }
+                        if (newones && newAlerts != null)
+                            newAlerts(null, null);
+                    }
+                }
+            );
+        }
+
+        // Must be called from background threads.
+        public static void receiveAlerts(string alertsbody, DateTime receivedStamp)
+        {
+            // it is possible for multiple threads to try to do this at the same time,
+            // so acquire a lock.
+            bool newones = false;
+            lock (lockable)
+            {
+                if (receivedStamp > lastReceived)
+                {
+                    lastReceived = receivedStamp;
+                    Util.writeText(alertsFile, alertsbody);  // cache it
+                    newones = parseAlerts(alertsbody); // and parse it
+                }
+            }
+            if (newones && newAlerts != null)
+            {
+                newAlerts(null, null);
+            }
+        }
+
+        #endregion
+
+        #region parsing and allocating
+
+        // time for a regular expression!
+        // example format in the comment below.
+        private static string re = @"\G__ ([\d.:]+) (\d+)\n" + // beginning line: "__" <key> <routecodes>"\n""
+                                   @"(.+?\n)(?=__)";           // content: everything up to the next "__"
+
+        private static bool parseAlerts(string alertsbody)
+        {
+            int alertCount;
+            bool newones = false;
+
+            if (alertsbody.Length < 10)
+            {
+                Log.write("Received empty or truncated alerts: |" + alertsbody + "|");
+                return newones;
+            }
+
+            // get count of how many we expect
+            alertCount = Regex.Matches(alertsbody, "\n__").Count;
+            
+            // now do the real match
+            MatchCollection matches = Regex.Matches(alertsbody,re,RegexOptions.Singleline);
+
+            if (matches.Count != alertCount)
+            {
+                Log.write("Error parsing alerts: count does not match: " + matches.Count + "/" + alertCount);
+                // go ahead and try anyway...
+            }
+
+            foreach (Match m in matches)
+            {
+                Alert a = new Alert();
+                a.id = m.Groups[1].Value;
+                a.content = m.Groups[3].Value;
+                int rCodes = Int32.Parse(m.Groups[2].Value);
+                bool foundone = false;
+
+                // skip if we've already got this one
+                if (AllAlerts.ContainsKey(a.id))
+                    continue;
+
+                // otherwise install.
+                AllAlerts[a.id] = a;
+                foreach( Route r in RouteManager.bitRoutes( rCodes ))
+                {
+                    foundone = true;
+                    if (!RouteAlerts.ContainsKey(r))
+                        RouteAlerts[r] = new List<Alert>();
+                    RouteAlerts[r].Add(a);
+                }
+
+                if (!foundone)
+                {
+                    Log.write("Received alert that matched no routes! " + rCodes);
+                }
+                else
+                {
+                    newones = true;
+                }
+            }
+            return newones;
+        }
+        #endregion
     }
 }

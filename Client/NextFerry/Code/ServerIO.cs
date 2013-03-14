@@ -122,7 +122,7 @@ namespace NextFerry
                         Log.write("received schedule");
                         string dataversion = controlLine.Substring("#schedule".Length + 1);
                         string newschedule = buffer.ToString();
-                        bool success = ScheduleIO.deserialize(new StringReader(newschedule));
+                        bool success = ScheduleIO.deserialize(newschedule);
                         if (success)
                         {
                             // Write it out to cache, and store the version id
@@ -141,7 +141,12 @@ namespace NextFerry
                     {
                         // special schedules are not cached, so this is simpler.
                         Log.write("special schedule received");
-                        ScheduleIO.deserialize(new StringReader(buffer.ToString()));
+                        ScheduleIO.deserialize(buffer.ToString());
+                    }
+                    else if (controlLine.StartsWith("#allalerts"))
+                    {
+                        Log.write("received alerts");
+                        AlertManager.receiveAlerts(buffer.ToString(), DateTime.Now);
                     }
                     else
                     {

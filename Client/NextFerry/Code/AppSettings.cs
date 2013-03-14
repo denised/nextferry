@@ -7,11 +7,12 @@ using System.Reflection;
 namespace NextFerry
 {
     /// <summary>
-    /// Manage user settings.   Mostly uninteresting boilerplate.
+    /// Manage user settings and small bits of persistent state.
     /// </summary>
     public static class AppSettings
     {
-        // Use the same keys for the app settings and for OnChanged notification
+        #region keys
+        // Use the same keys for IsolatedStorage and for OnChanged notification
         public const string KdisplayWB = "displayWB";
         public const string Kdisplay12hr = "display12hr";
         public const string KbufferTime = "bufferTime";
@@ -19,6 +20,10 @@ namespace NextFerry
         public const string KuseLocation = "useLocation";
         public const string Kdebug = "debug";
         public const string KlastAppVersion = "lastAppVersion";
+        #endregion
+
+        #region fields
+        // All fields except display settings are "write immediate" when set.
 
         private static bool _displayWB = true;
         public static bool displayWB
@@ -92,6 +97,10 @@ namespace NextFerry
             }
         }
 
+        // Note the trick in the next  field:  the update goes to isolated
+        // storage but *not* to the in-memory field.  Hence the new value
+        // will only be seen the next time the app is launched (or recovered).
+
         private static string _lastAppVersion = "0.0";
         /// <summary>
         /// The last version of the application to run before this invocation.
@@ -102,22 +111,13 @@ namespace NextFerry
             get { return _lastAppVersion; }
             set
             {
-                _lastAppVersion = value;
                 IsolatedStorageSettings.ApplicationSettings[KlastAppVersion] = value;
-                OnChanged(KlastAppVersion);
             }
         }
 
-        public static event PropertyChangedEventHandler PropertyChanged;
-        public static void OnChanged(string s)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(null, new PropertyChangedEventArgs(s));
-            }
-        }
+        #endregion
 
-
+        #region initialization and shutdown
         /// <summary>
         /// Read initial values from AppSettings, if present.
         /// Else initialize from defaults.
@@ -155,11 +155,22 @@ namespace NextFerry
             }
         }
 
-
         public static void close()
         {
             storeDisplaySettings();
         }
+        #endregion
+
+        #region events
+        public static event PropertyChangedEventHandler PropertyChanged;
+        public static void OnChanged(string s)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(null, new PropertyChangedEventArgs(s));
+            }
+        }
+        #endregion
 
         #region route display preferences
         // Route display is handled a bit differently: we load and store route display

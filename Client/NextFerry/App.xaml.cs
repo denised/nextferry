@@ -28,23 +28,10 @@ namespace NextFerry
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            // call order matters.
             AppSettings.init();
             Log.write("Launching");
-            if (! appVersion.Equals(AppSettings.lastAppVersion))
-            {
-                Log.write("Upgrading");
-                if (AppSettings.lastAppVersion.StartsWith("1"))
-                {
-                    Log.write("...from V1");
-                    // Clear the cache --- it will have bad route data.
-                    ScheduleIO.deleteCache();
-                }
-                // For either V1 or V2, update display information
-                AppSettings.RouteSetting.upgrade();
-
-                AppSettings.lastAppVersion = appVersion;
-            }
+            
+            upgrade();
             startBackground();
         }
 
@@ -152,23 +139,42 @@ namespace NextFerry
 
         #endregion
 
-        #region background work
+        #region the real work
+
+        private void upgrade()
+        {
+            // check to see if we need to updgrade any data
+            string lastv = AppSettings.lastAppVersion;
+            if (lastv != "0.0" && lastv != appVersion)
+            {
+                Log.write("Upgrading");
+                if (lastv.StartsWith("1"))
+                {
+                    Log.write("...from V1");
+                    // Clear the cache --- it will have bad route data.
+                    ScheduleIO.deleteCache();
+                }
+                // For either V1 or V2, update display information
+                AppSettings.RouteSetting.upgrade();
+            }
+            AppSettings.lastAppVersion = appVersion;
+        }
 
         private void startBackground()
         {
-            // we have to start a thread because readCache is synchronous, and we 
-            // want to complete it before beginning ServerIO or LocationMonitor.
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += (o, e) =>
+            // Readcache is synchronous, and we want it to complete before beginning
+            // the others.   The others are all asynchronous.
+            Util.Asynch(() =>
+            {
+                // if we are resuming, instance intact, we should already have schedules
+                if (!RouteManager.haveSchedules())
                 {
-                    if (!RouteManager.haveSchedules())
-                    {
-                        ScheduleIO.readCache();
-                        ServerIO.requestInitUpdate();
-                    }
-                    LocationMonitor.start();
-                };
-            bw.RunWorkerAsync();
+                    ScheduleIO.readCache();
+                    ServerIO.requestInitUpdate();
+                    AlertManager.recoverCache();
+                }
+                LocationMonitor.start();
+            });
         }
 
         #endregion

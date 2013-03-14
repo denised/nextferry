@@ -63,6 +63,18 @@ namespace NextFerry
         }
 
         /// <summary>
+        /// Return all routes represented by bitcode
+        /// </summary>
+        public static IEnumerable<Route> bitRoutes(int bitcode)
+        {
+            foreach (Route r in AllRoutes)
+            {
+                if ( (r.routeCode & bitcode)  != 0)
+                    yield return r;
+            }
+        }
+
+        /// <summary>
         /// Remove all the current schedules from the routes.   Used to completely refresh schedule state.
         /// </summary>
         public static void clearSchedules()

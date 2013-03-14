@@ -3,6 +3,7 @@ using System.Windows;
 using System.IO;
 using System.IO.IsolatedStorage;
 
+
 namespace NextFerry
 {
     /// <summary>
@@ -20,7 +21,7 @@ namespace NextFerry
         //
         // When we read the schedule file, we update AllRoutes accordingly.
 
-        private readonly static IsolatedStorageFile myStore = IsolatedStorageFile.GetUserStoreForApplication();
+
         private const string scheduleFile = "CachedFerrySchedules.txt";  // where on disk to store it.
 
         /// <summary>
@@ -29,13 +30,7 @@ namespace NextFerry
         public static void writeCache(string newtext)
         {
             Log.write("writing cache");
-            using (IsolatedStorageFileStream stream = new IsolatedStorageFileStream(scheduleFile, FileMode.Create, myStore))
-            {
-                using (StreamWriter writer = new StreamWriter(stream))
-                {
-                    writer.Write(newtext);
-                }
-            }
+            Util.writeText(scheduleFile, newtext);
         }
 
         /// <summary>
@@ -43,24 +38,10 @@ namespace NextFerry
         /// </summary>
         public static void readCache()
         {
-            if (myStore.FileExists(scheduleFile))
-            {
-                Log.write("reading cache");
-                try
-                {
-                    using (var isoFileStream = new IsolatedStorageFileStream(scheduleFile, FileMode.Open, myStore))
-                    {
-                        using (var isoFileReader = new StreamReader(isoFileStream))
-                        {
-                            deserialize(isoFileReader);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.write("readCache failed: " + e);
-                }
-            }
+            Log.write("reading cache");
+            String cache = Util.readText(scheduleFile);
+            if (cache != null)
+                deserialize(cache);
         }
 
 
@@ -68,14 +49,15 @@ namespace NextFerry
         /// Parse a schedule, putting the values into the appropriate field in Routes.
         /// </summary>
         /// <returns>True if we successfully parsed all routes.</returns>
-        public static bool deserialize(TextReader s)
+        public static bool deserialize(string s)
         {
-            //try
-            //{
+            try
+            {
+                StringReader sr = new StringReader(s);
                 int count = 0;
                 while (true)
                 {
-                    string line = s.ReadLine();
+                    string line = sr.ReadLine();
                     if (line == null) break;
                     //Log.write("deserialize: |" + line + "|");
                     // Skip comments and empty lines.
@@ -87,12 +69,12 @@ namespace NextFerry
                 }
                 Log.write("Deserialize successful (" + count + ")");
                 return (count == RouteManager.AllRoutes.Count * 4);  // four departurelists per route
-            //}
-            //catch (Exception e)
-            //{
-            //    Log.write("Unexpected exception in Route deserialize " + e);
-            //    return false;
-            //}
+            }
+            catch (Exception e)
+            {
+                Log.write("Unexpected exception in Route deserialize " + e);
+                return false;
+            }
         }
 
 
@@ -131,7 +113,7 @@ namespace NextFerry
             try
             {
                 AppSettings.cacheVersion = "";
-                myStore.DeleteFile(scheduleFile);
+                IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(scheduleFile);
             }
             catch (Exception e)
             {
@@ -141,8 +123,9 @@ namespace NextFerry
 
         public static string cacheStatus()
         {
-            if (myStore.FileExists(scheduleFile))
-                return "Cached as of " + myStore.GetCreationTime(scheduleFile).ToString("G");
+            IsolatedStorageFile store = IsolatedStorageFile.GetUserStoreForApplication();
+            if (store.FileExists(scheduleFile))
+                return "Cached as of " + store.GetCreationTime(scheduleFile).ToString("G");
             else
                 return "Cache not present.";
         }
