@@ -41,19 +41,17 @@ Terminals = (
 )
 
 
+# Note: at some point we expect to be able to propagate route information
+# from server to client.  For now, since routes don't change, it hasn't been
+# necessary to implement
 
 class route(object):
-    """
-    The route class (and Routes collection) is **the** master data for this application
-    Changes here will be propagated to clients.
-    Note these are a mix of WSF terms and our own.
-    
+    """  
     code: bit code to designate this route
     term1: official name of one terminal (the east-most terminal)
     term2: official name of the other terminal (the west-most terminal)
     dir1name:  our name for the route term1->term2 (westbound)
-    dir2name:  our name for the route term2->term1 (eastbound)
-    
+    dir2name:  our name for the route term2->term1 (eastbound)    
     """
     def __init__(self,code,t1,t2,dir1name,dir2name,):
         self.code = code 
@@ -69,15 +67,16 @@ class route(object):
             if datum in (route.code, route.dir1name, route.dir2name):
                 return route
         logging.warn("Attempted to look up a non-existent route field! " + repr(datum))
+        return None
     
-    @staticmethod
-    def findall(term):
-        """Yield all routes that depart from a given terminal"""
-        for route in Routes:
-            if term.name == route.term1 or term.name == route.term2:
-                yield route
-    
-            
+    #@staticmethod
+    #def findall(term):
+    #    """Yield all routes that depart from a given terminal"""
+    #    for route in Routes:
+    #        if term.name == route.term1 or term.name == route.term2:
+    #            yield route
+    #
+    #        
 
 Routes = (
     route(1,'Seattle','Bainbridge','bainbridge','bainbridge'),
@@ -85,16 +84,17 @@ Routes = (
     route(1<<3,'Mukilteo','Clinton','mukilteo','mukilteo'),
     route(1<<4,'Keystone','Port Townsend','pt townsend','pt townsend'),
     route(1<<5,'Fauntleroy','Southworth','fauntleroy-southworth','southworth-fauntleroy'),
-    route(1<<6,'Fauntleroy','Vashon Island','fauntleroty-vashon','vashon-fauntleroy'),
+    route(1<<6,'Fauntleroy','Vashon Island','fauntleroy-vashon','vashon-fauntleroy'),
     route(1<<7,'Vashon Island','Southworth','vashon-southworth','southworth-vashon'),
     route(1<<8,'Seattle','Bremerton','bremerton','bremerton'),
-    route(1<<9,'Tahlequah','Point Defiance','pt defiance','pt defiance'),
+    route(1<<9,'Tahlequah','Point Defiance','vashon-pt defiance','pt defiance-vashon'),
     route(1<<10,'Anacortes','Friday Harbor','friday harbor','friday harbor'),
     route(1<<11,'Anacortes','Orcas Island','orcas','orcas')
 )
 
 def printRoutes():
     """return a string containing Routes data, to send to client"""
+    return ""
 
 
 # this is text WSF uses to identify routes in alerts.

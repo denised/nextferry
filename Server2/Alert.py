@@ -18,17 +18,11 @@ class Alert(db.Model):
         return "__ %s %d\n%s\n" % (str(self.posted.time()), self.routes, self.body)
 
     
-def hasAlerts(recent=False):
-    q = Alert.all()
-    if recent:
-        q.filter("posted >", datetime.datetime.now() - datetime.timedelta(minutes=5))
-    return q.count(limit=1) > 0
+def hasAlerts():
+    return Alert.all().count(limit=1) > 0
 
-def allAlerts(recent=False):
-    q = Alert.all()
-    if recent:
-        q.filter("posted >", datetime.datetime.now() - datetime.timedelta(minutes=5))
-    return q.run(limit=15)
+def allAlerts():
+    return Alert.all().run(limit=15)
 
 
 # Temporarily, at least, keep mail we error out on, so we can figure out what happened.
@@ -68,15 +62,18 @@ class NewAlertHandler(InboundMailHandler):
         format of the messages are too irregular to do that robustly.
         """
         try:
-            subject = message.subject
-            body = ""
+            # get rid of initial string on subject line
+            subject = re.sub('Ferry Alert: ', '', message.subject)
+            msgbody = ""
             # there should only be one segment, but let's be proper about it
             for (btype, bcontent) in message.bodies('text/plain'):
-                body += bcontent.decode()
+                msgbody += re.sub('\r','',bcontent.decode())
                 
             # divide the real content from the boilerplate
             # the boilerplate is set off by three (or more) newlines
-            parts = re.split('\n\n\n+', body)
+            parts = re.split('\n\n\n+', msgbody)
+            logging.debug("Email has %d parts", len(parts))
+            
             # now extract out the route name from the boilerplate
             boilerplate = parts[-1]
             routes = 0
@@ -90,7 +87,7 @@ class NewAlertHandler(InboundMailHandler):
                 
             # so far so good.
             newAlert = Alert()
-            newAlert.body = subject + "\n" + ("\n".join(parts[:-1]))   # ok, that's getting hard to read...
+            newAlert.body = "\n".join( [subject] + parts[:-1] )
             newAlert.routes = routes
             return newAlert
         
@@ -170,6 +167,21 @@ will be  5:07 p.m. and 6:43 p.m. from Seattle and 4:25 p.m. and 5:55 p.m. from B
 Fauntleroy/Vashon/Southworth: This route will be on a two boat schedule with the
 124 car Issaquah and the 87-car Tillikum. This service will be supplemented with
 unscheduled sailings by the 34-car Hiyu.
+
+****************************************
+GRR, now they don't put route info in!
+****************************************
+ALL ROUTES: The Klahowya will be out of service on Monday, March 11 due to necessary
+repairs to the vessel. Fauntleroy, Vashon and Southworth will be operating on a two
+boat schedule. Updates will occur as more information becomes available.
+
+This alert was sent on 3/10/2013 at 8:33PM.
+
+Our Web Site is at http://www.wsdot.wa.gov/ferries
+
+You can change your account, anytime, at: https://secure1.wsdot.wa.gov/ferries/account
+
+Please send any comments or suggestions you may have to WSFAlert@wsdot.wa.gov
 """
 
 

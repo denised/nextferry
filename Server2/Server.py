@@ -15,7 +15,7 @@ logging.getLogger().setLevel(logging.INFO)
 # put the result in to this string
 # upload that
 # grr. automate grr.
-appversion = "tmp-3-ge6d5351"
+appversion = "V2x-10 unmodified: will send alerts, so backend only"
     
 class GetInitUpdate(webapp2.RequestHandler):
     """
@@ -24,10 +24,6 @@ class GetInitUpdate(webapp2.RequestHandler):
     """
     def get(self, clientversion, year=None, month=None, day=None):
         self.response.headers['Content-Type'] = 'text/plain'
-        if needsroutes(clientversion,year,month,day):
-            self.response.out.write('#routes\n')
-            for route in WSF.Routes:
-                self.response.out.write(str(route) + '\n')
         if needschedule(year,month,day):
             self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
             self.response.out.write(CurrentSchedule.text())
@@ -38,6 +34,7 @@ class GetInitUpdate(webapp2.RequestHandler):
             self.response.out.write('#allalerts\n')
             for alert in Alert.allAlerts():
                 self.response.out.write(str(alert))
+            self.response.out.write('__\n')
         self.response.out.write('#done\n')
 
 def needschedule(year,month,day):
@@ -55,7 +52,6 @@ def needschedule(year,month,day):
         logging.warn('Garbled data version caught: %s/%s/%s', year, month, day)
         return True
 
-
 class GetTravelTimes(webapp2.RequestHandler):
     """
     Travel times are computed from the client's location to each of the ferry
@@ -71,11 +67,8 @@ class GetTravelTimes(webapp2.RequestHandler):
         else:
             self.response.out.write('#traveltimes\n')
             self.response.out.write(MapQuestTT.getTravelTimes(flat,flon))
-        if Alert.hasAlerts(recent=True):
-            self.response.out.write('#newalerts\n')
-            for alert in Alert.allAlerts(recent=True):
-                self.response.out.write(str(alert))
         self.response.out.write('#done\n')
+
         
 class Version(webapp2.RequestHandler):
     def get(self):
