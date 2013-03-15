@@ -133,6 +133,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Fonts\heydings_icons.ttf" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml">
       <SubType>Designer</SubType>

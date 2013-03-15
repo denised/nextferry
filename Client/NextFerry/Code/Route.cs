@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -49,9 +50,18 @@ namespace NextFerry
 
         public string displayName { get { return (AppSettings.displayWB ? wbName : ebName); }}
 
+        /// <summary>
+        /// Style to use to display alerts, based on whether we have any or not.
+        /// Set by updateAlertStyle().
+        /// </summary>
+        public Style alertStyle { get; private set; }
         #endregion
 
         #region non-change notified properties
+
+        public static Style alertStyleNone;
+        public static Style alertStyleNormal;
+        public static Style alertStyleUnread;
 
         public Schedule weekday { get; private set; }
         public Schedule weekend { get; private set; }
@@ -82,6 +92,7 @@ namespace NextFerry
             ebName = eName;
             clearSchedules();
             AppSettings.PropertyChanged += appSettingsChanged;
+            AlertManager.RouteAlerts[this] = new List<Alert>();
         }
 
         /// <summary>
@@ -104,6 +115,27 @@ namespace NextFerry
 
                 OnChanged("futureDepartures");  // noisy: will signal unnecessarily, but not really a problem.
             });
+        }
+
+        /// <summary>
+        /// Recalculate alert state.  Causes change notification
+        /// </summary>
+        public void updateAlertStyle()
+        {
+            List<Alert> alerts = AlertManager.RouteAlerts[this];
+            Style newstyle;
+            if (alerts.Count == 0)
+                newstyle = alertStyleNone;
+            else if (alerts.Any(a => !a.read))
+                newstyle = alertStyleUnread;
+            else
+                newstyle = alertStyleNormal;
+
+            if (newstyle != alertStyle)
+            {
+                alertStyle = newstyle;
+                OnChanged("alertStyle");
+            }
         }
 
 

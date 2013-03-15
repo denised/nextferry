@@ -6,16 +6,12 @@ What's next:
 		Obvious solutions won't work for various reasons, so postponing indefinitely.
 
 	Postponing features to V3:
-		Alerts
 		Travel times accomodate wait times.
 		
 	Fix location for Pierce-west of narrows bridge.  (Server change)
 	Automate tooling for retrieving schedule (low priority)	
 	Add a "donate" button?	
 	Consider making the alerts a paid feature?
-	
-	A few graphical changes are required: the "[All]" button is still invisible to most people.
-	Need to increase the size.
 
 	Improve the experience of fetching server logs to something repeatable.
 
@@ -26,8 +22,6 @@ I think we may only be providing timing hints with location, in spite of the sug
 We may want to do a dialog pop-up for no routes displayed on MainPage, given the reversal of the defaults.
 
 We need to add "downloading schedules" popup for when there is no cache.
-
-Bug: changing theme type from light to dark did not change background on routepage (though it did change the background on the top bar and app bar).
 
 
 What's done:

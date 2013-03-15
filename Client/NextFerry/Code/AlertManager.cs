@@ -141,8 +141,6 @@ namespace NextFerry
                 foreach( Route r in RouteManager.bitRoutes( rCodes ))
                 {
                     foundone = true;
-                    if (!RouteAlerts.ContainsKey(r))
-                        RouteAlerts[r] = new List<Alert>();
                     RouteAlerts[r].Add(a);
                 }
 

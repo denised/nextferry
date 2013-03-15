@@ -36,7 +36,7 @@ namespace NextFerry
                 {
                     fs = new IsolatedStorageFileStream(filename, FileMode.Open, iStore);
                     s = new StreamReader(fs);
-                    return s.ToString();
+                    return s.ReadToEnd();
                 }
                 catch (Exception e)
                 {

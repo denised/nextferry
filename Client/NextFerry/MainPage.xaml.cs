@@ -28,15 +28,23 @@ namespace NextFerry
 
             ((App)Application.Current).theMainPage = this;
  
+            // Some top down initialization...
             DepartureTime.tooLateStyle = (Style)this.Resources["tooLateStyle"];
             DepartureTime.riskyStyle = (Style)this.Resources["riskyStyle"];
             DepartureTime.goodStyle = (Style)this.Resources["goodStyle"];
             DepartureTime.defaultStyle = (Style)this.Resources["defaultStyle"];
 
+            Route.alertStyleNone = (Style)this.Resources["iconAbsent"];
+            Route.alertStyleNormal = (Style)this.Resources["icon"];
+            Route.alertStyleUnread = (Style)this.Resources["iconBright"];
+            newAlertsArrived(null,null);
+
             list1.ItemsSource = displayRoutes;
             list3.ItemsSource = displayRoutes;
 
             WP7Contrib.Diagnostics.RuntimeDebug.Initialize(true, false, "denisesandbox@mailup.net", "");
+
+            AlertManager.newAlerts += newAlertsArrived;
 
             initTTWatcher();
             initScheduleWatcher();
@@ -209,11 +217,20 @@ namespace NextFerry
 
         #endregion
         
-        #region notifications
+        #region alerts
 
-        private void notifications_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private void newAlertsArrived(Object sender, EventArgs args)
         {
-
+            // Philosophically, Routes could do this themselves, but 
+            // then we'd have bunches of BeginInvoke()'s, which just annoys me.
+            // So...
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                foreach (Route r in RouteManager.AllRoutes)
+                {
+                    r.updateAlertStyle();
+                }
+            });
         }
 
         #endregion

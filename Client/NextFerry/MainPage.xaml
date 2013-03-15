@@ -11,10 +11,8 @@
     d:DesignHeight="696" d:DesignWidth="480"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="DarkMagenta"
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="True">
-    <!-- "Magenta" is so I notice if something isn't being explicitly assigned: its probably a mistake -->
 
     <phone:PhoneApplicationPage.Resources>
         <Color x:Key="PugetGreyColor">#FF5D7681</Color>
@@ -48,11 +46,24 @@
         <Style x:Name="defaultStyle" TargetType="TextBlock" BasedOn="{StaticResource rowBase}">
             <Setter Property="Foreground" Value="{StaticResource DarkerPugetGrey}"/>
         </Style>
+        
+        <!-- Styles to control the appearance of the little icon/buttons under the schedule names -->
+        <Style x:Name="icon" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value=".\Fonts\heydings_icons.ttf#Heydings Icons"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkerPugetGrey}" />
+        </Style>
+        <Style x:Name="iconBright" TargetType="TextBlock" BasedOn="{StaticResource icon}">
+            <Setter Property="Foreground" Value="{StaticResource PhoneAccentBrush}"/>
+        </Style>
+        <Style x:Name="iconAbsent" TargetType="TextBlock" BasedOn="{StaticResource icon}">
+            <Setter Property="Visibility" Value="Collapsed"/>
+        </Style>
 
         <!-- Styles for the buttons -->
         <Style x:Name="toggleSelected" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource PhoneSubtleBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource MilkySky}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PhoneAccentBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource DarkerPugetGrey}"/>
         </Style>
         <Style x:Name="toggleUnselected" TargetType="Button">
@@ -78,17 +89,9 @@
         <TextBlock Text="next ferry" Grid.Row="0" Margin="10,17,0,28"
                    Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}"/>
         <TextBlock x:Name="ewsign" Text="west" Margin="0,29,26,-16"
-                   Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PugetGrey}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4" TextAlignment="Right"/>
+                   Style="{StaticResource PhoneTextTitle1Style}" Foreground="{StaticResource PhoneAccentBrush}" FontSize="96" HorizontalAlignment="Right" Width="193" Opacity="0.4" TextAlignment="Right"/>
 
-
-        <!-- Notification Button -->             
-        <Canvas x:Name="notifications" Height="38" Width="55" Margin="0,8,26,0" VerticalAlignment="Top" HorizontalAlignment="Right"
-                Tap="notifications_Tap" Visibility="Collapsed">
-            <Rectangle Height="38" Width="55" RadiusX="10" RadiusY="10" Fill="{StaticResource DarkerPugetGrey}" Stroke="{StaticResource PhoneAccentBrush}" StrokeThickness="3"/>
-            <TextBlock x:Name="notificationCount" Foreground="{StaticResource PhoneAccentBrush}" Margin="18,2,0,0"
-                       FontSize="22" FontWeight="Bold" Text="11"/>
-        </Canvas>
-            
+           
         <!-- Background image -->
         <Image Grid.Row="1" Grid.RowSpan="2" Source="Resources\FerryCrop4.jpg" Stretch="Fill"/>
 
@@ -109,15 +112,17 @@
                             <StackPanel Height="74">
                                 <TextBlock Text="{Binding displayName}" FontSize="32" Foreground="{StaticResource DarkerPugetGrey}"
                                        VerticalAlignment="Bottom"/>
-                                <TextBlock Text="[All]" FontSize="18.667" Foreground="{StaticResource DarkerPugetGrey}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="i" Style="{StaticResource icon}"/>
+                                    <TextBlock Text="!" Style="{Binding alertStyle}"/>
+                                </StackPanel>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
-                              Margin="48,32,0,0">
+                              Margin="52,32,0,0">
                     <!-- list3 shows the departure times "after now" -->
                     <ItemsControl x:Name="list3" Grid.Column="1"
                                   Style="{StaticResource VerticalList}" HorizontalAlignment="Left">
@@ -151,8 +156,8 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Height="72" Margin="0,0,0,20" 
                     VerticalAlignment="Bottom" HorizontalAlignment="Center">
-            <Button Content="westbound" x:Name="buttonWB" Click="switchToWB" Style="{StaticResource toggleSelected}" BorderBrush="{StaticResource PhoneAccentBrush}"/>
-            <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}" BorderBrush="{StaticResource PhoneAccentBrush}"/>
+            <Button Content="westbound" x:Name="buttonWB" Click="switchToWB" Style="{StaticResource toggleSelected}"/>
+            <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}"/>
         </StackPanel>
 
         <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
