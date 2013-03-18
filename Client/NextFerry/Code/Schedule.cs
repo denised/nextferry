@@ -55,6 +55,7 @@ namespace NextFerry
         {
             return timesWest._times.Count == 0;
         }
+
         /// <summary>
         /// Return true if the weekend schedule should be used right now.
         /// Uses the day cutoff logic.

@@ -1,28 +1,22 @@
 ﻿
 What's next:
+	V3 outstanding list:
+	Cron cleanup of old alerts on server.
+
+	Server features (can do any time):		
+		Fix location for Pierce-west of narrows bridge.
+		Automate tooling for retrieving schedule (low priority)	
+		Improve the experience of fetching server logs to something repeatable.
+
+Postponed Indefinitely:
 	
 	We've got a performance problem: drawing the main display can take as much as 0.5 second.
 		Investigation reveals this is an organic problem, simply linear in the number of times displayed.
+		Most people will presumably have only a few routes displayed once they've customized their system
 		Obvious solutions won't work for various reasons, so postponing indefinitely.
 
-	Postponing features to V3:
-		Travel times accomodate wait times.
-		
-	Fix location for Pierce-west of narrows bridge.  (Server change)
-	Automate tooling for retrieving schedule (low priority)	
-	Add a "donate" button?	
-	Consider making the alerts a paid feature?
-
-	Improve the experience of fetching server logs to something repeatable.
-
-	Standing issues:
-	
-I think we may only be providing timing hints with location, in spite of the suggestion that buffer time is meaningful w/o it.
-
-We may want to do a dialog pop-up for no routes displayed on MainPage, given the reversal of the defaults.
-
-We need to add "downloading schedules" popup for when there is no cache.
-
+	Base wait times on ferry traffic density
+	Wire cameras of terminals in to RoutePage
 
 What's done:
 	Get it into git.
@@ -69,7 +63,7 @@ What's done:
 	Added "easter egg" debug capability.
 	Added help page.
 
-	Create a public repository, just for grins (maybe someone else will add features?)
+	Create a public github repository, just for grins (maybe someone else will add features?)
 
 	Version 2.x
 	Solved duplicate message problem (we were creating multiple backgroundworkers)
@@ -81,5 +75,6 @@ What's done:
 	Moved holiday logic to Server, and added generalized capability for "special" routes.
 	Changed MainPage app menu to app bar buttons
 	Changed client to address new "backend" server natively.
+	Added Alerts feature
 
 

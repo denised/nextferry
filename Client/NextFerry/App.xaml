@@ -42,6 +42,36 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="appTitle" TargetType="TextBlock">
+            <Setter Property="Text" Value="NEXT FERRY"/>
+            <Setter Property="Height" Value="27"/>
+            <Setter Property="Margin" Value="12,10,0,-7"/>
+        </Style>
+        
+        <!-- Shared text blocks / styles used in RoutePage and RouteAlerts -->
+        <Style x:Key="RPtitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="38"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Canvas.Left" Value="20"/>
+            <Setter Property="Canvas.Top" Value="50"/>
+        </Style>
+        <Style x:Key="RPaltTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource RPtitleStyle}">
+            <Setter Property="Foreground" Value="{StaticResource PhoneSubtleBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Canvas.Left" Value="412"/>
+        </Style>
+        <Style x:Key="RPsubtitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="Foreground" Value="{StaticResource PhoneAccentBrush}"/>
+            <Setter Property="Margin" Value="21,25,0,0"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
+
+
+        <src:VisibilityBooleanConverter x:Key="boolVisibility" />
     </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>

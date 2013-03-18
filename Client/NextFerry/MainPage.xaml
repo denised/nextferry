@@ -160,13 +160,13 @@
             <Button Content="eastbound" x:Name="buttonEB" Click="switchToEB" Style="{StaticResource toggleUnselected}"/>
         </StackPanel>
 
-        <Canvas x:Name="warning" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
+        <Canvas x:Name="message" Grid.Row="1" Height="33" Margin="35,0,35,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
             <Rectangle Height="25" Width="340" Fill="{StaticResource PaleYellow}" RadiusX="5" RadiusY="5" Canvas.Left="-171" Canvas.Top="5"/>
-            <TextBlock x:Name="warningText" Foreground="{StaticResource DarkerPugetGrey}" 
+            <TextBlock x:Name="messageText" Foreground="{StaticResource DarkerPugetGrey}" 
                        TextWrapping="NoWrap" TextAlignment="Center" Canvas.Top="4" Height="27" Width="270" Canvas.Left="-135">
                 Waiting for travel times
             </TextBlock>
-            <Image Height="35" Width="35" HorizontalAlignment="Left" Source="Resources\warning.png" Stretch="Uniform" Canvas.Left="-185" Canvas.Top="-1"/>
+            <Image x:Name="warning" Height="35" Width="35" HorizontalAlignment="Left" Source="Resources\warning.png" Stretch="Uniform" Canvas.Left="-185" Canvas.Top="-1"/>
         </Canvas>
     </Grid>
 

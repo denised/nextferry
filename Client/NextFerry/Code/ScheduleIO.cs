@@ -36,12 +36,11 @@ namespace NextFerry
         /// <summary>
         /// Reads cached state and updates AllRoutes accordingly.
         /// </summary>
-        public static void readCache()
+        public static bool readCache()
         {
             Log.write("reading cache");
             String cache = Util.readText(scheduleFile);
-            if (cache != null)
-                deserialize(cache);
+            return (cache != null) && deserialize(cache);
         }
 
 

@@ -20,10 +20,11 @@ namespace NextFerry
         public const string KuseLocation = "useLocation";
         public const string Kdebug = "debug";
         public const string KlastAppVersion = "lastAppVersion";
+        public const string KalertsSeen = "alertsSeen";
         #endregion
 
         #region fields
-        // All fields except display settings are "write immediate" when set.
+        // Most fields are "write immediate" when set.
 
         private static bool _displayWB = true;
         public static bool displayWB
@@ -97,7 +98,7 @@ namespace NextFerry
             }
         }
 
-        // Note the trick in the next  field:  the update goes to isolated
+        // Note the trick in the next field:  the update goes to isolated
         // storage but *not* to the in-memory field.  Hence the new value
         // will only be seen the next time the app is launched (or recovered).
 
@@ -115,6 +116,18 @@ namespace NextFerry
             }
         }
 
+        private static List<string> _alertsSeen = new List<string>();
+        public static List<string> alertsSeen
+        {
+            get { return _alertsSeen; }
+            set
+            {
+                IsolatedStorageSettings.ApplicationSettings[KalertsSeen] = value;
+                // not signaled.
+            }
+        }
+
+
         #endregion
 
         #region initialization and shutdown
@@ -131,6 +144,7 @@ namespace NextFerry
             init<bool>(KuseLocation);
             init<bool>(Kdebug);
             init<string>(KlastAppVersion);
+            init<List<string>>(KalertsSeen);
             recoverDisplaySettings();
             Log.write("Application Settings restored");
         }

@@ -67,6 +67,9 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RouteAlerts.xaml.cs">
+      <DependentUpon>RouteAlerts.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Code\AlertManager.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -107,6 +110,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Page Include="RouteAlerts.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Choose.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -134,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Fonts\heydings_icons.ttf" />
+    <Content Include="Todo.txt" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml">
       <SubType>Designer</SubType>

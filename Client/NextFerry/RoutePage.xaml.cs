@@ -1,105 +1,136 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Phone.Controls;
+using System.Windows.Navigation;
+using System.ComponentModel;
+using System.Windows;
 
 
 namespace NextFerry
 {
     public partial class RoutePage : PhoneApplicationPage
     {
-        private Route r = null;
+        private Route r { get; set; }
 
-        // Note that the data on this page is "dead".  If the schedule is updated while the 
-        // user is on this page (or while the page is tombstoned), the page will not update.
-        // However, the page is recomputed from scratch every time it is visited fresh from
-        // mainpage.   I consider this a reasonable tradeoff.
+        // RoutePage is the landing page for a pseudo-pivot composed of multiple pages.
+        // In addition to holding the main pivot (Schedules), we also set up the other page(s)
+        // (Currently just alerts; in the future maybe the terminal cams will get a page too.)
 
         public RoutePage()
         {
             InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
+        #region setup
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            bool recovered = false;
+            r = findRoute(this,r);
+            r.initDisplayStrings();
+            DataContext = r;
+            manageBackPointer(this);
+            pageTitle.Text = r.eastTerminal.name + " / " + r.westTerminal.name;
+        }
 
-            // if our state is already set, we don't need to do anything
-            if (r != null)
-                return;
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            State["route"] = r.wbName;
+        }
 
+        public static Route findRoute(PhoneApplicationPage me, Route r)
+        {
+            if (r != null)  // we already have it.
+                return r;
+            
             // This is either a new page, or we're being restored from tombstoning.
             // If we tombstoned, the route should be in State
             // If this is a new page, the route name is in the URL.
             String routeName = null;
-            if (State.ContainsKey("route"))
+            if (me.State.ContainsKey("route"))
             {
-                routeName = (string)State["route"];
-                recoverLists();
-                recovered = true;
+                routeName = (string)me.State["route"];
             }
             else
             {
-                NavigationContext.QueryString.TryGetValue("route", out routeName);
+                me.NavigationContext.QueryString.TryGetValue("route", out routeName);
             }
-
-            if (routeName == null)
-            {
-                Log.write("Can't recover RoutePage state!");
-                throw new InvalidOperationException();
-            }
-
-            r = RouteManager.lookup(routeName);
-            eastport.Text = Terminal.lookup(r.eastCode).name;
-            westport.Text = Terminal.lookup(r.westCode).name;
-
-            if (!recovered)
-            {
-                assignLists();
-            }
-        }
-
-
-        #region content management
-        private void assignLists()
-        {
-            wbwdam.Text = computeString(r.weekday.timesWest.beforeNoon());
-            wbwdpm.Text = computeString(r.weekday.timesWest.afterNoon());
-            wbweam.Text = computeString(r.weekend.timesWest.beforeNoon());
-            wbwepm.Text = computeString(r.weekend.timesWest.afterNoon());
-
-            ebwdam.Text = computeString(r.weekday.timesEast.beforeNoon());
-            ebwdpm.Text = computeString(r.weekday.timesEast.afterNoon());
-            ebweam.Text = computeString(r.weekend.timesEast.beforeNoon());
-            ebwepm.Text = computeString(r.weekend.timesEast.afterNoon());
-        }
-
-        protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
-        {
-            State["route"] = r.wbName;
-            State["wbwdam"] = wbwdam.Text;
-            State["wbwdpm"] = wbwdpm.Text;
-            State["wbweam"] = wbweam.Text;
-            State["wbwepm"] = wbwepm.Text;
-
-            State["ebwdam"] = ebwdam.Text;
-            State["ebwdpm"] = ebwdpm.Text;
-            State["ebweam"] = ebweam.Text;
-            State["ebwepm"] = ebwepm.Text;
-        }
-
-        private void recoverLists()
-        {
-            wbwdam.Text = (string)State["wbwdam"];
-            wbwdpm.Text = (string)State["wbwdpm"];
-            wbweam.Text = (string)State["wbweam"];
-            wbwepm.Text = (string)State["wbwepm"];
-
-            ebwdam.Text = (string)State["ebwdam"];
-            ebwdpm.Text = (string)State["ebwdpm"];
-            ebweam.Text = (string)State["ebweam"];
-            ebwepm.Text = (string)State["ebwepm"];
+            return RouteManager.lookup(routeName);
         }
         #endregion
+
+        #region pseudo-pivot
+        /// <summary>
+        /// Enable the user to see the "back button" go back to wherever previously
+        /// navigated from (not one of the pivots).
+        /// </summary>
+        public static void manageBackPointer(PhoneApplicationPage me)
+        {
+            if (me.NavigationService.CanGoBack)
+            {
+                // if we got here from one of our peers, pop that off the back stack.
+                JournalEntry j = me.NavigationService.BackStack.First();
+                if (j.Source.OriginalString.Contains("RoutePage") ||
+                    j.Source.OriginalString.Contains("RouteAlerts"))
+                    me.NavigationService.RemoveBackEntry();
+            }
+        }
+
+        private void gotoAlerts(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (r.hasAlerts)
+            {
+                string urlWithData = string.Format("/RouteAlerts.xaml?route={0}", r.wbName);
+                NavigationService.Navigate(new Uri(urlWithData, UriKind.Relative));
+            }
+        }
+        #endregion
+    }
+
+    #region schedule content management
+
+    public partial class Route : INotifyPropertyChanged
+    {
+        // Cached string versions of the departuretimes.
+        public string ds_wbwdam { get; private set; }
+        public string ds_wbwdpm { get; private set; }
+        public string ds_wbweam { get; private set; }
+        public string ds_wbwepm { get; private set; }
+        public string ds_ebwdam { get; private set; }
+        public string ds_ebwdpm { get; private set; }
+        public string ds_ebweam { get; private set; }
+        public string ds_ebwepm { get; private set; }
+        private int ds_initState = 0;
+            // 0: no initialization
+            // 1: event added
+            // 2: strings correct
+
+        internal void initDisplayStrings()
+        {
+            if (ds_initState == 0)
+                AppSettings.PropertyChanged += watchTimeFormat;
+
+            if (ds_initState != 2 )
+            {
+                ds_wbwdam = computeString(weekday.timesWest.beforeNoon());
+                ds_wbwdpm = computeString(weekday.timesWest.afterNoon());
+                ds_wbweam = computeString(weekend.timesWest.beforeNoon());
+                ds_wbwepm = computeString(weekend.timesWest.afterNoon());
+
+                ds_ebwdam = computeString(weekday.timesEast.beforeNoon());
+                ds_ebwdpm = computeString(weekday.timesEast.afterNoon());
+                ds_ebweam = computeString(weekend.timesEast.beforeNoon());
+                ds_ebwepm = computeString(weekend.timesEast.afterNoon());
+                ds_initState = 2;
+            }
+        }
+
+        internal void watchTimeFormat(Object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == AppSettings.Kdisplay12hr)
+            {
+                ds_initState = 1;
+            }
+        }
 
         private static System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
@@ -116,12 +147,6 @@ namespace NextFerry
 
             return sb.ToString();
         }
-
-
-
-        private void gotoSettings(object sender, EventArgs e)
-        {
-            NavigationService.Navigate(new Uri("/Settings.xaml", UriKind.Relative));
-        }
     }
+    #endregion
 }

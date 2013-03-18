@@ -56,6 +56,7 @@ namespace NextFerry
         // This code will not execute when the application is closing
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
+            AlertManager.save();
             LocationMonitor.stop();
             AppSettings.close();
         }
@@ -64,6 +65,7 @@ namespace NextFerry
         // This code will not execute when the application is deactivated
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
+            AlertManager.save();
             LocationMonitor.stop();
             AppSettings.close();
         }
@@ -169,7 +171,14 @@ namespace NextFerry
                 // if we are resuming, instance intact, we should already have schedules
                 if (!RouteManager.haveSchedules())
                 {
-                    ScheduleIO.readCache();
+                    bool rd = ScheduleIO.readCache();
+                    if (!rd)
+                    {
+                        Deployment.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                theMainPage.addMessage("Downloading...");
+                            });
+                    }
                     ServerIO.requestInitUpdate();
                     AlertManager.recoverCache();
                 }

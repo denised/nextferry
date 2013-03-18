@@ -22,6 +22,7 @@ namespace NextFerry
         private DispatcherTimer travelTimeWatcher = new DispatcherTimer();
         private DispatcherTimer scheduleWatcher = new DispatcherTimer();
 
+        #region initialization
         public MainPage()
         {
             InitializeComponent();
@@ -37,7 +38,6 @@ namespace NextFerry
             Route.alertStyleNone = (Style)this.Resources["iconAbsent"];
             Route.alertStyleNormal = (Style)this.Resources["icon"];
             Route.alertStyleUnread = (Style)this.Resources["iconBright"];
-            newAlertsArrived(null,null);
 
             list1.ItemsSource = displayRoutes;
             list3.ItemsSource = displayRoutes;
@@ -70,12 +70,15 @@ namespace NextFerry
 
             if (AppSettings.useLocation)
                 travelTimeWatcher.Start();
+
+            newAlertsArrived(null, null);
         }
 
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
         {
             travelTimeWatcher.Stop();
         }
+        #endregion
 
         #region user actions
         private void switchToWB(object sender, RoutedEventArgs e)
@@ -144,7 +147,7 @@ namespace NextFerry
                 {
                     if (AppSettings.useLocation)
                     {
-                        addWarning("Waiting for travel times");
+                        addMessage("Waiting for travel times");
                     }
                     // The timer will be turned back on when travel times arrive.
                     travelTimeWatcher.Stop();
@@ -161,7 +164,7 @@ namespace NextFerry
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 if (args.traveltimes.Count > 0)
-                    removeWarning();
+                    removeMessage();
                 else
                     addWarning("Travel times not available");
 
@@ -185,19 +188,6 @@ namespace NextFerry
             });
         }
 
-
-        private void addWarning(string contents)
-        {
-            warningText.Text = contents;
-            warning.Visibility = System.Windows.Visibility.Visible;
-        }
-
-        private void removeWarning()
-        {
-            warning.Visibility = System.Windows.Visibility.Collapsed;
-        }
-
-
         private void initScheduleWatcher()
         {
             // Schedule watcher is a one-time event to make sure we are actually
@@ -216,14 +206,34 @@ namespace NextFerry
         }
 
         #endregion
-        
+
+        #region message display
+        // These must be called carefully --- there is no locking
+
+        public void addMessage(string contents)
+        {
+            messageText.Text = contents;
+            warning.Visibility = System.Windows.Visibility.Collapsed;
+            message.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        public void addWarning(string contents)
+        {
+            messageText.Text = contents;
+            warning.Visibility = System.Windows.Visibility.Visible;
+            message.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        public void removeMessage()
+        {
+            message.Visibility = System.Windows.Visibility.Collapsed;
+        }
+        #endregion
+
         #region alerts
 
         private void newAlertsArrived(Object sender, EventArgs args)
         {
-            // Philosophically, Routes could do this themselves, but 
-            // then we'd have bunches of BeginInvoke()'s, which just annoys me.
-            // So...
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 foreach (Route r in RouteManager.AllRoutes)
@@ -232,7 +242,38 @@ namespace NextFerry
                 }
             });
         }
-
-        #endregion
     }
+
+    // I just figured out you can get some of the benefits of a view 
+    // cheaply by using partial classes... Factors relevant code
+    // closer together.
+
+    public partial class Route : INotifyPropertyChanged
+    {
+        internal static Style alertStyleNone;
+        internal static Style alertStyleNormal;
+        internal static Style alertStyleUnread;
+
+        /// <summary>
+        /// Style to use to display alerts, based on whether we have any or not.
+        /// </summary>
+        public Style alertStyle { get; private set; }
+
+        /// <summary>
+        /// Recalculate alert state.  Causes change notification
+        /// </summary>
+        internal void updateAlertStyle()
+        {
+            Style newstyle =
+                (this.hasAlerts ? (this.hasNewAlerts ? alertStyleUnread : alertStyleNormal)
+                                : alertStyleNone);
+
+            if (newstyle != alertStyle)
+            {
+                alertStyle = newstyle;
+                OnChanged("alertStyle");
+            }
+        }
+    }
+    #endregion
 }

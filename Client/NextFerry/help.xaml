@@ -23,54 +23,43 @@
         <!-- Title Block -->
         <StackPanel Grid.Row="0">
             <TextBlock Text="NEXT FERRY" Margin="12,10,0,0"/>
-            <TextBlock Text="help" Margin="12,-7,0,20" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock Text="info" Margin="12,-7,0,20" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
         <ScrollViewer Grid.Row="1" Height="610" VerticalAlignment="Top"
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- Page Content -->
             <StackPanel Grid.Row="1" Margin="12,0,20,12">
-                <TextBlock Text="routes" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
+                <TextBlock Text="travel times" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
                 <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                Select which routes to display with the "choose routes..." operation.
-                The main page shows the next available travel times.  The "[Full]" button
-                will show a complete schedule.
-                </TextBlock>
-
-                <TextBlock Text="times" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
-                <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                The color coding on the travel times indicates how likely you can make
-                that departure if you are driving.
+                If location is on, NextFerry will use travel times to estimate how likely
+                    you can get to a ferry terminal in time for each departure.                   
                 </TextBlock>
                 <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                Turning on location services in the settings will use your current location to
-                estimate drive time.  Otherwise drive time is not estimated.
-                </TextBlock>
-                <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                Use the buffer time setting to increase or decrease the time allowed.
-                If you do not use location services, increase this time to account for drive time.
+                    Red means unlikely, yellow risky, green good.  No color is shown if the terminal
+                    is out of reach or the departure far into the future.
                 </TextBlock>
 
                 <!-- Notices -->
 
                 <TextBlock Text="notices" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
                 <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                    This application uses network access to retrieve data, including
-                    ferry schedules and travel times.  The amount of data required is minimal.  
-                    Network access and location accuracy can be poor in some parts of the Puget Sound region.
+                    NextFerry uses network access to retrieve data, including
+                    ferry schedules and travel times.  The amount of data required is minimal, 
+                    however network access and location accuracy can be poor in some parts of the Puget Sound region.
                 </TextBlock>
                 <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                    This application uses schedule and other information from WSDOT, but is not affiliated with WSDOT.
+                    NextFerry uses schedule and other information from WSDOT, but is not affiliated with WSDOT.
                 </TextBlock>
                 <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                    This application may use travel estimates from MapQuest, but is not affiliated with MapQuest.
+                    NextFerry may use travel estimates from MapQuest, but is not affiliated with MapQuest.
                 </TextBlock>
 
                 <!-- About -->
 
                 <TextBlock Text="about" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
                 <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                     Developed by Denise Draper, 2012, because I'm always trying to 
+                     Developed by Denise Draper, 2012-2013, because I'm always trying to 
                      figure out whether to take the Edmonds or Bainbridge ferry.
                 </TextBlock>
                 <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">

@@ -15,7 +15,7 @@ namespace NextFerry
     ///    weekend / weekday
     ///    eastbound / westbound
     /// </summary>
-    public class Route : INotifyPropertyChanged
+    public partial class Route : INotifyPropertyChanged
     {
         #region change notified properties
         /// <summary>
@@ -39,7 +39,6 @@ namespace NextFerry
             // or if the eb/wb changes (in appSettingsChanged)
             // Note that we do *not* track changes to "Now" --- in theory we could,
             // but the added complexity isn't worth it.
-
             get
             {
                 return (AppSettings.displayWB ?
@@ -49,19 +48,11 @@ namespace NextFerry
         }
 
         public string displayName { get { return (AppSettings.displayWB ? wbName : ebName); }}
-
-        /// <summary>
-        /// Style to use to display alerts, based on whether we have any or not.
-        /// Set by updateAlertStyle().
-        /// </summary>
-        public Style alertStyle { get; private set; }
+        public bool hasAlerts { get { return AlertManager.RouteAlerts[this].Count > 0; } }
+        public bool hasNewAlerts { get { return AlertManager.RouteAlerts[this].Any(a => a.isNew); } }
         #endregion
 
         #region non-change notified properties
-
-        public static Style alertStyleNone;
-        public static Style alertStyleNormal;
-        public static Style alertStyleUnread;
 
         public Schedule weekday { get; private set; }
         public Schedule weekend { get; private set; }
@@ -76,8 +67,11 @@ namespace NextFerry
 
         // convenient shortcuts
         public Schedule today { get { return (special == null ? (Schedule.useWeekendSchedule() ? weekend : weekday ) : special); }}
+        public Terminal eastTerminal { get { return Terminal.lookup(eastCode); } }
+        public Terminal westTerminal { get { return Terminal.lookup(westCode); } }
         public Terminal departureTerminal { get { return Terminal.lookup(AppSettings.displayWB ? eastCode : westCode); }}
         public Terminal destinationTerminal { get { return Terminal.lookup(AppSettings.displayWB ? westCode : eastCode); }}
+        public List<Alert> alerts { get { return AlertManager.RouteAlerts[this]; } }
 
         #endregion
 
@@ -113,29 +107,8 @@ namespace NextFerry
                 else
                     weekday.setTimeList(isWest, times);
 
-                OnChanged("futureDepartures");  // noisy: will signal unnecessarily, but not really a problem.
+                OnChanged("futureDepartures");  // noisy: will signal unnecessarily, but it isn't a problem
             });
-        }
-
-        /// <summary>
-        /// Recalculate alert state.  Causes change notification
-        /// </summary>
-        public void updateAlertStyle()
-        {
-            List<Alert> alerts = AlertManager.RouteAlerts[this];
-            Style newstyle;
-            if (alerts.Count == 0)
-                newstyle = alertStyleNone;
-            else if (alerts.Any(a => !a.read))
-                newstyle = alertStyleUnread;
-            else
-                newstyle = alertStyleNormal;
-
-            if (newstyle != alertStyle)
-            {
-                alertStyle = newstyle;
-                OnChanged("alertStyle");
-            }
         }
 
 

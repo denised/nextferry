@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Windows.Data;
+using System.Windows;
 
 namespace NextFerry
 {
@@ -77,6 +79,26 @@ namespace NextFerry
                 else if (stream != null)
                     stream.Close();
             }
+        }
+    }
+
+
+    /// <summary>
+    /// A type converter for visibility and boolean values.
+    /// (WTH couldn't Visibility be a boolean in the first place?)
+    /// </summary>
+    public class VisibilityBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool visibility = (bool)value;
+            return visibility ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            Visibility visibility = (Visibility)value;
+            return (visibility == Visibility.Visible);
         }
     }
 }

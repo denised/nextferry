@@ -1,0 +1,66 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="NextFerry.Alerts"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480"
+    shell:SystemTray.IsVisible="True">
+    
+    <phone:PhoneApplicationPage.Resources>
+        <Style x:Key="titleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="38"/>
+        </Style>
+        <Style x:Key="altTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource titleStyle}">
+            <Setter Property="Foreground" Value="{StaticResource PhoneSubtleBrush}"/>
+        </Style>
+        <Style x:Key="subtitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="Foreground" Value="{StaticResource PhoneAccentBrush}"/>
+        </Style>
+        <Style x:Key="popStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PhoneAccentBrush}"/>
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+        <Style x:Key="idStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18.667"/>
+            <Setter Property="Foreground" Value="{StaticResource PhoneSubtleBrush}"/>
+        </Style>
+    </phone:PhoneApplicationPage.Resources>
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Canvas Height="140" Width="480" Grid.Row="0">
+            <!-- Note there is manual alignment of spacing here and in RoutePage; -->
+            <!-- Changes need to be made in both locations -->
+            <TextBlock x:Name="pageTitle" Style="{StaticResource appTitle}"/>
+            <TextBlock Text="Alerts" Style="{StaticResource RPtitleStyle}"/>
+            <TextBlock Text="Schedule" Style="{StaticResource RPaltTitleStyle}"
+                       Tap="gotoSchedule"/>
+        </Canvas>
+        <ListBox ItemsSource="{Binding alerts}" Margin="20,0,30,0" Grid.Row="1" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding posted}" Style="{StaticResource idStyle}"/>
+                            <TextBlock Text="  New!" Style="{StaticResource popStyle}"
+                                       Visibility="{Binding isNew, Converter={StaticResource boolVisibility}}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding content}" TextWrapping="Wrap" Width="400"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</phone:PhoneApplicationPage>

@@ -8,9 +8,6 @@ namespace NextFerry
 {
     public partial class Settings : PhoneApplicationPage
     {
-        private const string explainWT = "Wait time.";
-        private const string explainWTT = "Travel + wait time.";
-
         public Settings()
         {
             InitializeComponent();
@@ -18,16 +15,16 @@ namespace NextFerry
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            time12.Style = (Style)this.Resources[ AppSettings.display12hr ? "toggleSelected" : "toggleUnselected" ];
-            time24.Style = (Style)this.Resources[ AppSettings.display12hr ? "toggleUnselected" : "toggleSelected" ];
-
             waitslider.Value = AppSettings.bufferTime;
             useLoc.IsChecked = AppSettings.useLocation;
-            explanation.Text = (AppSettings.useLocation ? explainWT : explainWTT);
+            buffertimeblock.Visibility = (AppSettings.useLocation ?
+                System.Windows.Visibility.Visible :
+                System.Windows.Visibility.Collapsed);
+            timeToggle.IsChecked = AppSettings.display12hr;
+            timeToggle.Content = (AppSettings.display12hr ? "12:00" : "24:00");
 
             debug.IsChecked = AppSettings.debug;
             setDebugAppearance(AppSettings.debug);
-
 
             cacheStatus.Text = ScheduleIO.cacheStatus();
         }
@@ -53,15 +50,13 @@ namespace NextFerry
         private void switchTo12hr(object sender, RoutedEventArgs e)
         {
             AppSettings.display12hr = true;
-            time12.Style = (Style)this.Resources["toggleSelected"];
-            time24.Style = (Style)this.Resources["toggleUnselected"];
+            timeToggle.Content = "12:00";
         }
 
         private void switchTo24hr(object sender, RoutedEventArgs e)
         {
             AppSettings.display12hr = false;
-            time12.Style = (Style)this.Resources["toggleUnselected"];
-            time24.Style = (Style)this.Resources["toggleSelected"];
+            timeToggle.Content = "24:00";
         }
 
         private void uselocOn(object sender, RoutedEventArgs e)
@@ -69,12 +64,7 @@ namespace NextFerry
             if (!AppSettings.useLocation)   // the check is because the toggle switch will trigger an event
             {                               // even when being initialized, which we don't want to respond to.
                 AppSettings.useLocation = true;
-                explanation.Text = explainWT;
-                int val = Int16.Parse(slideValue.Text);
-                if (val > 10)
-                {
-                    waitslider.Value = Math.Max(5, val - 30);
-                }
+                buffertimeblock.Visibility = System.Windows.Visibility.Visible;
                 Util.Asynch(() => { LocationMonitor.checkTravelTimes(); });
             }
         }
@@ -84,9 +74,7 @@ namespace NextFerry
             if (AppSettings.useLocation)
             {
                 AppSettings.useLocation = false;
-                explanation.Text = explainWTT;
-                int newval = Int16.Parse(slideValue.Text) + 30;
-                waitslider.Value = (newval > waitslider.Maximum ? waitslider.Maximum : newval);
+                buffertimeblock.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
 

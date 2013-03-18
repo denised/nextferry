@@ -10,9 +10,12 @@ namespace NextFerry
 {
     public class Alert
     {
-        public string content;
-        public bool read;
-        public string id;
+        public string content { get; set; }
+        public bool read { get; set; }
+        public string id { get; set; }
+
+        public bool isNew { get { return !read; } }
+        public string posted { get { return "posted " + id.Substring(0, 5); } } // yeah, I know.
     }
 
     /// <summary>
@@ -34,15 +37,12 @@ namespace NextFerry
     /// </summary>
     public static class AlertManager
     {
-        public static Dictionary<String, Alert> AllAlerts = new Dictionary<String, Alert>();
         public static Dictionary<Route, List<Alert>> RouteAlerts = new Dictionary<Route, List<Alert>>();
+        private static Dictionary<string, Alert> AllAlerts = new Dictionary<string, Alert>();
         private static Object lockable = new Object();
         private static DateTime lastReceived = DateTime.MinValue;
 
         public static event EventHandler newAlerts;
-
-        #region managing "read" bits
-        #endregion
 
         #region caching or receiving
         private readonly static IsolatedStorageFile myStore = IsolatedStorageFile.GetUserStoreForApplication();
@@ -69,6 +69,21 @@ namespace NextFerry
                     }
                 }
             );
+        }
+
+        // called at shutdown; we keep track of the alerts that have been read.
+        public static void save()
+        {
+            if (AllAlerts.Count > 0)
+            {
+                List<string> seen = new List<string>();
+                foreach (Alert a in AllAlerts.Values)
+                {
+                    if (a.read)
+                        seen.Add(a.id);
+                }
+                AppSettings.alertsSeen = seen;
+            }
         }
 
         // Must be called from background threads.
@@ -126,17 +141,17 @@ namespace NextFerry
 
             foreach (Match m in matches)
             {
+                // skip if we've already got this one
+                if (AllAlerts.ContainsKey(m.Groups[1].Value))
+                    continue;
+
                 Alert a = new Alert();
                 a.id = m.Groups[1].Value;
                 a.content = m.Groups[3].Value;
+                a.read = AppSettings.alertsSeen.Contains(a.id);
                 int rCodes = Int32.Parse(m.Groups[2].Value);
                 bool foundone = false;
 
-                // skip if we've already got this one
-                if (AllAlerts.ContainsKey(a.id))
-                    continue;
-
-                // otherwise install.
                 AllAlerts[a.id] = a;
                 foreach( Route r in RouteManager.bitRoutes( rCodes ))
                 {

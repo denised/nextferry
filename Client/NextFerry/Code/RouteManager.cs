@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -18,7 +19,7 @@ namespace NextFerry
         /// </summary>
         public static ObservableCollection<Route> AllRoutes = new ObservableCollection<Route>()
         {
-            // Some day we may want to read these from the server, rather than hard code them.
+            // Some day we may want to receive these from the server, rather than hard code them.
             // Today is not that day.
             new Route(1,     7,  3, "bainbridge","bainbridge"),
             new Route(1<<2,  8, 12, "edmonds","edmonds"),
@@ -39,14 +40,7 @@ namespace NextFerry
         /// </summary>
         public static Route lookup(string name)
         {
-            foreach (Route r in AllRoutes)
-            {
-                if (r.ebName == name || r.wbName == name)
-                {
-                    return r;
-                }
-            }
-            return null;
+            return AllRoutes.First(r => r.ebName == name || r.wbName == name);
         }
 
         /// <summary>
@@ -54,12 +48,7 @@ namespace NextFerry
         /// </summary>
         public static Route lookup(int code)
         {
-            foreach (Route r in AllRoutes)
-            {
-                if (r.routeCode == code)
-                    return r;
-            }
-            return null;
+            return AllRoutes.First(r => r.routeCode == code);
         }
 
         /// <summary>
@@ -88,12 +77,7 @@ namespace NextFerry
         /// </summary>
         public static bool haveSchedules()
         {
-            foreach (Route r in AllRoutes)
-            {
-                if (!r.weekday.isEmpty())
-                    return true;
-            }
-            return false;
+            return AllRoutes.Any(r => !r.weekday.isEmpty());
         }
 
         /// <summary>
@@ -104,7 +88,9 @@ namespace NextFerry
             foreach (Route r in AllRoutes)
             {
                 if (r.display)
+                {
                     r.updateGoodness();
+                }
             }
         }
     }
