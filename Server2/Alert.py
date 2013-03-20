@@ -3,7 +3,7 @@ import re
 import logging
 import webapp2
 import email
-import datetime
+import datetime as dt
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 from google.appengine.ext import db
 import WSF
@@ -22,7 +22,14 @@ def hasAlerts():
     return Alert.all().count(limit=1) > 0
 
 def allAlerts():
-    return Alert.all().run(limit=15)
+    return Alert.all().run(limit=10)
+
+def dailyCleanup():
+    """ Remove all alerts posted before 10pm yesterday """
+    target = dt.datetime.combine( dt.date.today() - dt.timedelta(1), dt.time(22) )
+    for a in db.Query(Alert).filter('posted <',target).run():
+        logging.info("deleting " + str(a.posted))
+        a.delete()
 
 
 # Temporarily, at least, keep mail we error out on, so we can figure out what happened.

@@ -1,10 +1,13 @@
 application: nextferry
-version: 2
+version: 3
 runtime: python27
 api_version: 1
 threadsafe: true
 
 handlers:
+- url: /tasks/.*
+  script: Server.app
+  login: admin
 - url: /.*
   script: Server.app
 

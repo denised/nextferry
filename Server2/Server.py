@@ -75,6 +75,11 @@ class Version(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write('#version: |' + appversion + '|\n#done\n')
 
+class DailyCleanup(webapp2.RequestHandler):
+    def get(self):
+        Alert.dailyCleanup()
+        pass
+
 
 app = webapp2.WSGIApplication(debug=True)
 # note the notation {3,20} means between 3 and 20 charcaters.
@@ -84,6 +89,7 @@ app.router.add((r'/init/(.{3,20}?)/', GetInitUpdate))
 app.router.add((r'/traveltimes/(.{3,20}?)/([+-]?[\d.]{3,11}),([+-]?[\d.]{3,11})', GetTravelTimes))
 app.router.add((r'/_ah/mail/alert@nextferry.appspotmail.com', Alert.NewAlertHandler))
 app.router.add((r'/version',Version))
+app.router.add((r'/tasks/dailycleanup',DailyCleanup))
 
 if __name__ == '__main__':
     app.run()
