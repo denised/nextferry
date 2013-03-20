@@ -20,7 +20,7 @@
             <Setter Property="Foreground" Value="{StaticResource PhoneAccentBrush}"/>
             <Setter Property="FontFamily" Value="Segoe WP Light"/>
             <Setter Property="FontSize" Value="29.333"/>
-            <Setter Property="Margin" Value="22,0,0,-10"/>
+            <Setter Property="Margin" Value="22.5,0,0,-10"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
         </Style>
@@ -35,7 +35,7 @@
             <Setter Property="Fill" Value="{StaticResource PhoneAccentBrush}"/>
             <Setter Property="Stroke" Value="{StaticResource PhoneAccentBrush}"/>
             <Setter Property="Height" Value="37"/>
-            <Setter Property="Width" Value="78"/>
+            <Setter Property="Width" Value="82"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
         </Style>
@@ -44,12 +44,13 @@
             <Setter Property="TextAlignment" Value="Right"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="33,9,0,0"/>
+            <Setter Property="Margin" Value="28,4,0,0"/>
         </Style>
         <Style x:Key="pmHeader" TargetType="TextBlock" BasedOn="{StaticResource amHeader}">
             <Setter Property="Text" Value="PM"/>
+            <Setter Property="Foreground" Value="{StaticResource PhoneContrastForegroundBrush}"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Margin" Value="0,9,15,0"/>
+            <Setter Property="Margin" Value="0,4,26,0"/>
         </Style>
         <Style x:Key="verticalAccent" TargetType="TextBlock">
             <Setter Property="HorizontalAlignment" Value="Left"/>

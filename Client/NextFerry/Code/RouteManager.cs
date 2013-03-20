@@ -34,6 +34,19 @@ namespace NextFerry
             new Route(1<<11, 1, 15, "orcas","orcas")
         };
 
+        /// <summary>
+        /// Event fires when schedules are retrieved, whether from cache or server.
+        /// </summary>
+        public static EventHandler newScheduleArrived;
+        
+        /// <summary>
+        /// Called by partner classes that actually do the schedule reading
+        /// </summary>
+        public static void scheduleNotification()
+        {
+            if (newScheduleArrived != null)
+                newScheduleArrived(null, null);
+        }
 
         /// <summary>
         /// Return the route that corresponds to this name (which may be either a wb or eb name)

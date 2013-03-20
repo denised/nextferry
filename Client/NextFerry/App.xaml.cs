@@ -7,6 +7,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using System.Windows.Threading;
 using System.ComponentModel;
+using BugSense;
 
 
 namespace NextFerry
@@ -16,12 +17,14 @@ namespace NextFerry
         public PhoneApplicationFrame RootFrame { get; private set; }
         public string appVersion = "3.0";  // TODO: set via reflection?  (didn't work?)
         public MainPage theMainPage = null;
+        public bool deTombed = false;
 
         public App()
         {
             UnhandledException += Application_UnhandledException;
             InitializeComponent();
             InitializePhoneApplication();
+            BugSenseHandler.Instance.Init(this,"42fd8d24");
         }
      
         // Code to execute when the application is launching (eg, from Start)
@@ -42,10 +45,12 @@ namespace NextFerry
         {
             if (e.IsApplicationInstancePreserved)
             {
+                deTombed = false;
                 Log.write("Activating, instance preserved");
             }
             else // start over again
             {
+                deTombed = true;
                 AppSettings.init();
                 Log.write("Activating, rehydrating, cache version " + AppSettings.cacheVersion );
             }
@@ -168,19 +173,11 @@ namespace NextFerry
             // the others.   The others are all asynchronous.
             Util.Asynch(() =>
             {
-                // if we are resuming, instance intact, we should already have schedules
+                AlertManager.recoverCache();
                 if (!RouteManager.haveSchedules())
                 {
-                    bool rd = ScheduleIO.readCache();
-                    if (!rd)
-                    {
-                        Deployment.Current.Dispatcher.BeginInvoke(() =>
-                            {
-                                theMainPage.addMessage("Downloading...");
-                            });
-                    }
+                    ScheduleIO.readCache();
                     ServerIO.requestInitUpdate();
-                    AlertManager.recoverCache();
                 }
                 LocationMonitor.start();
             });

@@ -46,14 +46,15 @@ namespace NextFerry
 
         /// <summary>
         /// Parse a schedule, putting the values into the appropriate field in Routes.
+        /// Will forward an event to RouteManager if at least some routes were present.
         /// </summary>
         /// <returns>True if we successfully parsed all routes.</returns>
         public static bool deserialize(string s)
         {
+            int count = 0;
             try
             {
                 StringReader sr = new StringReader(s);
-                int count = 0;
                 while (true)
                 {
                     string line = sr.ReadLine();
@@ -66,14 +67,18 @@ namespace NextFerry
                     parseLine(line);
                     count++;
                 }
-                Log.write("Deserialize successful (" + count + ")");
-                return (count == RouteManager.AllRoutes.Count * 4);  // four departurelists per route
             }
             catch (Exception e)
             {
                 Log.write("Unexpected exception in Route deserialize " + e);
-                return false;
             }
+
+            Log.write("Deserialize finished (" + count + ")");
+            if (count > 0)
+            {
+                RouteManager.scheduleNotification();
+            }
+            return (count == RouteManager.AllRoutes.Count * 4);  // four departurelists per route
         }
 
 

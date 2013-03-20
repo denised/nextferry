@@ -52,13 +52,12 @@ namespace NextFerry
         {
             Util.Asynch(() =>
                 {
-                    // Wait awhile to see if init has returned new data anyway
-                    Thread.Sleep(1000 * 60); // one minute
-                    if (lastReceived == DateTime.MinValue &&   // no new data
-                         myStore.FileExists(alertsFile) &&     // we have a cache
+                    if ( lastReceived == DateTime.MinValue &&   // we haven't been updated
+                         myStore.FileExists(alertsFile) &&     // we do have a cache
                          myStore.GetCreationTime(alertsFile).Date == DateTime.Today)  // and it is fresh
                     {
                         bool newones = false;
+                        Log.write("restoring alert cache");
                         lock (lockable)
                         {
                             string alertsbody = Util.readText(alertsFile);
@@ -113,7 +112,7 @@ namespace NextFerry
 
         // time for a regular expression!
         // example format in the comment below.
-        private static string re = @"\G__ ([\d.:]+) (\d+)\n" + // beginning line: "__" <key> <routecodes>"\n""
+        private static string re = @"\G__ ([\d.:]+) (\d+)\n" + // beginning line: "__" <key> <routecodes>"\n"
                                    @"(.+?\n)(?=__)";           // content: everything up to the next "__"
 
         private static bool parseAlerts(string alertsbody)
@@ -168,6 +167,7 @@ namespace NextFerry
                     newones = true;
                 }
             }
+            Log.write("alerts parsed");
             return newones;
         }
         #endregion

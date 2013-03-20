@@ -46,13 +46,13 @@ namespace NextFerry
         public static List<Terminal> AllTerminals = new List<Terminal>
         {
             new Terminal(1, "Anacortes", "48.502220, -122.679455"),
-            new Terminal(3, "Bainbridge", "47.623046, -122.511377"),
+            new Terminal(3, "Bainbridge Island", "47.623046, -122.511377"),
             new Terminal(4, "Bremerton", "47.564990, -122.627012"),
             new Terminal(5, "Clinton", "47.974785, -122.352139"),
             new Terminal(8, "Edmonds", "47.811240, -122.382631"),
             new Terminal(9, "Fauntleroy", "47.523115, -122.392952"),
             new Terminal(10, "Friday Harbor", "48.535010, -123.014645"),
-            new Terminal(11, "Keystone", "48.160592, -122.674305"),
+            new Terminal(11, "Coupeville", "48.160592, -122.674305"),
             new Terminal(12, "Kingston", "47.796943, -122.496785"),
             new Terminal(13, "Lopez Island", "48.570447, -122.883646"),
             new Terminal(14, "Mukilteo", "47.947758, -122.304138"),

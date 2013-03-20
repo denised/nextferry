@@ -109,7 +109,7 @@ namespace NextFerry
             if (ds_initState == 0)
                 AppSettings.PropertyChanged += watchTimeFormat;
 
-            if (ds_initState != 2 )
+            if (ds_initState != 2 || ((App)Application.Current).deTombed)
             {
                 ds_wbwdam = computeString(weekday.timesWest.beforeNoon());
                 ds_wbwdpm = computeString(weekday.timesWest.afterNoon());

@@ -45,6 +45,7 @@ namespace NextFerry
             ScheduleIO.deleteCache();
             RouteManager.clearSchedules();
             cacheStatus.Text = ScheduleIO.cacheStatus();
+            throw new NotImplementedException();
         }
 
         private void switchTo12hr(object sender, RoutedEventArgs e)
@@ -83,7 +84,7 @@ namespace NextFerry
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             //((App)Application.Current).verifySchedule();
-            //((App)Application.Current).theMainPage.addWarning("hi there!");
+            //((App)Application.Current).theMainPage.setWarning("hi there!");
         }
 
 

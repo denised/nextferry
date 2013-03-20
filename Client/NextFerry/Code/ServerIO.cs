@@ -132,16 +132,16 @@ namespace NextFerry
                         // if we weren't successful, we leave whatever we managed to read, but don't update
                         // the cache file.
                     }
-                    else if (controlLine.StartsWith("#traveltimes"))
-                    {
-                        Log.write("received traveltimes");
-                        LocationMonitor.processTravelTimes(buffer.ToString());
-                    }
                     else if (controlLine.StartsWith("#special"))
                     {
                         // special schedules are not cached, so this is simpler.
                         Log.write("special schedule received");
                         ScheduleIO.deserialize(buffer.ToString());
+                    }
+                    else if (controlLine.StartsWith("#traveltimes"))
+                    {
+                        Log.write("received traveltimes");
+                        LocationMonitor.processTravelTimes(buffer.ToString());
                     }
                     else if (controlLine.StartsWith("#allalerts"))
                     {

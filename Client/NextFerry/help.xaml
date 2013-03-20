@@ -32,11 +32,11 @@
             <StackPanel Grid.Row="1" Margin="12,0,20,12">
                 <TextBlock Text="travel times" Margin="20,32,0,0" Style="{StaticResource PhoneTextTitle2Style}"/>
                 <TextBlock TextWrapping="Wrap" Margin="20,0,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                If location is on, NextFerry will use travel times to estimate how likely
+                    If the "use location" setting is on, NextFerry will compute travel times to estimate how easily
                     you can get to a ferry terminal in time for each departure.                   
                 </TextBlock>
                 <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                    Red means unlikely, yellow risky, green good.  No color is shown if the terminal
+                    Red means don't bother, yellow is risky, green good.  No color is shown if the terminal
                     is out of reach or the departure far into the future.
                 </TextBlock>
 
@@ -52,7 +52,7 @@
                     NextFerry uses schedule and other information from WSDOT, but is not affiliated with WSDOT.
                 </TextBlock>
                 <TextBlock TextWrapping="Wrap" Margin="20,4,0,0" Style="{StaticResource PhoneTextSmallStyle}">
-                    NextFerry may use travel estimates from MapQuest, but is not affiliated with MapQuest.
+                    Travel times provided by MapQuest.
                 </TextBlock>
 
                 <!-- About -->

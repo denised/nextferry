@@ -42,7 +42,9 @@ namespace NextFerry
             list1.ItemsSource = displayRoutes;
             list3.ItemsSource = displayRoutes;
 
-            WP7Contrib.Diagnostics.RuntimeDebug.Initialize(true, false, "denisesandbox@mailup.net", "");
+            // We init here rather than in App because RuntimeDebug needs the window to
+            // be instantiated first
+            WP7Contrib.Diagnostics.RuntimeDebug.Initialize(false, false, "denisesandbox@mailup.net", "");
 
             AlertManager.newAlerts += newAlertsArrived;
 
@@ -147,7 +149,7 @@ namespace NextFerry
                 {
                     if (AppSettings.useLocation)
                     {
-                        addMessage("Waiting for travel times");
+                        setMessage("Waiting for travel times");
                     }
                     // The timer will be turned back on when travel times arrive.
                     travelTimeWatcher.Stop();
@@ -164,9 +166,9 @@ namespace NextFerry
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 if (args.traveltimes.Count > 0)
-                    removeMessage();
+                    removeMessages();
                 else
-                    addWarning("Travel times not available");
+                    setWarning("Travel times not available");
 
                 foreach (Terminal t in Terminal.AllTerminals)
                 {
@@ -187,46 +189,73 @@ namespace NextFerry
                 travelTimeWatcher.Start();
             });
         }
+        #endregion
 
+        #region init watcher
         private void initScheduleWatcher()
         {
-            // Schedule watcher is a one-time event to make sure we are actually
-            // displaying a schedule to the user.  If not, we show an error message.
-            // This should only occur if (a) there is no cached version of the schedule
-            // and (b) there is no network access.
-            scheduleWatcher.Interval = new TimeSpan(0,2,0);
-            scheduleWatcher.Tick += (o, a) =>
-                {
-                    scheduleWatcher.Stop();
-                    scheduleWatcher = null;
-                    if ( ! RouteManager.haveSchedules() )
-                        this.nonetwork.Visibility = System.Windows.Visibility.Visible;
-                };
-            scheduleWatcher.Start();
+            int count = 0;
+            if (!RouteManager.haveSchedules())
+            {
+                // this is an unfortunate way to do this, but the race conditions involved
+                // are a pain: we have the initialization of MainPage competing with 
+                // the reading of the cache, competing with the download of a new schedule,
+                // so there is no "safe" place to put a check that doesn't involve serializing
+                // something we don't want to serialize.
+                // So, the clunky way: busy wait.
+
+                scheduleWatcher.Interval = new TimeSpan(0, 0, 1);
+                scheduleWatcher.Tick += (o, a) =>
+                    {
+                        ++count;
+                        if (RouteManager.haveSchedules())
+                        {
+                            scheduleWatcher.Stop();
+                            scheduleWatcher = null;
+                            removeMessages();
+                        }
+                        else if (count == 2)
+                        {
+                            setMessage("Downloading...");
+                        }
+                        else if (count == 20)
+                        {
+                            setWarning("Still downloading...");
+                        }
+                        else if (count > 65)
+                        {
+                            removeMessages();
+                            // turn on the big dialog.
+                            nonetwork.Visibility = System.Windows.Visibility.Visible;
+                        }
+                    };
+                scheduleWatcher.Start();
+            }
         }
 
         #endregion
 
         #region message display
-        // These must be called carefully --- there is no locking
+        // These overwrite each other.
 
-        public void addMessage(string contents)
+        public void setMessage(string contents)
         {
             messageText.Text = contents;
             warning.Visibility = System.Windows.Visibility.Collapsed;
             message.Visibility = System.Windows.Visibility.Visible;
         }
 
-        public void addWarning(string contents)
+        public void setWarning(string contents)
         {
             messageText.Text = contents;
             warning.Visibility = System.Windows.Visibility.Visible;
             message.Visibility = System.Windows.Visibility.Visible;
         }
 
-        public void removeMessage()
+        public void removeMessages()
         {
             message.Visibility = System.Windows.Visibility.Collapsed;
+            nonetwork.Visibility = System.Windows.Visibility.Collapsed;
         }
         #endregion
 

@@ -48,7 +48,7 @@
             <TextBlock Text="Schedule" Style="{StaticResource RPaltTitleStyle}"
                        Tap="gotoSchedule"/>
         </Canvas>
-        <ListBox ItemsSource="{Binding alerts}" Margin="20,0,30,0" Grid.Row="1" >
+        <ListBox x:Name="alertList" Margin="20,0,30,0" Grid.Row="1" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
