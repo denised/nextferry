@@ -2,23 +2,18 @@
 What's next:
 	Server features (can do any time):		
 		Fix location for Pierce-west of narrows bridge.
-		Automate tooling for retrieving schedule (low priority)	
 		Improve the experience of fetching server logs to something repeatable.
 		Cron job to check for errors and email me?
 
+	Server features (soon):
+		Automate retrieval of schedules so we can use the special schedules feature.
+
 	Server feature (immediate):
-		There are errors in the schedules we are sending.  Not clear how they got there.
-			Problem: cannot debug the current storage format because of the 'minutes past midnight' business, 
-			so cannot tell where the problem was inserted.
 		V2 client does not read first two departures of schedules: fix by sending dummy departures in it's place.
+		"Posted" time on alerts is in a different time zone
 
-	Fuck, fuck, fuck.  Two crashes --- once crashed the entire phone.  Not simply repeatable.  In both cases
-	I was testing the phone's response to lack of network connectivity, and had just turned network connectivity
-	back on.  
-
-	** Known issue: race conditions with the "Downloading..." message.  The message can come up, and stay up, even
-	when the there are schedules right there.   (Answer: "downloading" has to be shown and removed by the process
-	that is actually *doing* it, synchronously for it.)
+	We're good!  Let's ship!
+	(Caveat: a few things are a bit under tested:  special schedules and BugSense.)
 
 Postponed Indefinitely:
 	
@@ -36,6 +31,12 @@ Postponed Indefinitely:
 	be empty (as it should), but it will also stay empty even if you revisit it later.  However, exiting
 	the app and re-entering it will fix the issue.  Disposition: highly unlikely sequence, easilty remedied:
 	don't fix.
+
+	** Known Issue: Fuck, fuck, fuck.  Two crashes --- once crashed the entire phone.  In both cases I was testing 
+	the phone's response to lack of network connectivity, and had just turned network connectivity back on.   
+	I haven't been able to repeat it.   Partial disposition: added BugSense so at least I'll find out if it 
+	happens again, and hopefully give users a better experience.   Also: I turned exception logging *off* in 
+	the debug log, so it doesn't consume as much space (which may have been the problem).
 
 
 What's done:

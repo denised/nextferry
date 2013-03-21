@@ -19,8 +19,8 @@
         <Style x:Key="termName" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource PhoneAccentBrush}"/>
             <Setter Property="FontFamily" Value="Segoe WP Light"/>
-            <Setter Property="FontSize" Value="29.333"/>
-            <Setter Property="Margin" Value="22.5,0,0,-10"/>
+            <Setter Property="FontSize" Value="31"/>
+            <Setter Property="Margin" Value="23,0,0,-10"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
         </Style>
@@ -157,7 +157,7 @@
                                 <TextBlock Style="{StaticResource amHeader}"/>
                                 <TextBlock Style="{StaticResource pmHeader}"/>
                                 <TextBlock Style="{StaticResource leftBlock}" Text="{Binding ds_ebwdam}"/>
-                                <TextBlock Style="{StaticResource rightBlock}" Text="{Binding ds_wbwdpm}"/>
+                                <TextBlock Style="{StaticResource rightBlock}" Text="{Binding ds_ebwdpm}"/>
                             </Grid>
                         </Border>
                     </Grid>

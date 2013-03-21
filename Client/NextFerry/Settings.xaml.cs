@@ -45,7 +45,6 @@ namespace NextFerry
             ScheduleIO.deleteCache();
             RouteManager.clearSchedules();
             cacheStatus.Text = ScheduleIO.cacheStatus();
-            throw new NotImplementedException();
         }
 
         private void switchTo12hr(object sender, RoutedEventArgs e)
