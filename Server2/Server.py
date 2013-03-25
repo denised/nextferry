@@ -26,10 +26,16 @@ class GetInitUpdate(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         if needschedule(year,month,day):
             self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
-            self.response.out.write(CurrentSchedule.text())
+            schedule = CurrentSchedule.text()
+            if clientversion == '2.0':
+                schedule = CurrentSchedule.v2interpolate(schedule)
+            self.response.out.write(schedule)
         if CurrentSchedule.isHoliday():
             self.response.out.write("#special\n")
-            self.response.out.write(CurrentSchedule.holidaySchedule())
+            schedule = CurrentSchedule.holidaySchedule()
+            if clientversion == '2.0':
+                schedule = CurrentSchedule.v2interpolate(schedule)
+            self.response.out.write(schedule)
         if Alert.hasAlerts():
             self.response.out.write('#allalerts\n')
             for alert in Alert.allAlerts():
