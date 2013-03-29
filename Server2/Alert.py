@@ -7,6 +7,7 @@ import datetime as dt
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 from google.appengine.ext import db
 import WSF
+import pst
 
 class Alert(db.Model):
     body = db.TextProperty()      # alert content
@@ -15,7 +16,8 @@ class Alert(db.Model):
     
     def __str__(self):
         # not a general purpose format...
-        return "__ %s %d\n%s\n" % (str(self.posted.time()), self.routes, self.body)
+        localtime = pst.toPacific(self.posted).time()
+        return "__ %s %d\n%s\n" % (str(localtime), self.routes, self.body)
 
     
 def hasAlerts():

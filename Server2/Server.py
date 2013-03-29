@@ -15,7 +15,7 @@ logging.getLogger().setLevel(logging.INFO)
 # put the result in to this string
 # upload that
 # grr. automate grr.
-appversion = "V2x-10 unmodified: will send alerts, so backend only"
+appversion = "V3-2 (pacific tz fix)"
     
 class GetInitUpdate(webapp2.RequestHandler):
     """

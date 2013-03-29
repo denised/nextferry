@@ -2,3 +2,4 @@ cron:
 - description: clean up old alerts
   url: /tasks/dailycleanup
   schedule: every day 02:00
+  timezone: US/Pacific
