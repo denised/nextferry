@@ -6,16 +6,7 @@ from datetime import date
 import CurrentSchedule
 import MapQuestTT
 import Alert
-
-logging.getLogger().setLevel(logging.INFO)
-
-# protocol:
-# commit the server code.
-# issue command "git describe --tags"
-# put the result in to this string
-# upload that
-# grr. automate grr.
-appversion = "V3-2 (pacific tz fix)"
+import AdminUtils
     
 class GetInitUpdate(webapp2.RequestHandler):
     """
@@ -24,24 +15,29 @@ class GetInitUpdate(webapp2.RequestHandler):
     """
     def get(self, clientversion, year=None, month=None, day=None):
         self.response.headers['Content-Type'] = 'text/plain'
-        if needschedule(year,month,day):
-            self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
-            schedule = CurrentSchedule.text()
-            if clientversion == '2.0':
-                schedule = CurrentSchedule.v2interpolate(schedule)
-            self.response.out.write(schedule)
-        if CurrentSchedule.isHoliday():
-            self.response.out.write("#special\n")
-            schedule = CurrentSchedule.holidaySchedule()
-            if clientversion == '2.0':
-                schedule = CurrentSchedule.v2interpolate(schedule)
-            self.response.out.write(schedule)
-        if Alert.hasAlerts():
-            self.response.out.write('#allalerts\n')
-            for alert in Alert.allAlerts():
-                self.response.out.write(str(alert))
-            self.response.out.write('__\n')
-        self.response.out.write('#done\n')
+        try:
+            if needschedule(year,month,day):
+                self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
+                schedule = CurrentSchedule.text()
+                if clientversion == '2.0':
+                    schedule = CurrentSchedule.v2interpolate(schedule)
+                self.response.out.write(schedule)
+            if CurrentSchedule.isHoliday():
+                self.response.out.write("#special\n")
+                schedule = CurrentSchedule.holidaySchedule()
+                if clientversion == '2.0':
+                    schedule = CurrentSchedule.v2interpolate(schedule)
+                self.response.out.write(schedule)
+            if Alert.hasAlerts():
+                self.response.out.write('#allalerts\n')
+                for alert in Alert.allAlerts():
+                    self.response.out.write(str(alert))
+                self.response.out.write('__\n')
+        except:
+            AdminUtils.handleError()
+        finally:
+            self.response.out.write('#done\n')
+            
 
 def needschedule(year,month,day):
     """
@@ -66,25 +62,28 @@ class GetTravelTimes(webapp2.RequestHandler):
     def get(self, clientversion, lat, lon):         
         self.response.headers['Content-Type'] = 'text/plain'
         try:
-            flat = float(lat)
-            flon = float(lon)
-        except (ValueError, TypeError):
-            logging.error('GetTravelTime received bad args: %s, %s', lat, lon)
-        else:
-            self.response.out.write('#traveltimes\n')
-            self.response.out.write(MapQuestTT.getTravelTimes(flat,flon))
-        self.response.out.write('#done\n')
+            try:
+                flat = float(lat)
+                flon = float(lon)
+            except (ValueError, TypeError):
+                logging.error('GetTravelTime received bad args: %s, %s', lat, lon)
+            else:
+                self.response.out.write('#traveltimes\n')
+                self.response.out.write(MapQuestTT.getTravelTimes(flat,flon))
+        except:
+            AdminUtils.handleError()
+        finally:
+            self.response.out.write('#done\n')
 
         
 class Version(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
-        self.response.out.write('#version: |' + appversion + '|\n#done\n')
+        self.response.out.write('#version: |' + AdminUtils.appversion + '|\n#done\n')
 
 class DailyCleanup(webapp2.RequestHandler):
     def get(self):
         Alert.dailyCleanup()
-        pass
 
 
 app = webapp2.WSGIApplication(debug=True)
