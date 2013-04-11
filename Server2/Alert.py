@@ -8,6 +8,7 @@ from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 from google.appengine.ext import db
 import WSF
 import pst
+import unicodedata
 
 class Alert(db.Model):
     body = db.TextProperty()      # alert content
@@ -28,7 +29,7 @@ def allAlerts():
 
 def dailyCleanup():
     """ Remove all alerts posted before 10pm yesterday """
-    target = dt.datetime.combine( dt.date.today() - dt.timedelta(1), dt.time(22) )
+    target = pst.toUTC( dt.datetime.combine( dt.date.today() - dt.timedelta(1), dt.time(22) ))
     for a in db.Query(Alert).filter('posted <',target).run():
         logging.info("deleting " + str(a.posted))
         a.delete()
@@ -96,7 +97,8 @@ class NewAlertHandler(InboundMailHandler):
                 
             # so far so good.
             newAlert = Alert()
-            newAlert.body = "\n".join( [subject] + parts[:-1] )
+            body = "\n".join( [subject] + parts[:-1] )
+            newAlert.body = unicodedata.normalize('NFKD', body).encode('ascii','ignore')
             newAlert.routes = routes
             return newAlert
         

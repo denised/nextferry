@@ -45,6 +45,12 @@ def toPacific(dt):
     if dt.tzinfo == None:
         dt = dt.replace(tzinfo=utc)
     return dt.astimezone(pacific)
+
+def toUTC(dt):
+    """convert time to UTC, interpreting naive times as pacific"""
+    if dt.tzinfo == None:
+        dt = dt.replace(tzinfo=pacific)
+    return dt.astimezone(utc)
     
     
     
