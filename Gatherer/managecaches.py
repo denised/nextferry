@@ -1,20 +1,13 @@
 #!/usr/bin/env python
 #
-# Manaage the cached ferry schedules
+# Create a new ferry schedule
 #
-# Caches are kept in a fixed directory and they are named nfcache[yyyy_mm_dd]_[id].txt
-# The one with the highest name (that is, latest date and highest id number) is the
-# currently active cache.
+# Various things are done with caching raw text, etc., but the really important bit is
+# writing a new cache*.txt file with the new schedule in it.
+# 
+# This code should be run just after a new schedule comes online.
 #
-# The code in this file handles the following:
-#   1.  Do we need a new cache (there is none, or it is expired)?
-#   2.  If so, try to create a new one.
-#   3.  Does the new one smell good?
-#   4.  If so, install the new one
-#   ### 5.  And send it to the server.   TODO
-#
-# Various things are checked and logged, and suspicious things cause notifications.
-#
+
 import os
 import re
 import glob
@@ -43,28 +36,12 @@ def getwsdotexpiration():
     # we extract the 2nd one.
     datepat = re.search(r"\d\d?/\d\d?/\d\d\d\d +- +(\d\d?)/(\d\d?)/(\d\d\d\d)",text)
     if datepat != None:
-        logger.info("WSDOT schedules expire at %s", datepat.group(0))
+        logger.info("WSDOT schedules cover %s", datepat.group(0))
         return datetime.date(int(datepat.group(3)),int(datepat.group(1)),int(datepat.group(2)))
     else:
         logger.error("Unable to obtain expiration from WSDOT")
         logger.error(text)
         raise RuntimeError("Unable to obtain expiration from WSDOT")
-
-
-def getcurrentcache():
-    """Return the filename of the current cache, or None if there is no cache"""
-    files = glob.glob(cachdir + r"cache*.txt")
-    if len(files) > 0:
-        return max(files)
-    else:
-        logger.info("No cache found")
-
-def getcachedexpiration(filename):
-    """Extract the expiration date from the filename, and return it as a date"""
-    match = re.search("(\d\d\d\d)_(\d\d)_(\d\d)",filename)
-    expiration = datetime.date(match.group(1),match.group(2),match.group(3))
-    logger.info("Found cache for " + expiration)
-    return expiration
 
 def install(candidate, expdate):
     """Store the candidate as the current cache"""
@@ -81,22 +58,10 @@ def install(candidate, expdate):
 # errors, we simply note that they occurred and abort.   Since this code needs to
 # run four times a year, manual recovery is sufficient.
 
-def main(force=False):
-    bestcache = None
+def main():
     try:
-        bestcache = getcurrentcache()
-        if not force and bestcache <> None and getcachedexpiration(bestcache) >= datetime.date.today():
-            logger.info("Current cache still good; exiting")
-        else:
-            # we need a new cache
-            logger.info("Start: create a new cache")
-            candidate = fetchpages.allschedules()
-            #sanitysniff(candidate)
-            #if bestcache <> None:
-            #    sanitydiff(bestcache,candidate)
-            #logger.info("Current candidate passes; installing")
-            install(candidate,getwsdotexpiration())
-            #logger.info("Candidate installation successful; exiting")
+        candidate = fetchpages.allschedules()
+        install(candidate,getwsdotexpiration())
     except Exception as e:
         logger.exception("Exception raised %s", repr(e))
 
