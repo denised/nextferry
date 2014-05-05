@@ -1,7 +1,0 @@
-backends:
-- name: server
-  class: B1
-  instances: 1
-  options: dynamic, public
-
-

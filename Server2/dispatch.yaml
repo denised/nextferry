@@ -1,0 +1,6 @@
+dispatch:
+  # Clients may target nextferry.appspot.com or 
+  # server.nextferry.appspot.com --- it all goes to the same
+  # place.
+  - url: "*/*"
+    module: default
