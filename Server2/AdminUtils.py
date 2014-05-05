@@ -1,11 +1,9 @@
 import logging
 import sys
 import traceback
-import datetime as dt
 import re
 from google.appengine.api import mail
 from google.appengine.api.logservice import logservice
-
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -55,4 +53,4 @@ def readclienthistory(stream):
             stream.write("%d, 3, %s, %s, %s\n" % (record.start_time, record.ip, l1, l2))
         else:
             pass # ignore all other message types
-    
+
