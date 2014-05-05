@@ -12,6 +12,7 @@ bin/
 Bin/
 obj/
 csx/
+env/
 Debug/
 PerformanceLogs/
 SubmissionInfo/
