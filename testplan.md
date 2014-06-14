@@ -1,22 +1,36 @@
 <!-- vim: set filetype=markdown : -->
 
-Server-Client Interaction
-=========================
+# Manual Test Plan for Nextferry server update
+
+Update at night.
+Check that these commands work and return sensible results:
+
+    curl http://nextferry.appspot.com/version
+    curl http://nextferry.appspot.com/init/2.0/
+    curl http://server.nextferry.appspot.com/init/3.0/
+    curl http://server.nextferry.appspot.com/init/3.0/mm-dd-yyyy
+    # above should return empty if the date is above min date for current schedule
+    # and return a full schedule otherwise
+    curl http://nextferry.appspot.com/3.0/traveltimes/3.0/47.590417,-122.331688
+    curl http://nextferry.appspot.com/getlogs
+
+To test the alert mechanism, resend an old alert to alert@nextferry.appspotmail.com, then do one of the init's above and verify that the alert is included.  Then
+manually remove it from the alert DB via the appengine console.   (Note: only send from draperd@acm.org; other mail sources will be rejected.)
+
+# Manual Test Plan for NextFerry client update
+
+## Client Server dual-update
+
+If the update involves changes to both client and server, use this section.
+If it only involves the client, skip to next section.
 
 Test in this order:
 * Check that new client works with new server in emulation mode
-* During downtime (e.g. at night), upload new server.  Check that old client (on phone) works with
-  new server.
-* Check that old client updates to new client
-* Check that new client works with new server
+* During downtime (e.g. at night), upload new server.  Do server tests as above.
+* Check that old client (on phone) works with new server.
+* Do the Client Upgrade test, below.
 
-Unfortunately, there appears to be no way to test upgrades of ApplicationSettings (there are tools
-that work for Windows 8/Windows Phone 8 only).
-
-Test Cases for Client
-=====================
-
-## Upgrade
+## Client Upgrade
 
 This comes first since you often only get a single shot to do it easily.
 
