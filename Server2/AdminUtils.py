@@ -8,9 +8,8 @@ from google.appengine.api.logservice import logservice
 logging.getLogger().setLevel(logging.INFO)
 
 # Keep this updated to some reasonable string
-# Usually it should be the first part of the output of 'git describe --tags'
-# together with a verbal description.   Wish I could automate this...
-appversion = "V3-5 updated to appengine modules structure"
+# Usually it should match the version in the app.yaml file
+appversion = "V5 added cross-domain-access header"
 
 notifyfrom = "error@nextferry.appspotmail.com"
 notifylist = ["draperd@acm.org"]
@@ -43,7 +42,7 @@ def readclienthistory(stream):
     # and lat, long are empty unless this is a travel request
     for record in logservice.fetch():
         request_type = record.resource # URL string
-        
+
         if '/init' in request_type:
             isnew = (1 if re.search('/[0-9]',request_type) == None else 2)
             stream.write("%d, %d, %s,,\n" % (record.start_time, isnew, record.ip))

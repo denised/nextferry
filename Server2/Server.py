@@ -6,7 +6,7 @@ import CurrentSchedule
 import MapQuestTT
 import Alert
 import AdminUtils
-    
+
 class GetInitUpdate(webapp2.RequestHandler):
     """
     The client calls init to get whatever information it might need.
@@ -14,6 +14,7 @@ class GetInitUpdate(webapp2.RequestHandler):
     """
     def get(self, clientversion, year=None, month=None, day=None):
         self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
         try:
             if needschedule(year,month,day):
                 self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
@@ -36,7 +37,7 @@ class GetInitUpdate(webapp2.RequestHandler):
             AdminUtils.handleError()
         finally:
             self.response.out.write('#done\n')
-            
+
 
 def needschedule(year,month,day):
     """
@@ -58,8 +59,9 @@ class GetTravelTimes(webapp2.RequestHandler):
     Travel times are computed from the client's location to each of the ferry
     terminals.  We also return any alerts that have occurred in the last five minutes.
     """
-    def get(self, clientversion, lat, lon):         
+    def get(self, clientversion, lat, lon):
         self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
         try:
             try:
                 flat = float(lat)
@@ -74,10 +76,11 @@ class GetTravelTimes(webapp2.RequestHandler):
         finally:
             self.response.out.write('#done\n')
 
-        
+
 class Version(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.out.write('#version: |' + AdminUtils.appversion + '|\n#done\n')
 
 class DailyCleanup(webapp2.RequestHandler):

@@ -8,7 +8,7 @@ Check that these commands work and return sensible results:
     curl http://nextferry.appspot.com/version
     curl http://nextferry.appspot.com/init/2.0/
     curl http://server.nextferry.appspot.com/init/3.0/
-    curl http://server.nextferry.appspot.com/init/3.0/mm-dd-yyyy
+    curl http://server.nextferry.appspot.com/init/3.0/mm-dd-yyyy/
     # above should return empty if the date is above min date for current schedule
     # and return a full schedule otherwise
     curl http://nextferry.appspot.com/3.0/traveltimes/3.0/47.590417,-122.331688
