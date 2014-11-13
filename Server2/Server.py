@@ -22,8 +22,9 @@ class GetInitUpdate(webapp2.RequestHandler):
                 if clientversion == '2.0':
                     schedule = CurrentSchedule.v2interpolate(schedule)
                 self.response.out.write(schedule)
+                self.response.out.write('#name ' + CurrentSchedule.schedulename + '\n')
             if CurrentSchedule.isHoliday():
-                self.response.out.write("#special\n")
+                self.response.out.write('#special\n')
                 schedule = CurrentSchedule.holidaySchedule()
                 if clientversion == '2.0':
                     schedule = CurrentSchedule.v2interpolate(schedule)
@@ -93,17 +94,21 @@ class GetLogs(webapp2.RequestHandler):
         AdminUtils.readclienthistory(self.response.out)
         self.response.out.write('#done\n')
 
+class Noop(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write('#done\n')
+
 
 app = webapp2.WSGIApplication(debug=True)
-# note the notation {3,20} means between 3 and 20 charcaters.
-# I'm adding it as a DOS defense, but I don't know if it is needed or not.
-app.router.add((r'/init/(.{3,20}?)/(\d\d\d\d).(\d\d).(\d\d)', GetInitUpdate))
-app.router.add((r'/init/(.{3,20}?)/', GetInitUpdate))
-app.router.add((r'/traveltimes/(.{3,20}?)/([+-]?[\d.]{3,11}),([+-]?[\d.]{3,11})', GetTravelTimes))
+app.router.add((r'/init/(.{1,20}?)/(\d\d\d\d).(\d\d).(\d\d)', GetInitUpdate))
+app.router.add((r'/init/(.{1,20}?)/', GetInitUpdate))
+app.router.add((r'/traveltimes/(.{1,20}?)/([+-]?[\d.]+),([+-]?[\d.]+)', GetTravelTimes))
 app.router.add((r'/_ah/mail/alert@nextferry.appspotmail.com', Alert.NewAlertHandler))
 app.router.add((r'/version',Version))
 app.router.add((r'/tasks/dailycleanup',DailyCleanup))
 app.router.add((r'/getlogs',GetLogs))
+app.router.add((r'/_ah/start',Noop))  # silence gao errors
 
 if __name__ == '__main__':
     app.run()

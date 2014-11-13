@@ -9,7 +9,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 # Keep this updated to some reasonable string
 # Usually it should match the version in the app.yaml file
-appversion = "V5 added cross-domain-access header"
+appversion = "V6 removed restrictions on geo length"
 
 notifyfrom = "error@nextferry.appspotmail.com"
 notifylist = ["draperd@acm.org"]
