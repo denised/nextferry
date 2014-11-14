@@ -18,16 +18,12 @@ class GetInitUpdate(webapp2.RequestHandler):
         try:
             if needschedule(year,month,day):
                 self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
-                schedule = CurrentSchedule.text()
-                if clientversion == '2.0':
-                    schedule = CurrentSchedule.v2interpolate(schedule)
+                schedule = CurrentSchedule.versionify(CurrentSchedule.text(),clientversion)
                 self.response.out.write(schedule)
                 self.response.out.write('#name ' + CurrentSchedule.schedulename + '\n')
             if CurrentSchedule.isHoliday():
                 self.response.out.write('#special\n')
-                schedule = CurrentSchedule.holidaySchedule()
-                if clientversion == '2.0':
-                    schedule = CurrentSchedule.v2interpolate(schedule)
+                schedule = CurrentSchedule.versionify(CurrentSchedule.holidaySchedule(),clientversion)
                 self.response.out.write(schedule)
             if Alert.hasAlerts():
                 self.response.out.write('#allalerts\n')
@@ -58,22 +54,25 @@ def needschedule(year,month,day):
 class GetTravelTimes(webapp2.RequestHandler):
     """
     Travel times are computed from the client's location to each of the ferry
-    terminals.  We also return any alerts that have occurred in the last five minutes.
+    terminals.
     """
     def get(self, clientversion, lat, lon):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
+
         try:
-            try:
-                flat = float(lat)
-                flon = float(lon)
-            except (ValueError, TypeError):
-                logging.error('GetTravelTime received bad args: %s, %s', lat, lon)
+            flat = float(lat)
+            flon = float(lon)
+        except (ValueError, TypeError):
+            logging.error('GetTravelTime received bad args: %s, %s', lat, lon)
+        else:
+            response = MapQuestTT.getTravelTimes(flat,flon)
+            if response.startswith("error:"):
+                self.response.out.write("#traveltimestatus\n")
+                self.response.out.write(response[6:] + "\n")
             else:
                 self.response.out.write('#traveltimes\n')
-                self.response.out.write(MapQuestTT.getTravelTimes(flat,flon))
-        except:
-            AdminUtils.handleError()
+                self.response.out.write(response)
         finally:
             self.response.out.write('#done\n')
 

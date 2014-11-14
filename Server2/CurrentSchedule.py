@@ -53,6 +53,17 @@ orcas,ed,405,525,745,1035,1190,1325
 orcas,ee,405,525,745,915,1035,1190,1325
 """
 
+def versionify(text,version):
+    """Correct schedule details for different client versions"""
+    if version == "1.0":
+        return text
+    elif version == "2.0":
+        return v2interpolate(text)
+    elif version == "3.0":
+        return text
+    else: # V4 and higher
+        return v4plus(text)
+
 def v2interpolate(text):
     """V2 clients leave off the first two times, so put dummy ones in"""
     result = ""
@@ -63,6 +74,17 @@ def v2interpolate(text):
             result += "{0[0]},{0[1]},333,333,{0[2]}\n".format(line.split(',',2))
     return result
 
+def v4plus(text):
+    """At V4 we turned the direction of pt defiance around"""
+    result = ""
+    for line in text.split('\n'):
+        if line.startswith("pt defiance-vashon,e"):
+            line = line.replace("pt defiance-vashon,e","pt defiance-vashon,w")
+        elif line.startswith("vashon-pt defiance,w"):
+            line = line.replace("vashon-pt defiance,w","vashon-pt defiance,e")
+        result += line + "\n"
+    return result
+
 def isHoliday():
     """Update this every time the schedule is updated"""
     today = date.today()
@@ -70,7 +92,7 @@ def isHoliday():
 
 def holidaySchedule():
     # only a few routes have different schedules on the holiday:
-    # typically bainbridge, mukilteo and pt. defiance
+    # typically bainbridge, mukilteo and pt defiance
 
     schedule = """
 bainbridge,ws,370,475,525,575,635,685,740,790,845,900,945,1000,1050,1100,1160,1210,1260,1305,1360,1395,1485,1570

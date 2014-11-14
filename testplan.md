@@ -19,6 +19,9 @@ manually remove it from the alert DB via the appengine console.   (Note: only se
 
 # Manual Test Plan for NextFerry client update
 
+Note: these instructions were written for the Windows Phone client.  They are
+about 90% correct for the HTML client as well.
+
 ## Client Server dual-update
 
 If the update involves changes to both client and server, use this section.
@@ -127,7 +130,7 @@ the emulator.
 
 ## Alerts
 
-* Engineer special alert(s) to be sent to the test app only.  Verify that the app can receive and 
+* Engineer special alert(s) to be sent to the test app only.  Verify that the app can receive and
   display them.  Verify that the app can display multiple alerts for the same route.
 * Verify that new alerts show as unread (icon on Mainpage and "new" text on alert itself).
 * Verify that once a RouteAlert page has been visited, those alerts are no longer marked unread.
@@ -155,9 +158,9 @@ the emulator.
 * Do the same process in the emulator with the "tombstone on exit" option set, to verify the same
   behavior when the application gets tombstoned.
 * With location and logging both on, from the Main Page use the Windows Phone button to start a new
-  application.  Use the phone "lightly" (only small applications, so the NextFerry app is *not* 
+  application.  Use the phone "lightly" (only small applications, so the NextFerry app is *not*
   tombstoned).  Leave the phone in this state for some time.  Return to the NextFerry app and verify
-  that it has not been working (the log contains no notices of timer or other activity).   This is 
+  that it has not been working (the log contains no notices of timer or other activity).   This is
   not a completely accurate test, since the log itself may have been disabled, but I don't have
   any better ideas.
 

@@ -17,9 +17,10 @@ Determine the travel times to ferry terminals from the client's current location
 
 def getTravelTimes(lat,lon):
     """Return a set of travel times from the given lat, lon position.
-    The return value is a json-able object
+    The return value is a json-able object, or an error message beginning
+    with the string "error: "
     """
-    
+
     ## Build the URL
     mqURIprefix = r'http://www.mapquestapi.com/directions/v1/routematrix?key=Fmjtd%7Cluuan9u12u%2Cas%3Do5-96rl0f'
     uri = '{0}&json={{locations:["{1},{2}"'.format(mqURIprefix,lat,lon)
@@ -33,23 +34,23 @@ def getTravelTimes(lat,lon):
             logging.debug("determined %s out of range", term.name)
     if len(keep) == 0:   # bail, nothing to do here
         logging.info("client too far away to estimate: %s, %s", lat, lon)
-        return "";
+        return "error: too far away to estimate.";
     uri += "]}"
     logging.debug("mq url is: " + repr(uri))
-    
+
     ## Get the response from MapQuest
     try:
         stream = urllib2.urlopen(uri)
         mqresponse = json.load(stream)
     except urllib2.URLError as e:
-        logging.warn("Access to mapquest failed: " + e.reason)
-        return ""
+        logging.warn("access to mapquest failed: " + e.reason)
+        return "error: sorry, server error."
     except ValueError as e:
         logging.error("error parsing mapquest response: " + repr(e))
-        return ""
-      
-    ## Parse the response from MapQuest  
-    # see http://www.mapquestapi.com/directions/#matrix for information on the result format   
+        return "error: sorry, server error."
+
+    ## Parse the response from MapQuest
+    # see http://www.mapquestapi.com/directions/#matrix for information on the result format
     try:
         times = mqresponse["time"]
         distances = mqresponse["distance"]
@@ -60,15 +61,15 @@ def getTravelTimes(lat,lon):
     except (KeyError, IndexError):
         logging.error("Mapquest reponse format unexpected")
         logging.error(json.dumps(mqresponse))
-        return ""
+        return "error: sorry, server error."
     logging.info("Client called from " + repr(clientcity) + " / " + repr(clientcounty))
     logging.debug("mq returned times: " + repr(times))
-    
+
     ## Extract the bits we want and build our own response from that
     ourresponse = ""
     for i in range(0,len(keep)):
         term = WSF.terminal.lookup(keep[i])
-        
+
         # determine what is on the same side of the water:
         # generally we use counties to determine reachability, but there are a few special cases:
         # Vashon is in King county, and Pierce reaches over to Gig Harbor
@@ -86,11 +87,11 @@ def getTravelTimes(lat,lon):
             if clientcity not in ["Gig Harbor","Tacoma"]:
                 continue
         elif clientcounty not in term.counties:
-            continue            
-        
+            continue
+
         #if we get here, we want to return this value.
         ourresponse += "{}:{}\n".format(term.code, int(times[i+1]/60))
-    
+
     ## Return our response
     return ourresponse
 
