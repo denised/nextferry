@@ -2,6 +2,7 @@
 import urllib2
 import logging
 import json
+import re
 import WSF
 
 """
@@ -22,48 +23,55 @@ def getTravelTimes(lat,lon):
     """
 
     ## Build the URL
-    mqURIprefix = r'http://www.mapquestapi.com/directions/v1/routematrix?key=Fmjtd%7Cluuan9u12u%2Cas%3Do5-96rl0f'
-    uri = '{0}&json={{locations:["{1},{2}"'.format(mqURIprefix,lat,lon)
+    mqurl = 'http://open.mapquestapi.com/directions/v2/routematrix'
+    mqkey = r'Fmjtd%7Cluuan9u12u%2Cas%3Do5-96rl0f'
+
+    # build the Mapquest request object
+    locs = [ mqformat([lat,lon]) ]
+    keep = []  # keep track of which terminals we've requested results for
+
     # add terminals that are within "reasonable range"
-    keep = []
     for term in WSF.Terminals:
         if closeEnough(lat,lon,term.location):
-            uri += ',"{0[0]},{0[1]}"'.format(term.location)
+            locs.append(mqformat(term.location))
             keep.append(term.code)
         else:
             logging.debug("determined %s out of range", term.name)
+
     if len(keep) == 0:   # bail, nothing to do here
         logging.info("client too far away to estimate: %s, %s", lat, lon)
         return "error: too far away to estimate.";
-    uri += "]}"
-    logging.debug("mq url is: " + repr(uri))
+
+    mqquery = json.dumps({"locations" : locs})
+    mqrequest = mqurl + "?key=" + mqkey + "&json=" + urlencode(mqquery)
 
     ## Get the response from MapQuest
     try:
-        stream = urllib2.urlopen(uri)
-        mqresponse = json.load(stream)
+        stream = urllib2.urlopen(mqrequest)
+        body = stream.read()
+        mqresponse = json.loads(body)
     except urllib2.URLError as e:
-        logging.warn("access to mapquest failed: " + e.reason)
+        logging.error("access to mapquest failed: " + e.reason)
+        logging.error(mqrequest)
         return "error: sorry, server error."
     except ValueError as e:
         logging.error("error parsing mapquest response: " + repr(e))
+        logging.error(body)
         return "error: sorry, server error."
 
     ## Parse the response from MapQuest
     # see http://www.mapquestapi.com/directions/#matrix for information on the result format
     try:
         times = mqresponse["time"]
-        distances = mqresponse["distance"]
         locations = mqresponse["locations"]
         clientloc = locations[0]
-        clientcounty = clientloc["adminArea4"]
+        clientcounty = clientloc["adminArea4"].replace(" County","")
         clientcity = clientloc["adminArea5"]
     except (KeyError, IndexError):
         logging.error("Mapquest reponse format unexpected")
         logging.error(json.dumps(mqresponse))
         return "error: sorry, server error."
-    logging.info("Client called from " + repr(clientcity) + " / " + repr(clientcounty))
-    logging.debug("mq returned times: " + repr(times))
+    logging.info("Client called from " + clientcity + " / " + clientcounty)
 
     ## Extract the bits we want and build our own response from that
     ourresponse = ""
@@ -105,3 +113,31 @@ def closeEnough(lat1,lon1,loc2):
     deltay = lon1 - loc2[1]
     return -0.6 < deltax < 0.6 and -0.9 < deltay < 0.9
 
+def mqformat(ary):
+    return {"latLng": {"lat": ary[0], "lng": ary[1]}}
+
+
+def urlencode(str):
+    """Our own quick and dirty encoder so as not to have to load a complete additional library."""
+    return "".join(map(convert,str))
+
+def convert(chr):
+    """url encoding.  we don't have to worry about all possible chars, just the ones we use."""
+    if (chr == '{'):
+        return '%7B'
+    elif (chr == '}'):
+        return '%7D'
+    elif (chr == '"'):
+        return '%22'
+    elif (chr == "'"):
+        return '%27'
+    elif (chr == ' '):
+        return '%20'
+    elif (chr == '+'):
+        return '%2B'
+    elif (chr == ':'):
+        return '%3A'
+    elif (chr == ','):
+        return '%2C'
+    else:
+        return chr

@@ -4,7 +4,7 @@
 #
 # Various things are done with caching raw text, etc., but the really important bit is
 # writing a new cache*.txt file with the new schedule in it.
-# 
+#
 # This code should be run just after a new schedule comes online.
 #
 
@@ -16,12 +16,12 @@ import time
 import logging
 import stat
 import fetchpages
- 
-cachdir = "D:\\NextFerry\\Cache\\"
-fetchpages.storepages = "D:\\NextFerry\\Cache\\Raw"
+
+cachdir = "D:\\Projects\\NextFerry\\Cache\\"
+fetchpages.storepages = "D:\\Projects\\NextFerry\\Cache\\Raw"
 
 logging.captureWarnings(True)
-logging.basicConfig(filename='D:\\NextFerry\\Cache\\Log\\Gatherer.log',\
+logging.basicConfig(filename='D:\\Projects\NextFerry\\Cache\\Log\\Gatherer.log',\
                 format='%(process)d:%(name)s:%(levelno)s:    %(message)s',\
                 level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 def getwsdotexpiration():
     """Return the current schedule expiration date as a date.
-    
+
     The date is retrieved from one of the schedules on the WSDOT web site."""
     text = fetchpages.fetch(7,3,"Mon")
     # the schedule has the range of dates  [from] - [to]
@@ -65,11 +65,11 @@ def main():
     except Exception as e:
         logger.exception("Exception raised %s", repr(e))
 
-    
+
 if __name__ == '__main__':
     main()
 
 
-    
+
 
 

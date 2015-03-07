@@ -9,7 +9,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 # Keep this updated to some reasonable string
 # Usually it should match the version in the app.yaml file
-appversion = "V7 updates for client V4: add traveltime status and turn pt defiance around"
+appversion = "V8 upgrade to MapQuest v2 API"
 
 notifyfrom = "error@nextferry.appspotmail.com"
 notifylist = ["draperd@acm.org"]
