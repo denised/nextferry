@@ -3,3 +3,7 @@ cron:
   url: /tasks/dailycleanup
   schedule: every day 02:00
   timezone: US/Pacific
+- description: send stats
+  url: /tasks/stats
+  schedule: every monday 02:00
+  timezone: US/Pacific

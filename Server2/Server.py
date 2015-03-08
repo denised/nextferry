@@ -87,11 +87,9 @@ class DailyCleanup(webapp2.RequestHandler):
     def get(self):
         Alert.dailyCleanup()
 
-class GetLogs(webapp2.RequestHandler):
+class DoStats(webapp2.RequestHandler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        AdminUtils.readclienthistory(self.response.out)
-        self.response.out.write('#done\n')
+        AdminUtils.mailstats();
 
 class Noop(webapp2.RequestHandler):
     def get(self):
@@ -106,8 +104,8 @@ app.router.add((r'/traveltimes/(.{1,20}?)/([+-]?[\d.]+),([+-]?[\d.]+)', GetTrave
 app.router.add((r'/_ah/mail/alert@nextferry.appspotmail.com', Alert.NewAlertHandler))
 app.router.add((r'/version',Version))
 app.router.add((r'/tasks/dailycleanup',DailyCleanup))
-app.router.add((r'/getlogs',GetLogs))
-app.router.add((r'/_ah/start',Noop))  # silence gao errors
+app.router.add((r'/tasks/stats',DoStats))
+app.router.add((r'/_ah/start',Noop))  # silence gae errors
 
 if __name__ == '__main__':
     app.run()
