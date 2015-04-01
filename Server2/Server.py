@@ -104,7 +104,7 @@ app.router.add((r'/traveltimes/(.{1,20}?)/([+-]?[\d.]+),([+-]?[\d.]+)', GetTrave
 app.router.add((r'/_ah/mail/alert@nextferry.appspotmail.com', Alert.NewAlertHandler))
 app.router.add((r'/version',Version))
 app.router.add((r'/tasks/dailycleanup',DailyCleanup))
-app.router.add((r'/tasks/stats',DoStats))
+app.router.add((r'/stats',DoStats))
 app.router.add((r'/_ah/start',Noop))  # silence gae errors
 
 if __name__ == '__main__':

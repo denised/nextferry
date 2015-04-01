@@ -42,7 +42,7 @@ def handleError():
 def mailstats():
     mailbody = dologs()
     for recipient in notifylist:
-            mail.send_mail(notifyfrom,recipient,"NextFerry Stats",mailbody)
+        mail.send_mail("stats@nextferry.appspotmail.com",recipient,"NextFerry Stats",mailbody)
 
 
 # anonymize ip addresses
@@ -57,10 +57,10 @@ def getId(ip):
 
 def dologs():
     """Process the last weeks worth of logs, build a digested version"""
-    # format: time, req-type, version, client, id, err, lat, long
+    # format: time, type, version, client, id, lat, long
     # where
     #    time = time of the call
-    #    type = new (a new init), call (a repeat call), travel (a travel time request)
+    #    type = init (new), revisit (init with prev), travel (a travel time request)
     #    version = client version of nextquery
     #    id = a unique id (for tracking multiple use by clients, without recording ip address, etc.)
     #    lat, long = only present if this is a travel request.
@@ -75,26 +75,30 @@ def dologs():
     for record in logservice.fetch(start_time=weekago):
         urlbits = record.resource.split('/')
 
-        if urlbits[1] in ("_ah", "tasks"):
+        if len(urlbits) < 2:
+            continue
+
+        calltype = urlbits[1]
+        version = ("" if len(urlbits)<3 else urlbits[2])
+        param = ("" if len(urlbits)<4 else urlbits[3])
+
+        if calltype in ("_ah", "tasks"):
             continue # we don't care about these
 
-        calltype = "other"
-        if urlbits[1] == "init":
-            calltype = ("new" if len(urlbits) == 3 else "call")
-        elif urlbits[1] == "traveltimes":
-            calltype = "travel"
+        if calltype == "init" and param != "":
+            calltype = "revisit"
 
-        print >>output, datetime.fromtimestamp(record.start_time), ",", calltype, ",",
-        print >>output, (urlbits[2] if len(urlbits)>2 else ""), ",", getId(record.ip),
-        if calltype == "travel":
-            print >>output, ",", (urlbits[3] if len(urlbits)>3 else "")
+        if calltype == "init":
+            countnew+=1
+        countaccess+=1
+
+        outputtime = datetime.fromtimestamp(record.start_time).strftime("%Y-%m-%d %X %a")
+        print >>output, outputtime, ",", calltype, ",",version, ",", getId(record.ip),
+        if calltype == "traveltimes":
+            print >>output, ",", param
         else:
             print >>output, ",,"
 
-        if calltype == "new":
-            countnew+=1
-        if calltype != "other":
-            countaccess+=1
 
     for record in logservice.fetch(start_time=weekago,minimum_log_level=logservice.LOG_LEVEL_WARNING):
         urlbits = record.resource.split('/')

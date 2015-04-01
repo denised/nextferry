@@ -4,6 +4,6 @@ cron:
   schedule: every day 02:00
   timezone: US/Pacific
 - description: send stats
-  url: /tasks/stats
+  url: /stats
   schedule: every monday 02:00
   timezone: US/Pacific
