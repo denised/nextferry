@@ -11,7 +11,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 # Keep this updated to some reasonable string
 # Usually it should match the version in the app.yaml file
-appversion = "V9 Redo log/stat processing"
+appversion = "V11 Use 'special' schedule to send today's schedule, showing correct daily times"
 
 notifyfrom = "error@nextferry.appspotmail.com"
 notifylist = ["draperd@acm.org"]

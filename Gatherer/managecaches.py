@@ -21,15 +21,26 @@ cachdir = "D:\\Projects\\NextFerry\\Cache\\"
 fetchpages.storepages = "D:\\Projects\\NextFerry\\Cache\\Raw"
 
 logging.captureWarnings(True)
-logging.basicConfig(filename='D:\\Projects\NextFerry\\Cache\\Log\\Gatherer.log',\
-                format='%(process)d:%(name)s:%(levelno)s:    %(message)s',\
-                level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('D:\\Projects\NextFerry\\Cache\\Log\\Gatherer.log')
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+fh.setFormatter(formatter)
+# add the handlers to logger
+logger.addHandler(ch)
+logger.addHandler(fh)
+
 
 
 def getwsdotexpiration():
     """Return the current schedule expiration date as a date.
-
     The date is retrieved from one of the schedules on the WSDOT web site."""
     text = fetchpages.fetch(7,3,"Mon")
     # the schedule has the range of dates  [from] - [to]
@@ -43,13 +54,13 @@ def getwsdotexpiration():
         logger.error(text)
         raise RuntimeError("Unable to obtain expiration from WSDOT")
 
-def install(candidate, expdate):
-    """Store the candidate as the current cache"""
+def install(newschedule, expdate):
+    """Store the new schedule as the current cache"""
     filename = "{}\cache_{:%Y_%m_%d}.txt".format(cachdir,expdate)
     logger.info("Creating cache file %s", filename)
     with open(filename,"w") as f:
-            for line in candidate:
-                f.write(line + "\n")
+        for line in newschedule:
+            f.write(line)
     confirm = os.stat(filename)
     logger.info("Created: %s, %d bytes", time.ctime(confirm.st_mtime), confirm.st_size )
 
@@ -60,8 +71,8 @@ def install(candidate, expdate):
 
 def main():
     try:
-        candidate = fetchpages.allschedules()
-        install(candidate,getwsdotexpiration())
+        newschedule = fetchpages.allschedules()
+        install(newschedule,getwsdotexpiration())
     except Exception as e:
         logger.exception("Exception raised %s", repr(e))
 

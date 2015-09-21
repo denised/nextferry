@@ -8,12 +8,9 @@ To update the schedule, do the following:
 * Wait until the first day of the new schedule!  The API we use can only fetch current schedule times.
 * Run Gatherer/managecaches.py.  It automatically downloads all the day schedules and puts the resulting data in a file in ../Cache/
 * Edit CurrentSchedule.py, and make the following changes:
-**  Set mindate to the first date of this schedule period.
+**  Set mindate to the first date of this schedule period, or to the date the schedule is actually uploaded, if that is later (shame!)
 **  Set the schedule name to the proper name of the current schedule (as seen on wsdot.gov)
-**  Replace the schedule content with the newly downloaded content.
-**  Update the holiday schedules:
-*** Find out the holiday schedule dates for this schedule, and which routes are affected.
-*** Set the holidays at the bottom of CurrentSchedule.py.
-*** For each holiday route, copy the weekend schedule times to the holiday schedule and replace the "e" (weekend designation) with an "s" (special schedule designation).
+**  Set the holidays and affected routes
+**  Replace the schedule content with the newly downloaded content.  Be sure to remove the trailing ","
 * Upload the app.   (No version change just for a schedule change.)
 * Check that the new schedule times actually appear.

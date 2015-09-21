@@ -74,15 +74,12 @@ routes = [
 #}
 
 def fetch(fromterm, toterm, dow):
-    """Read the WSDOT web page for this route and return the page as a string
-
+    """Read the WSDOT web page for this route and return the page as a string.
     fromterm and toterm are terminal identifiers as given above,
     and dow is the day of the week as a capitalized string.
     """
-    logger.info("Fetching %d %d %s",fromterm,toterm,dow)
-    uri = "http://www.wsdot.com/Ferries/Schedule/Small/ScheduleDetail.aspx?tripday={0}&departingterm={1}&arrivingterm={2}&pdaformat=true".format(dow,fromterm,toterm)
+    uri = "http://www.wsdot.com/Ferries/Schedule/Small/ScheduleDetail.aspx?tripday={0}&departingterm={1}&arrivingterm={2}".format(dow,fromterm,toterm)
     page = urllib2.urlopen(uri).read()
-    logger.info("Fetch successful")
     logpage(page,fromterm,toterm,dow)
     return page
 
@@ -90,7 +87,7 @@ def parse(text):
     """Parse the departure times from a WSDOT schedule page."""
     # See a page samples at the bottom of this source file
     # to keep this sort of robust, we don't actually parse the HTML, but just look for
-    # the departure times with regular expressions.  
+    # the departure times with regular expressions.
     # We represent times by minutes past midnight (a simple and compact format).
     # WSDOT reports sequences of times up to and then past midnight, ala
     # 5:30AM, 6:30AM, ..., 10:50PM, 11:15PM, 12:10AM, 1:30AM
@@ -100,7 +97,7 @@ def parse(text):
     # midnight, then find the place in the sequence where that value decreases, and
     # add an extra 24 hours to the reported times after that.
 
-    logger.info("Beginning to parse page")
+    logger.debug("Beginning to parse page")
     aftermidnight = False
     last = 0
     times = []
@@ -120,19 +117,23 @@ def parse(text):
         last = time
         #print "convert " + m.group(0) + " --> " + str(time)
         times.append(time)
-    logger.info("Parse found %d times from %d to %d", len(times), times[0], times[-1])
+    logger.debug("Parse found %d times from %d to %d", len(times), times[0], times[-1])
     # return it as a csv string
     return ",".join(map(str,times))
 
 def allschedules():
-    """Return all schedules for our tracked WSDOT ferry routes, as a sequence of strings"""
+    """Return all schedules for our tracked WSDOT ferry routes as an array of strings"""
     result = [];
+    template = "schedule('{name}','{direction}',{dow},'{times}'),\n"
+
     for (name, terma, termb, direction) in routes:
-        # each route generates two schedules: one for week day, one for weekend      
-        result.append( "{0},{1}d,{2}".format(name, direction, parse(fetch(terma, termb, "Monday"))))
-        result.append( "{0},{1}e,{2}".format(name, direction, parse(fetch(terma, termb, "Sunday"))))
+        for (dow,dname) in ((0,"Monday"),(1,"Tuesday"),(2,"Wednesday"),
+                            (3,"Thursday"),(4,"Friday"),(5,"Saturday"),(6,"Sunday")):
+            logger.info("fetching %s %s %s", name, direction, dname)
+            times = parse(fetch(terma,termb,dname))
+            result.append(template.format(name=name,direction=direction,dow=dow,times=times))
     return result
-   
+
 
 def logpage(text,fromterm,toterm,dow):
     if storepages <> None:
@@ -140,7 +141,7 @@ def logpage(text,fromterm,toterm,dow):
         logger.info("Storing raw file %s", filename)
         with open(filename,"w") as f:
             f.write(text)
-    
+
 # page sample
 """
 <html><body>
@@ -150,8 +151,8 @@ def logpage(text,fromterm,toterm,dow):
 Fall 2012<br>
 9/23/2012 - 12/29/2012<br>
 
-        
-        
+
+
         <br>
  Fri, 11/2/2012<br>
 Seattle to Bainbridge Island<br>
@@ -180,15 +181,15 @@ Seattle to Bainbridge Island<br>
 12:15 AM [11/3/2012]<br>
 1:35 AM [11/3/2012]<br>
 
-        
+
         <br>
  The Seattle-Bainbridge Island schedule is presented as a sailing day which begins with the first printed sailing time for that day and progresses consecutively through the last printed sailing time even though the last sailing may be past midnight and technically on the following day. Please pay special attention to annotations next to sailing times.<br>
 
-        
+
         <br>
  <input name="cmdBack" type="submit" value="Back"/><br>
- 
-        
+
+
         <br>
  Additional Info 1-800-843-3779<br>
 
@@ -215,8 +216,8 @@ function __doPostBack(target, argument){
 Fall 2012<br>
 9/23/2012 - 12/29/2012<br>
 
-        
-        
+
+
         <br>
  <b>Thu, 11/1/2012<br>
 Anacortes to Friday Harbor</b><br>
@@ -235,23 +236,23 @@ Anacortes to Friday Harbor</b><br>
 <tr><td><font size="-1" color="Black" face="Arial">(1) Priority for Sidney BC vehicles ticketed and in line no later than 8:00am</font></td></tr>
 </table>
 <font size="-1" color="Black" face="Arial">
-        
+
         <br>
  Preservation projects will require temporary closures of the Orcas and Lopez terminals during September-October. For updated information and dates, visit:
 www.wsdot.wa.gov/projects/sr20/orcastransferspan
 www.wsdot.wa.gov/projects/sr20/lopeztrestlerehab<br>
 
-        
+
         <br>
  <input name="cmdBack" type="submit" value="Back"/><br>
- 
-        
+
+
         <br>
  Additional Info 1-800-843-3779<br>
 
         WSDOT &#169; 2012<br>
 
-                        <script type="text/javascript" src="http://www.wsdot.wa.gov/media/scripts/analytics.js"></script>                                       
+                        <script type="text/javascript" src="http://www.wsdot.wa.gov/media/scripts/analytics.js"></script>
                     </font></form></body></html>
 """
 

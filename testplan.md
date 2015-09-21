@@ -8,10 +8,10 @@ Check that these commands work and return sensible results:
     curl http://nextferry.appspot.com/version
     curl http://nextferry.appspot.com/init/2.0/
     curl http://server.nextferry.appspot.com/init/3.0/
-    curl http://server.nextferry.appspot.com/init/3.0/mm-dd-yyyy/
+    curl http://server.nextferry.appspot.com/init/3.0/yyyy.mm.dd
     # above should return empty if the date is above min date for current schedule
     # and return a full schedule otherwise
-    curl http://nextferry.appspot.com/3.0/traveltimes/3.0/47.590417,-122.331688
+    curl http://nextferry.appspot.com/traveltimes/3.0/47.590417,-122.331688
     curl http://nextferry.appspot.com/getlogs
 
 To test the alert mechanism, resend an old alert to alert@nextferry.appspotmail.com, then do one of the init's above and verify that the alert is included.  Then
@@ -19,8 +19,8 @@ manually remove it from the alert DB via the appengine console.   (Note: only se
 
 # Manual Test Plan for NextFerry client update
 
-Note: these instructions were written for the Windows Phone client.  They are
-about 90% correct for the HTML client as well.
+Note the client also has automated tests that should be run first.  The following tests are mostly run on
+the actual device.
 
 ## Client Server dual-update
 
@@ -54,9 +54,8 @@ the emulator.
 * Does the application start with MainPage?  Does it look right?
 * Do departure times scroll horizontally?
 * Does the East / West toggle work?
-* Does the "East" / "West" text fade in when the toggle is used?
 * Does each navigation item on MainPage take you to the appropriate page?
-  * [i][!] button to the corresponding RoutePage?
+  * Route name to the corresponding RoutePage?
   * Application bar icon to ChooseRoutes?
   * Application bar icon to Settings?
   * Application bar icon to Info?
@@ -68,13 +67,8 @@ the emulator.
   produce the correct route page.
 * Verify that re-visiting the same route page works.
 * ...Interleaved with other route pages.
-* Verify that re-visiting a route page works if MainPage has been switched between East & West
-  (especially for routes whose names change).
-
 * Does Route Page look correct?
 * Verify that the correct times are in the correct boxes for at least one Route Page
-* Verify that every Route Page has content in every box (unless legitimately empty), and
-  that the formatting looks correct in every case.
 * Does Route Page scroll vertically when content is longer than screen?
 
 ## Choose Routes Page
@@ -88,7 +82,8 @@ the emulator.
 
 ## Info Page
 
-* Typos?
+* Does the current schedule name display?
+* Turn travel times settings on and off and verify that the info page message follows
 
 ## Settings Page
 
@@ -96,22 +91,14 @@ the emulator.
 * Try above when re-visiting a previously-visited Route Page
 * Does the buffer time slider work properly?
 * Does the Location on/off toggle work properly?
-* Does a double-tap on the blank part of the screen bring up the Debug toggle and link?
 * Make changes, exit the app, re-enter and verify that the changes persisted.
-(Refresh schedules handled below).
 
 ## Loading Schedules
 
-* Does the "Refresh Schedules" button cause the explanatory text to change to reload app?
 * With an internet connection, click "Refresh Schedules", and exit and re-enter app.  Do schedules
   load quickly?
-* Without an internet connection, click, "Refresh Schedules", and exit and re-enter app.
-  * Does a "downloading..." dialog appear almost immediately?
-  * Navigate (quickly) to a Route page.  Verify that nothing breaks (though boxes are empty).
-  * Return to Main Page.  Verify that "no network connection" popup appears within a few minutes.
-  * Exit the app, restart the internet connection, and re-enter the app.  Do the schedules now load?
-* Go through above process (until the nonetwork popup is showing).  Exit and re-enter app without
-  an internet connection.  Verify that nonetwork popup returns.
+* Without an internet connection, all schedule pages will be blank, with no explanation.  This is
+  a known issue with the current implementation.
 
 ## Special Schedules
 
@@ -125,8 +112,6 @@ the emulator.
 * Basically, make sure they look right.   Drive around with the app and observe changing impact on
   travel times.
 * Verify that setting buffer time has the impact you expect on the travel times.
-* Verify that waiting for travel times messages display appropriately: appear after a few seconds of
-  waiting when there is no network access, and then turn off again when travel times are delivered.
 
 ## Alerts
 
@@ -141,32 +126,9 @@ the emulator.
   Verify that the app shows exclusively the new set of alerts (old ones are gone).  Verify that only
   the new alerts are marked unread.
 
-## Logging & Bugsense
-
-* Verify that with logging turned on, you can go to the Log page.
-* Verify that with logging turned on, no other changes are visible in the app (the original logging
-  code would put stuff on all pages).
-* Verify that clearing and emailing the log files works.
-* Verify that a thrown exception is caught by BugSense and displayed on the BugSense console.
-
 ## Application Life Cycle
 
-* For each page type, use the Windows Phone button to start a new application.  Verify that the back
-  button returns to the same location in the app, and that everything works (no data is lost).
-  Especially do this for the Route/Alert page and verify that back returns to where the user left, and
-  that back again returns to the main page.
-* Do the same process in the emulator with the "tombstone on exit" option set, to verify the same
-  behavior when the application gets tombstoned.
-* With location and logging both on, from the Main Page use the Windows Phone button to start a new
-  application.  Use the phone "lightly" (only small applications, so the NextFerry app is *not*
-  tombstoned).  Leave the phone in this state for some time.  Return to the NextFerry app and verify
-  that it has not been working (the log contains no notices of timer or other activity).   This is
-  not a completely accurate test, since the log itself may have been disabled, but I don't have
-  any better ideas.
-
-## WP7 Integration
-* Verify that the tile looks correct, both in the Applications list, and if placed on the main screen.
-* Verify that changing the light/dark theme and the theme colors produces correct behavior (especially
-  on Route Pages and highlighting on MainPage).
-* Verify that a phone call occuring while the NextFerry app is open works: the phone call goes through
-  and the app returns correctly afterwords.
+* For Android and WP, verify that the back button does the same thing as swipe left, and as a final step,
+  exits the app.
+* For all platforms, verify that directly exiting the app then returning returns you to the same page
+  that you left (unless the app has been kicked out, in which case it should go to the main page).

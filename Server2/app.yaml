@@ -1,6 +1,6 @@
 application: nextferry
 module: default
-version: 9
+version: 11
 runtime: python27
 instance_class: B1
 api_version: 1

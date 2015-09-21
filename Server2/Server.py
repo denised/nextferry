@@ -3,6 +3,7 @@ import logging
 import webapp2
 from datetime import date
 import CurrentSchedule
+import CalcSchedule
 import MapQuestTT
 import Alert
 import AdminUtils
@@ -18,13 +19,14 @@ class GetInitUpdate(webapp2.RequestHandler):
         try:
             if needschedule(year,month,day):
                 self.response.out.write('#schedule {:%Y.%m.%d}\n'.format(date.today()))
-                schedule = CurrentSchedule.versionify(CurrentSchedule.text(),clientversion)
-                self.response.out.write(schedule)
+                self.response.out.write(CalcSchedule.getSchedule(clientversion))
                 self.response.out.write('#name ' + CurrentSchedule.schedulename + '\n')
-            if CurrentSchedule.isHoliday():
+
+            special = CalcSchedule.getSpecial(clientversion);
+            if special:
                 self.response.out.write('#special\n')
-                schedule = CurrentSchedule.versionify(CurrentSchedule.holidaySchedule(),clientversion)
-                self.response.out.write(schedule)
+                self.response.out.write(special)
+
             if Alert.hasAlerts():
                 self.response.out.write('#allalerts\n')
                 for alert in Alert.allAlerts():

@@ -8,7 +8,7 @@ class terminal(object):
         self.name = name
         self.location = location
         self.counties = counties
-        
+
     @staticmethod
     def lookup(datum):
         """Return the terminal corresponding to the supplied datum (which may be name or code)."""
@@ -37,7 +37,7 @@ Terminals = (
     terminal(18, "Shaw Island", (48.583991,-122.929351), ("San Juan")),
     terminal(20, "Southworth", (47.512130,-122.500970), ("Jefferson","Mason","Thurston","Kitsap","Pierce")),
     terminal(21, "Tahlequah", (47.333023,-122.506999), ("King")),
-    terminal(22, "Vashon Island", (47.508616,-122.464127), ("King"))   
+    terminal(22, "Vashon Island", (47.508616,-122.464127), ("King"))
 )
 
 
@@ -46,20 +46,20 @@ Terminals = (
 # necessary to implement
 
 class route(object):
-    """  
+    """
     code: bit code to designate this route
     term1: official name of one terminal (the east-most terminal)
     term2: official name of the other terminal (the west-most terminal)
     dir1name:  our name for the route term1->term2 (westbound)
-    dir2name:  our name for the route term2->term1 (eastbound)    
+    dir2name:  our name for the route term2->term1 (eastbound)
     """
     def __init__(self,code,t1,t2,dir1name,dir2name,):
-        self.code = code 
+        self.code = code
         self.term1 = t1
         self.term2 = t2
         self.dir1name = dir1name
-        self.dir2name = dir2name    
-    
+        self.dir2name = dir2name
+
     @staticmethod
     def lookup(datum):
         """look up a route by name or code"""
@@ -68,15 +68,7 @@ class route(object):
                 return route
         logging.warn("Attempted to look up a non-existent route field! " + repr(datum))
         return None
-    
-    #@staticmethod
-    #def findall(term):
-    #    """Yield all routes that depart from a given terminal"""
-    #    for route in Routes:
-    #        if term.name == route.term1 or term.name == route.term2:
-    #            yield route
-    #
-    #        
+
 
 Routes = (
     route(1,'Seattle','Bainbridge','bainbridge','bainbridge'),
@@ -91,10 +83,7 @@ Routes = (
     route(1<<10,'Anacortes','Friday Harbor','friday harbor','friday harbor'),
     route(1<<11,'Anacortes','Orcas Island','orcas','orcas')
 )
-
-def printRoutes():
-    """return a string containing Routes data, to send to client"""
-    return ""
+AllRoutes = 1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<8 | 1<<9 | 1<<10 | 1<<10 | 1<<11
 
 
 # this is text WSF uses to identify routes in alerts.
@@ -119,11 +108,12 @@ AlertStringCode = {
         route.lookup('vashon-pt defiance').code,
     "Anacortes / San Juan Islands" :
         route.lookup('friday harbor').code |
-        route.lookup('orcas').code
+        route.lookup('orcas').code,
+    "Override All Routes" : AllRoutes
 }
 
 
-    
+
 
 
 
