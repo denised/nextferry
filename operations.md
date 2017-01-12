@@ -13,4 +13,5 @@ To update the schedule, do the following:
 **  Set the holidays and affected routes
 **  Replace the schedule content with the newly downloaded content.  Be sure to remove the trailing ","
 * Upload the app.   (No version change just for a schedule change.)
+* If there was a version change, you will need to go to the app dashboard and make the new version the default.
 * Check that the new schedule times actually appear.

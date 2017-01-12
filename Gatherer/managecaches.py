@@ -16,6 +16,7 @@ import time
 import logging
 import stat
 import fetchpages
+import argparse
 
 cachdir = "D:\\Projects\\NextFerry\\Cache\\"
 fetchpages.storepages = "D:\\Projects\\NextFerry\\Cache\\Raw"
@@ -37,7 +38,10 @@ fh.setFormatter(formatter)
 logger.addHandler(ch)
 logger.addHandler(fh)
 
-
+parser = argparse.ArgumentParser()
+parser.add_argument("--nofetch", help="Use the currently cached files instead of fetching new files",
+    action="store_true")
+args = parser.parse_args()
 
 def getwsdotexpiration():
     """Return the current schedule expiration date as a date.
@@ -71,7 +75,7 @@ def install(newschedule, expdate):
 
 def main():
     try:
-        newschedule = fetchpages.allschedules()
+        newschedule = fetchpages.allschedules(not args.nofetch)
         install(newschedule,getwsdotexpiration())
     except Exception as e:
         logger.exception("Exception raised %s", repr(e))

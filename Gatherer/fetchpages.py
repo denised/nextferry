@@ -24,6 +24,9 @@ import logging
 # copies of the downloaded pages, for logging/debugging purposes
 storepages = None
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
+
 
 routes = [
     ("bainbridge", 7, 3, "w" ),
@@ -121,7 +124,7 @@ def parse(text):
     # return it as a csv string
     return ",".join(map(str,times))
 
-def allschedules():
+def allschedules(dofetch=True):
     """Return all schedules for our tracked WSDOT ferry routes as an array of strings"""
     result = [];
     template = "schedule('{name}','{direction}',{dow},'{times}'),\n"
@@ -129,9 +132,13 @@ def allschedules():
     for (name, terma, termb, direction) in routes:
         for (dow,dname) in ((0,"Monday"),(1,"Tuesday"),(2,"Wednesday"),
                             (3,"Thursday"),(4,"Friday"),(5,"Saturday"),(6,"Sunday")):
-            logger.info("fetching %s %s %s", name, direction, dname)
-            times = parse(fetch(terma,termb,dname))
-            result.append(template.format(name=name,direction=direction,dow=dow,times=times))
+            try:
+                logger.info("fetching %s %s %s", name, direction, dname)
+                page = fetch(terma,termb,dname) if dofetch else readpage(terma,termb,dname)
+                times = parse(page)
+                result.append(template.format(name=name,direction=direction,dow=dow,times=times))
+            except Exception as e:
+                logger.exception("Error raised for %s %s %s: %s", name, direction, dname, repr(e))
     return result
 
 
@@ -141,6 +148,12 @@ def logpage(text,fromterm,toterm,dow):
         logger.info("Storing raw file %s", filename)
         with open(filename,"w") as f:
             f.write(text)
+
+def readpage(fromterm,toterm,dow):
+    filename = "{0}\q{1}_{2}_{3}.html".format(storepages,fromterm,toterm,dow)
+    with open(filename,"r") as f:
+        return f.read();
+
 
 # page sample
 """
