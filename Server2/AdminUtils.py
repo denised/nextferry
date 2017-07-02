@@ -11,7 +11,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 # Keep this updated to some reasonable string
 # Usually it should match the version in the app.yaml file
-appversion = "V11 Use 'special' schedule to send today's schedule, showing correct daily times"
+appversion = "V12 update to gcloud infrastructure and fix mapquest issue"
 
 notifyfrom = "error@nextferry.appspotmail.com"
 notifylist = ["draperd@acm.org"]

@@ -23,7 +23,7 @@ def getTravelTimes(lat,lon):
     """
 
     ## Build the URL
-    mqurl = 'http://open.mapquestapi.com/directions/v2/routematrix'
+    mqurl = 'http://mapquestapi.com/directions/v2/routematrix'
     mqkey = r'Fmjtd%7Cluuan9u12u%2Cas%3Do5-96rl0f'
 
     # build the Mapquest request object
@@ -46,18 +46,7 @@ def getTravelTimes(lat,lon):
     mqrequest = mqurl + "?key=" + mqkey + "&json=" + urlencode(mqquery)
 
     ## Get the response from MapQuest
-    try:
-        stream = urllib2.urlopen(mqrequest)
-        body = stream.read()
-        mqresponse = json.loads(body)
-    except urllib2.URLError as e:
-        logging.error("access to mapquest failed: " + e.reason)
-        logging.error(mqrequest)
-        return "error: sorry, server error."
-    except ValueError as e:
-        logging.error("error parsing mapquest response: " + repr(e))
-        logging.error(body)
-        return "error: sorry, server error."
+    mqresponse = fetchasjson(mqrequest)
 
     ## Parse the response from MapQuest
     # see http://www.mapquestapi.com/directions/#matrix for information on the result format
@@ -70,8 +59,27 @@ def getTravelTimes(lat,lon):
     except (KeyError, IndexError):
         logging.error("Mapquest reponse format unexpected")
         logging.error(json.dumps(mqresponse))
-        return "error: sorry, server error."
+        raise e
+
+
+    # if clientcounty == "":
+    #     logging.debug("Second mapquest call required to fetch county")
+    #     # It seems Mapquest doesn't return this anymore for some reason
+    #     # fetch it separately since we need it to determine "which side of the water" info
+    #     mqurl2 = "http://mapquestapi.com/geocoding/v1/reverse"
+    #     req2 = "{url}?key={key}&location={lat},{lon}&thumbMaps=false".format(url=mqurl2,key=mqkey,lat=lat,lon=lon)
+    #     resp2 = fetchasjson(req2)
+    #     logging.debug(json.dumps(resp2))
+    #     try:
+    #         clientloc = resp2["results"][0]["locations"][0]
+    #         clientcounty = clientloc["adminArea4"].replace(" County","")
+    #     except (KeyError, IndexError):
+    #         logging.error("Mapquest 2nd reponse format unexpected")
+    #         logging.error(json.dumps(resp2))
+    #         raise e
+
     logging.info("Client called from " + clientcity + " / " + clientcounty)
+
 
     ## Extract the bits we want and build our own response from that
     ourresponse = ""
@@ -102,6 +110,22 @@ def getTravelTimes(lat,lon):
 
     ## Return our response
     return ourresponse
+
+def fetchasjson(req):
+    try:
+        stream = urllib2.urlopen(req)
+        body = stream.read()
+        return json.loads(body)
+    except urllib2.URLError as e:
+        logging.error("access to mapquest failed: " + e.reason)
+        logging.error(req)
+        raise e;
+    except ValueError as e:
+        logging.error("error parsing mapquest response: " + repr(e))
+        logging.error(body)
+        # switch from ValueError as main interprets it differently
+        raise Exception("error parsing mapquest response");
+
 
 def closeEnough(lat1,lon1,loc2):
     """Return true if the two points are within approx 40 miles of each other

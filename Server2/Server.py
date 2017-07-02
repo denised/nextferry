@@ -65,16 +65,11 @@ class GetTravelTimes(webapp2.RequestHandler):
         try:
             flat = float(lat)
             flon = float(lon)
+            response = MapQuestTT.getTravelTimes(flat,flon)
+            self.response.out.write('#traveltimes\n')
+            self.response.out.write(response)
         except (ValueError, TypeError):
             logging.error('GetTravelTime received bad args: %s, %s', lat, lon)
-        else:
-            response = MapQuestTT.getTravelTimes(flat,flon)
-            if response.startswith("error:"):
-                self.response.out.write("#traveltimestatus\n")
-                self.response.out.write(response[6:] + "\n")
-            else:
-                self.response.out.write('#traveltimes\n')
-                self.response.out.write(response)
         finally:
             self.response.out.write('#done\n')
 

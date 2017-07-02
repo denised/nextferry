@@ -15,3 +15,17 @@ To update the schedule, do the following:
 * Upload the app.   (No version change just for a schedule change.)
 * If there was a version change, you will need to go to the app dashboard and make the new version the default.
 * Check that the new schedule times actually appear.
+
+Running and Deploying
+=====================
+
+We have now switched to using gcloud.  To run locally:
+* Open google cloud console
+* `Cd <this directory>`
+* `dev_appserver.py .`
+
+To deploy
+* `gcloud app deploy --project nextferry --version <version> [--no-promote] `
+Notes:
+The `no-promote` flag prevents a new version from becoming the default version automatically.
+If the `--version` flag is omitted, a new date-based version is created automatically.  I think we'll go with this approach from now on.
